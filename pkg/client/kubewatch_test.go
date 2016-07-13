@@ -9,7 +9,7 @@ import (
 
 func assertEqual(t *testing.T, result interface{}, expect interface{}) {
 	if result != expect {
-		t.Fatal("Expect (Value: %v) (Type: %T) - Got (Value: %v) (Type: %T)", expect, expect, result, result)
+		t.Fatalf("Expect (Value: %v) (Type: %T) - Got (Value: %v) (Type: %T)", expect, expect, result, result)
 	}
 }
 
