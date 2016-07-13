@@ -1,5 +1,5 @@
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright 2014 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -100,12 +100,15 @@ func Convert_unversioned_TypeMeta_To_unversioned_TypeMeta(in, out *unversioned.T
 }
 
 func Convert_unversioned_ListMeta_To_unversioned_ListMeta(in, out *unversioned.ListMeta, s conversion.Scope) error {
-	*out = *in
+	out.ResourceVersion = in.ResourceVersion
+	out.SelfLink = in.SelfLink
 	return nil
 }
 
 func Convert_intstr_IntOrString_To_intstr_IntOrString(in, out *intstr.IntOrString, s conversion.Scope) error {
-	*out = *in
+	out.Type = in.Type
+	out.IntVal = in.IntVal
+	out.StrVal = in.StrVal
 	return nil
 }
 

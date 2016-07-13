@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2016 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -77,10 +77,8 @@ func SetOldTransportDefaults(t *http.Transport) *http.Transport {
 // for the Proxy, Dial, and TLSHandshakeTimeout fields if unset
 func SetTransportDefaults(t *http.Transport) *http.Transport {
 	t = SetOldTransportDefaults(t)
-	// Allow clients to disable http2 if needed.
-	if s := os.Getenv("DISABLE_HTTP2"); len(s) > 0 {
-		glog.Infof("HTTP2 has been explicitly disabled")
-	} else {
+	// Allow HTTP2 clients but default off for now
+	if s := os.Getenv("ENABLE_HTTP2"); len(s) > 0 {
 		if err := http2.ConfigureTransport(t); err != nil {
 			glog.Warningf("Transport failed http2 configuration: %v", err)
 		}
