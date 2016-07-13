@@ -1,14 +1,11 @@
 # Kubewatch
 
-A Slack bot for Kubernetes
+A Slack watcher for Kubernetes
 
 # Installation
 
 ```
-mkdir -p $GOPATH/github.com/runseb
-cd $GOPATH/github.com/runseb
-git clone https://github.com/runseb/kubewatch.git
-go install -v github.com/runseb/kubewatch
+go get -u github.com/skippbox/kubewatch
 ```
 
 # Environment variables
