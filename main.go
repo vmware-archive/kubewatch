@@ -5,7 +5,7 @@ import (
 
 	"k8s.io/kubernetes/pkg/api"
 
-	"github.com/runseb/kubewatch/pkg/client"
+	"github.com/skippbox/kubewatch/pkg/client"
 )
 
 func main() {
