@@ -1,0 +1,6 @@
+FROM scratch
+MAINTAINER "Cuong Manh Le <cuong.manhle.vn@gmail.com>"
+
+COPY kubewatch /bin/kubewatch
+
+ENTRYPOINT ["/bin/kubewatch"]
