@@ -1,5 +1,5 @@
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright 2014 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -283,8 +283,7 @@ type PersistentVolumeClaimVolumeSource struct {
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient=true,nonNamespaced=true
 
 type PersistentVolume struct {
 	unversioned.TypeMeta `json:",inline"`
@@ -441,7 +440,7 @@ type HostPathVolumeSource struct {
 type EmptyDirVolumeSource struct {
 	// TODO: Longer term we want to represent the selection of underlying
 	// media more like a scheduling problem - user says what traits they
-	// need, we give them a backing store that satisfies that.  For now
+	// need, we give them a backing store that satisifies that.  For now
 	// this will cover the most common needs.
 	// Optional: what type of storage medium should back this directory.
 	// The default is "" which means to use the node's default medium.
@@ -1479,15 +1478,12 @@ type PodSecurityContext struct {
 	// Use the host's network namespace.  If this option is set, the ports that will be
 	// used must be specified.
 	// Optional: Default to false
-	// +k8s:conversion-gen=false
 	HostNetwork bool `json:"hostNetwork,omitempty"`
 	// Use the host's pid namespace.
 	// Optional: Default to false.
-	// +k8s:conversion-gen=false
 	HostPID bool `json:"hostPID,omitempty"`
 	// Use the host's ipc namespace.
 	// Optional: Default to false.
-	// +k8s:conversion-gen=false
 	HostIPC bool `json:"hostIPC,omitempty"`
 	// The SELinux context to be applied to all containers.
 	// If unspecified, the container runtime will allocate a random SELinux context for each
@@ -2004,7 +2000,7 @@ type AttachedVolume struct {
 	// Name of the attached volume
 	Name UniqueVolumeName `json:"name"`
 
-	// DevicePath represents the device path where the volume should be available
+	// DevicePath represents the device path where the volume should be avilable
 	DevicePath string `json:"devicePath"`
 }
 
@@ -2100,8 +2096,7 @@ const (
 // ResourceList is a set of (resource name, quantity) pairs.
 type ResourceList map[ResourceName]resource.Quantity
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient=true,nonNamespaced=true
 
 // Node is a worker node in Kubernetes
 // The name of the node according to etcd is in ObjectMeta.Name.
@@ -2154,8 +2149,7 @@ const (
 	NamespaceTerminating NamespacePhase = "Terminating"
 )
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient=true,nonNamespaced=true
 
 // A namespace provides a scope for Names.
 // Use of multiple namespaces is optional
@@ -2232,11 +2226,7 @@ type ListOptions struct {
 	FieldSelector fields.Selector
 	// If true, watch for changes to this list
 	Watch bool
-	// For watch, it's the resource version to watch.
-	// For list,
-	// - if unset, then the result is returned from remote storage based on quorum-read flag;
-	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
-	// - if set to non zero, then the result is as fresh as given rv.
+	// The resource version to watch (no effect on list yet)
 	ResourceVersion string
 	// Timeout for the list/watch call.
 	TimeoutSeconds *int64
@@ -2696,7 +2686,7 @@ const (
 	// TODO: Consider supporting different formats, specifying CA/destinationCA.
 	SecretTypeTLS SecretType = "kubernetes.io/tls"
 
-	// TLSCertKey is the key for tls certificates in a TLS secret.
+	// TLSCertKey is the key for tls certificates in a TLS secert.
 	TLSCertKey = "tls.crt"
 	// TLSPrivateKeyKey is the key for the private key field in a TLS secret.
 	TLSPrivateKeyKey = "tls.key"
@@ -2795,8 +2785,7 @@ type ComponentCondition struct {
 	Error   string                 `json:"error,omitempty"`
 }
 
-// +genclient=true
-// +nonNamespaced=true
+// +genclient=true,nonNamespaced=true
 
 // ComponentStatus (and ComponentStatusList) holds the cluster validation info.
 type ComponentStatus struct {

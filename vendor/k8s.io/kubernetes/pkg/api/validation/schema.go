@@ -1,5 +1,5 @@
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright 2014 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -297,10 +297,6 @@ func (s *SwaggerSchema) isGenericArray(p swagger.ModelProperty) bool {
 var versionRegexp = regexp.MustCompile(`^(v.+|unversioned)\..*`)
 
 func (s *SwaggerSchema) validateField(value interface{}, fieldName, fieldType string, fieldDetails *swagger.ModelProperty) []error {
-	allErrs := []error{}
-	if reflect.TypeOf(value) == nil {
-		return append(allErrs, fmt.Errorf("unexpected nil value for field %v", fieldName))
-	}
 	// TODO: caesarxuchao: because we have multiple group/versions and objects
 	// may reference objects in other group, the commented out way of checking
 	// if a filedType is a type defined by us is outdated. We use a hacky way
@@ -314,6 +310,7 @@ func (s *SwaggerSchema) validateField(value interface{}, fieldName, fieldType st
 		// if strings.HasPrefix(fieldType, apiVersion) {
 		return s.ValidateObject(value, fieldName, fieldType)
 	}
+	allErrs := []error{}
 	switch fieldType {
 	case "string":
 		// Be loose about what we accept for 'string' since we use IntOrString in a couple of places

@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2016 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,5 @@ limitations under the License.
 */
 
 // +groupName=rbac.authorization.k8s.io
-// +k8s:deepcopy-gen=package,register
-// +k8s:conversion-gen=k8s.io/kubernetes/pkg/apis/rbac
-
+// +genconversion=true
 package v1alpha1
