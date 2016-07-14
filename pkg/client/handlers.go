@@ -95,7 +95,7 @@ func prepareSlackAttachment(e watch.Event) slack.Attachment {
 	apiEvent := (e.Object).(*api.Event)
 
 	msg := fmt.Sprintf(
-		"In Namespace %s Kind %s from Component %s on Host %s had Reason %s",
+		"In *Namespace* %s *Kind* %s from *Component* %s on *Host* %s had *Reason* %s",
 		apiEvent.ObjectMeta.Namespace,
 		apiEvent.InvolvedObject.Kind,
 		apiEvent.Source.Component,
