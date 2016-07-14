@@ -1,12 +1,10 @@
 package client
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 
-	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
 )
 
@@ -33,23 +31,4 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 		}
 	}
 
-}
-
-func eventFormatter(e watch.Event) string {
-	apiEvent := (e.Object).(*api.Event)
-	msgFmt :=
-		`
-Namespace: %s
-Kind     : %s
-Component: %s
-Host     : %s
-Reason   : %s
-`
-	return fmt.Sprintf(
-		msgFmt,
-		apiEvent.ObjectMeta.Namespace,
-		apiEvent.InvolvedObject.Kind,
-		apiEvent.Source.Component,
-		apiEvent.Source.Host,
-		apiEvent.Reason)
 }
