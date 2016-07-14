@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,25 +11,49 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 )
 
+// Handlers map each event handler function to a name for easily lookup
+var Handlers = map[string]func(w watch.Event) error{
+	"default": PrintEvent,
+	"slack":   NotifySlack,
+}
+
+var (
+	// SlackToken used by slack handler, for slack authentication
+	SlackToken string
+	// SlackChannel used by slack handler, specify where the message sent to
+	SlackChannel string
+)
+
+// InitSlack prepares slack required variables
+func InitSlack(token, channel string) error {
+	if token == "" {
+		token = os.Getenv("KW_SLACK_TOKEN")
+	}
+
+	if channel == "" {
+		channel = os.Getenv("KW_SLACK_CHANNEL")
+	}
+
+	SlackToken = token
+	SlackChannel = channel
+
+	return checkMissingSlackVars()
+}
+
 // NotifySlack sends event to slack channel
 func NotifySlack(e watch.Event) error {
-	slackAPIToken := os.Getenv("KW_SLACK_TOKEN")
-	if slackAPIToken == "" {
-		return errors.New("Missing slack token!")
+	err := checkMissingSlackVars()
+	if err != nil {
+		return err
 	}
 
-	slackChannel := os.Getenv("KW_SLACK_CHANNEL")
-	if slackChannel == "" {
-		return errors.New("Missing slack channel!")
-	}
-
-	api := slack.New(slackAPIToken)
+	api := slack.New(SlackToken)
 	params := slack.PostMessageParameters{}
 	attachment := slack.Attachment{
 		Text: eventFormatter(e),
 	}
 	params.Attachments = []slack.Attachment{attachment}
-	channelID, timestamp, err := api.PostMessage(slackChannel, "", params)
+	channelID, timestamp, err := api.PostMessage(SlackChannel, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return err
@@ -46,6 +71,17 @@ func PrintEvent(e watch.Event) error {
 	}
 
 	log.Println(string(b))
+
+	return nil
+}
+
+func checkMissingSlackVars() error {
+	for k, v := range map[string]string{"token": SlackToken, "channel": SlackChannel} {
+		if v == "" {
+			errMsg := fmt.Sprintf("Missing slack %s!", k)
+			return errors.New(errMsg)
+		}
+	}
 
 	return nil
 }
