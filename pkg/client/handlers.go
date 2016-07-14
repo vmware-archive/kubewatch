@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/nlopes/slack"
+	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
 )
 
@@ -22,6 +23,11 @@ var (
 	SlackToken string
 	// SlackChannel used by slack handler, specify where the message sent to
 	SlackChannel string
+
+	slackColors = map[string]string{
+		"Normal":  "good",
+		"Warning": "warning",
+	}
 )
 
 // InitSlack prepares slack required variables
@@ -49,9 +55,8 @@ func NotifySlack(e watch.Event) error {
 
 	api := slack.New(SlackToken)
 	params := slack.PostMessageParameters{}
-	attachment := slack.Attachment{
-		Text: eventFormatter(e),
-	}
+	attachment := prepareSlackAttachment(e)
+
 	params.Attachments = []slack.Attachment{attachment}
 	channelID, timestamp, err := api.PostMessage(SlackChannel, "", params)
 	if err != nil {
@@ -84,4 +89,33 @@ func checkMissingSlackVars() error {
 	}
 
 	return nil
+}
+
+func prepareSlackAttachment(e watch.Event) slack.Attachment {
+	apiEvent := (e.Object).(*api.Event)
+
+	msg := fmt.Sprintf(
+		"In Namespace %s Kind %s from Component %s on Host %s had Reason %s",
+		apiEvent.ObjectMeta.Namespace,
+		apiEvent.InvolvedObject.Kind,
+		apiEvent.Source.Component,
+		apiEvent.Source.Host,
+		apiEvent.Reason,
+	)
+	attachment := slack.Attachment{
+		Fields: []slack.AttachmentField{
+			slack.AttachmentField{
+				Title: "kubewatch",
+				Value: msg,
+			},
+		},
+	}
+
+	if color, ok := slackColors[apiEvent.Type]; ok {
+		attachment.Color = color
+	}
+
+	attachment.MarkdownIn = []string{"fields"}
+
+	return attachment
 }
