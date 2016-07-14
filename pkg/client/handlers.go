@@ -115,5 +115,7 @@ func prepareSlackAttachment(e watch.Event) slack.Attachment {
 		attachment.Color = color
 	}
 
+	attachment.MarkdownIn = []string{"fields"}
+
 	return attachment
 }
