@@ -35,11 +35,22 @@ export KW_SLACK_TOKEN='XXXXXXXXXXXXXXXX'
 export KW_SLACK_CHANNEL='#channel_name'
 ```
 
-# Run
+# Run Locally
 
 ```
 "$GOPATH"/bin/kubewatch
 ```
+
+# Run in a Kubernetes cluster
+
+This is WIP. Enter your Bot SLACK toke in `kubewatch.yaml` then create the Pod.
+
+```
+kubectl create -f kubewatch.yaml
+```
+
+It uses a kubectl side car container to reach the API server on localhost.
+
 
 # Testing
 
