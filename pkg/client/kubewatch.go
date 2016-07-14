@@ -16,7 +16,7 @@ type Client struct {
 // New creates new kubewatch client
 func New() (*Client, error) {
 	config := &restclient.Config{
-		Host: "http://localhost:8080",
+		Host: "http://127.0.0.1:8080",
 	}
 
 	c, err := k8sClient.New(config)
