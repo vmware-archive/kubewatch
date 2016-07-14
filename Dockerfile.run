@@ -1,5 +1,5 @@
-FROM scratch
-MAINTAINER "Cuong Manh Le <cuong.manhle.vn@gmail.com>"
+FROM alpine:3.4
+RUN apk add --update ca-certificates
 
 COPY kubewatch /bin/kubewatch
 
