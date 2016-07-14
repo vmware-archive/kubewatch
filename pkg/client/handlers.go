@@ -3,7 +3,9 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/nlopes/slack"
 	"k8s.io/kubernetes/pkg/watch"
@@ -22,14 +24,27 @@ var (
 	SlackChannel string
 )
 
-// NotifySlack sends event to slack channel
-func NotifySlack(e watch.Event) error {
-	if SlackToken == "" {
-		return errors.New("Missing slack token!")
+// InitSlack prepares slack required variables
+func InitSlack(token, channel string) error {
+	if token == "" {
+		token = os.Getenv("KW_SLACK_TOKEN")
 	}
 
-	if SlackChannel == "" {
-		return errors.New("Missing slack channel!")
+	if channel == "" {
+		channel = os.Getenv("KW_SLACK_CHANNEL")
+	}
+
+	SlackToken = token
+	SlackChannel = channel
+
+	return checkMissingSlackVars()
+}
+
+// NotifySlack sends event to slack channel
+func NotifySlack(e watch.Event) error {
+	err := checkMissingSlackVars()
+	if err != nil {
+		return err
 	}
 
 	api := slack.New(SlackToken)
@@ -56,6 +71,17 @@ func PrintEvent(e watch.Event) error {
 	}
 
 	log.Println(string(b))
+
+	return nil
+}
+
+func checkMissingSlackVars() error {
+	for k, v := range map[string]string{"token": SlackToken, "channel": SlackChannel} {
+		if v == "" {
+			errMsg := fmt.Sprintf("Missing slack %s!", k)
+			return errors.New(errMsg)
+		}
+	}
 
 	return nil
 }

@@ -16,12 +16,16 @@ var (
 )
 
 var slackErrMsg = `
-Missing slack token or slack channel
+%s
 
-Specify by "--slack-token" and "--slack-channel", or using environment variables:
+You need to set both slack token and channel for slack notify,
+using "--slack-token" and "--slack-channel", or using environment variables:
 
-KW_SLACK_TOKEN=slack_token
-KW_SLACK_CHANNEL=slack_channel
+export KW_SLACK_TOKEN=slack_token
+export KW_SLACK_CHANNEL=slack_channel
+
+Command line flags will override environment variables
+
 `
 
 func init() {
@@ -39,13 +43,9 @@ func main() {
 	}
 
 	if handlerFlag == "slack" {
-		for _, s := range []string{slackToken, slackChannel} {
-			if s == "" {
-				log.Fatal(slackErrMsg)
-			}
+		if err := client.InitSlack(slackToken, slackChannel); err != nil {
+			log.Fatalf(slackErrMsg, err)
 		}
-		client.SlackToken = slackToken
-		client.SlackChannel = slackChannel
 	}
 
 	kubeWatchClient, err := client.New()
