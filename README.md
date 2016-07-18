@@ -1,4 +1,5 @@
 # Kubewatch
+[![Build Status](https://travis-ci.org/skippbox/kubewatch.svg?branch=master)](https://travis-ci.org/skippbox/kubewatch) [![Join us on Slack](https://s3.eu-central-1.amazonaws.com/ngtuna/slack-cmyk-2.png)](https://skippbox.herokuapp.com)
 
 A Slack watcher for Kubernetes
 
