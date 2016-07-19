@@ -23,6 +23,7 @@ import (
 	"k8s.io/kubernetes/pkg/api"
 
 	"github.com/skippbox/kubewatch/pkg/client"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
 var (
@@ -53,15 +54,18 @@ func init() {
 func main() {
 	flag.Parse()
 
-	eventHandler, ok := client.Handlers[handlerFlag]
+	h, ok := handlers.Map[handlerFlag]
 	if !ok {
 		log.Fatal("Handler not found")
 	}
 
-	if handlerFlag == "slack" {
-		if err := client.InitSlack(slackToken, slackChannel); err != nil {
-			log.Fatalf(slackErrMsg, err)
-		}
+	eventHandler, ok := h.(handlers.Handler)
+	if !ok {
+		log.Fatal("Not an Handler type")
+	}
+
+	if err := eventHandler.Init(slackToken, slackChannel); err != nil {
+		log.Fatalf(slackErrMsg, err)
 	}
 
 	kubeWatchClient, err := client.New()
@@ -70,5 +74,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	kubeWatchClient.EventLoop(w, eventHandler)
+	kubeWatchClient.EventLoop(w, eventHandler.Handle)
 }
