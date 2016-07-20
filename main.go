@@ -20,8 +20,7 @@ import (
 	"flag"
 	"log"
 
-	"k8s.io/kubernetes/pkg/api"
-
+	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/client"
 	"github.com/skippbox/kubewatch/pkg/handlers"
 )
@@ -31,19 +30,6 @@ var (
 	slackToken   string
 	slackChannel string
 )
-
-var slackErrMsg = `
-%s
-
-You need to set both slack token and channel for slack notify,
-using "--slack-token" and "--slack-channel", or using environment variables:
-
-export KW_SLACK_TOKEN=slack_token
-export KW_SLACK_CHANNEL=slack_channel
-
-Command line flags will override environment variables
-
-`
 
 func init() {
 	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
@@ -64,15 +50,13 @@ func main() {
 		log.Fatal("Not an Handler type")
 	}
 
-	if err := eventHandler.Init(slackToken, slackChannel); err != nil {
-		log.Fatalf(slackErrMsg, err)
-	}
+	c := &config.Config{}
+	c.SlackToken = slackToken
+	c.SlackChannel = slackChannel
 
-	kubeWatchClient, err := client.New()
-	w, err := kubeWatchClient.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true})
-	if err != nil {
+	if err := eventHandler.Init(c); err != nil {
 		log.Fatal(err)
 	}
 
-	kubeWatchClient.EventLoop(w, eventHandler.Handle)
+	client.Run(eventHandler.Handle)
 }

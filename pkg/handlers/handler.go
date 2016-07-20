@@ -22,13 +22,14 @@ import (
 
 	"k8s.io/kubernetes/pkg/watch"
 
+	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 )
 
 // Handler is implemented by any handler.
 // The Handle method is used to process event
 type Handler interface {
-	Init(v ...interface{}) error
+	Init(c *config.Config) error
 	Handle(w watch.Event) error
 }
 
@@ -45,7 +46,7 @@ type Default struct {
 
 // Init initializes handler configuration
 // Do nothing for default handler
-func (d *Default) Init(v ...interface{}) error {
+func (d *Default) Init(c *config.Config) error {
 	return nil
 }
 

@@ -17,19 +17,34 @@ limitations under the License.
 package slack
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 
 	"k8s.io/kubernetes/pkg/watch"
+
+	"github.com/skippbox/kubewatch/config"
 )
 
 func TestSlackInit(t *testing.T) {
 
 	s := &Slack{}
+	expectedError := fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 
-	err := s.Init("foo", "bar")
+	var Tests = []struct {
+		c   *config.Config
+		err error
+	}{
+		{&config.Config{SlackToken: "foo", SlackChannel: "bar"}, nil},
+		{&config.Config{SlackToken: "foo"}, expectedError},
+		{&config.Config{SlackChannel: "foo"}, expectedError},
+		{&config.Config{}, expectedError},
+	}
 
-	if err != nil {
-		t.Fatal("NotifySlack(): should return error when missing token or channel")
+	for _, tt := range Tests {
+		if err := s.Init(tt.c); !reflect.DeepEqual(err, tt.err) {
+			t.Fatalf("Init(): %v", err)
+		}
 	}
 }
 
@@ -41,6 +56,6 @@ func TestSlackHandle(t *testing.T) {
 	err := s.Handle(w)
 
 	if err == nil {
-		t.Fatal("NotifySlack(): should return error when missing token or channel")
+		t.Fatalf("Handle(): %v", err)
 	}
 }

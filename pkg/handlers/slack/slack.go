@@ -17,7 +17,6 @@ limitations under the License.
 package slack
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -25,12 +24,27 @@ import (
 	"github.com/nlopes/slack"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
+
+	"github.com/skippbox/kubewatch/config"
 )
 
 var slackColors = map[string]string{
 	"Normal":  "good",
 	"Warning": "warning",
 }
+
+var slackErrMsg = `
+%s
+
+You need to set both slack token and channel for slack notify,
+using "--slack-token" and "--slack-channel", or using environment variables:
+
+export KW_SLACK_TOKEN=slack_token
+export KW_SLACK_CHANNEL=slack_channel
+
+Command line flags will override environment variables
+
+`
 
 // Slack handler implements handler.Handler interface,
 // Notify event to slack channel
@@ -40,7 +54,10 @@ type Slack struct {
 }
 
 // Init prepares slack configuration
-func (s *Slack) Init(token, channel string) error {
+func (s *Slack) Init(c *config.Config) error {
+	token := c.SlackToken
+	channel := c.SlackChannel
+
 	if token == "" {
 		token = os.Getenv("KW_SLACK_TOKEN")
 	}
@@ -80,7 +97,7 @@ func (s *Slack) Handle(e watch.Event) error {
 
 func checkMissingSlackVars(s *Slack) error {
 	if s.Token == "" || s.Channel == "" {
-		return errors.New("Missing slack token or channel")
+		return fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 	}
 
 	return nil
