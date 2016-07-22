@@ -25,16 +25,10 @@ import (
 	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
-var (
-	handlerFlag  string
-	slackToken   string
-	slackChannel string
-)
+var handlerFlag string
 
 func init() {
 	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
-	flag.StringVar(&slackToken, "slack-token", "", "Slack token")
-	flag.StringVar(&slackChannel, "slack-channel", "", "Slack channel")
 }
 
 func main() {
@@ -50,9 +44,8 @@ func main() {
 		log.Fatal("Not an Handler type")
 	}
 
-	c := &config.Config{}
-	c.SlackToken = slackToken
-	c.SlackChannel = slackChannel
+	c := config.New()
+	_ = c.Load()
 
 	if err := eventHandler.Init(c); err != nil {
 		log.Fatal(err)

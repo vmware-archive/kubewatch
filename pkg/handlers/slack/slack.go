@@ -55,8 +55,8 @@ type Slack struct {
 
 // Init prepares slack configuration
 func (s *Slack) Init(c *config.Config) error {
-	token := c.SlackToken
-	channel := c.SlackChannel
+	token := c.Handler.Slack.Token
+	channel := c.Handler.Slack.Channel
 
 	if token == "" {
 		token = os.Getenv("KW_SLACK_TOKEN")

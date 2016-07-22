@@ -32,17 +32,19 @@ func TestSlackInit(t *testing.T) {
 	expectedError := fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 
 	var Tests = []struct {
-		c   *config.Config
-		err error
+		slack config.Slack
+		err   error
 	}{
-		{&config.Config{SlackToken: "foo", SlackChannel: "bar"}, nil},
-		{&config.Config{SlackToken: "foo"}, expectedError},
-		{&config.Config{SlackChannel: "foo"}, expectedError},
-		{&config.Config{}, expectedError},
+		{config.Slack{Token: "foo", Channel: "bar"}, nil},
+		{config.Slack{Token: "foo"}, expectedError},
+		{config.Slack{Channel: "bar"}, expectedError},
+		{config.Slack{}, expectedError},
 	}
 
 	for _, tt := range Tests {
-		if err := s.Init(tt.c); !reflect.DeepEqual(err, tt.err) {
+		c := &config.Config{}
+		c.Handler.Slack = tt.slack
+		if err := s.Init(c); !reflect.DeepEqual(err, tt.err) {
 			t.Fatalf("Init(): %v", err)
 		}
 	}
