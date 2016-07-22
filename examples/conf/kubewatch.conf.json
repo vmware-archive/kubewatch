@@ -1,0 +1,8 @@
+{
+    "handler": {
+        "slack": {
+            "channel": "slack_channel",
+            "token": "slack_token"
+        }
+    }
+}

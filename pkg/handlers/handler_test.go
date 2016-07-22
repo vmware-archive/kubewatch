@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package client
+package handlers
 
 import (
 	"testing"
@@ -22,22 +22,12 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 )
 
-func TestNotifySlack(t *testing.T) {
+func TestDefaultHandle(t *testing.T) {
 
 	w := watch.Event{}
+	d := &Default{}
 
-	err := NotifySlack(w)
-
-	if err == nil {
-		t.Fatal("NotifySlack(): should return error when missing token or channel")
-	}
-}
-
-func TestPrintEvent(t *testing.T) {
-
-	w := watch.Event{}
-
-	err := PrintEvent(w)
+	err := d.Handle(w)
 
 	if err != nil {
 		t.Fatal(err)

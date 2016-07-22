@@ -14,11 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package client
+package slack
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -26,28 +24,40 @@ import (
 	"github.com/nlopes/slack"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
+
+	"github.com/skippbox/kubewatch/config"
 )
 
-// Handlers map each event handler function to a name for easily lookup
-var Handlers = map[string]func(w watch.Event) error{
-	"default": PrintEvent,
-	"slack":   NotifySlack,
+var slackColors = map[string]string{
+	"Normal":  "good",
+	"Warning": "warning",
 }
 
-var (
-	// SlackToken used by slack handler, for slack authentication
-	SlackToken string
-	// SlackChannel used by slack handler, specify where the message sent to
-	SlackChannel string
+var slackErrMsg = `
+%s
 
-	slackColors = map[string]string{
-		"Normal":  "good",
-		"Warning": "warning",
-	}
-)
+You need to set both slack token and channel for slack notify,
+using "--slack-token" and "--slack-channel", or using environment variables:
 
-// InitSlack prepares slack required variables
-func InitSlack(token, channel string) error {
+export KW_SLACK_TOKEN=slack_token
+export KW_SLACK_CHANNEL=slack_channel
+
+Command line flags will override environment variables
+
+`
+
+// Slack handler implements handler.Handler interface,
+// Notify event to slack channel
+type Slack struct {
+	Token   string
+	Channel string
+}
+
+// Init prepares slack configuration
+func (s *Slack) Init(c *config.Config) error {
+	token := c.Handler.Slack.Token
+	channel := c.Handler.Slack.Channel
+
 	if token == "" {
 		token = os.Getenv("KW_SLACK_TOKEN")
 	}
@@ -56,25 +66,26 @@ func InitSlack(token, channel string) error {
 		channel = os.Getenv("KW_SLACK_CHANNEL")
 	}
 
-	SlackToken = token
-	SlackChannel = channel
+	s.Token = token
+	s.Channel = channel
 
-	return checkMissingSlackVars()
+	return checkMissingSlackVars(s)
 }
 
-// NotifySlack sends event to slack channel
-func NotifySlack(e watch.Event) error {
-	err := checkMissingSlackVars()
+// Handle handles event for slack handler,
+// send notify event to slack channel
+func (s *Slack) Handle(e watch.Event) error {
+	err := checkMissingSlackVars(s)
 	if err != nil {
 		return err
 	}
 
-	api := slack.New(SlackToken)
+	api := slack.New(s.Token)
 	params := slack.PostMessageParameters{}
 	attachment := prepareSlackAttachment(e)
 
 	params.Attachments = []slack.Attachment{attachment}
-	channelID, timestamp, err := api.PostMessage(SlackChannel, "", params)
+	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return err
@@ -84,24 +95,9 @@ func NotifySlack(e watch.Event) error {
 	return nil
 }
 
-// PrintEvent print event in json format, for testing or debugging
-func PrintEvent(e watch.Event) error {
-	b, err := json.Marshal(e)
-	if err != nil {
-		return err
-	}
-
-	log.Println(string(b))
-
-	return nil
-}
-
-func checkMissingSlackVars() error {
-	for k, v := range map[string]string{"token": SlackToken, "channel": SlackChannel} {
-		if v == "" {
-			errMsg := fmt.Sprintf("Missing slack %s!", k)
-			return errors.New(errMsg)
-		}
+func checkMissingSlackVars(s *Slack) error {
+	if s.Token == "" || s.Channel == "" {
+		return fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 	}
 
 	return nil
