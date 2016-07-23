@@ -19,6 +19,8 @@ package client
 import (
 	"k8s.io/kubernetes/pkg/client/restclient"
 	k8sClient "k8s.io/kubernetes/pkg/client/unversioned"
+
+	"github.com/skippbox/kubewatch/config"
 )
 
 const userAgent = "kubewatch-client"
@@ -27,10 +29,15 @@ const userAgent = "kubewatch-client"
 type Client struct {
 	client *k8sClient.Client
 	ua     string
+	Config *config.Config
 }
 
 // New creates new kubewatch client
-func New() (*Client, error) {
+func New(conf *config.Config) (*Client, error) {
+	if conf == nil {
+		conf = config.New()
+	}
+
 	config := &restclient.Config{
 		Host: "http://127.0.0.1:8080",
 	}
@@ -43,6 +50,7 @@ func New() (*Client, error) {
 	kubeWatchClient := &Client{
 		client: c,
 		ua:     userAgent,
+		Config: conf,
 	}
 
 	return kubeWatchClient, nil

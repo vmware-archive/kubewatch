@@ -107,7 +107,6 @@ func TestLoadNotOK(t *testing.T) {
 		if err == nil {
 			t.Fatalf("TestLoadNotOK(): %+v", err)
 		}
-
 	}
 }
 

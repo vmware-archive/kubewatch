@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/signal"
 
+	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
 )
 
@@ -37,9 +38,11 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 			if !ok {
 				return
 			}
-			if err := handler(event); err != nil {
-				log.Println(err)
-				w.Stop()
+			if c.Filter(event) {
+				if err := handler(event); err != nil {
+					log.Println(err)
+					w.Stop()
+				}
 			}
 		case <-signals:
 			log.Println("Catched signal, quit normally.")
@@ -47,4 +50,22 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 		}
 	}
 
+}
+
+// Filter checks whether event matchs configuration or not
+func (c *Client) Filter(e watch.Event) bool {
+	apiEvent := (e.Object).(*api.Event)
+	reason := apiEvent.Reason
+
+	if len(c.Config.Reason) == 0 {
+		return true
+	}
+
+	for _, r := range c.Config.Reason {
+		if r == reason || r == "*" {
+			return true
+		}
+	}
+
+	return false
 }
