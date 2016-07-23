@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 var configFileName = "kubewatch.conf.json"
@@ -32,6 +33,7 @@ var (
 	slackToken   string
 	slackChannel string
 	configFile   string
+	reasonFlag   string
 )
 
 // Config struct contains kubewatch configuration
@@ -40,6 +42,7 @@ type Config struct {
 	Handler  struct {
 		Slack `json:"slack"`
 	} `json:"handler"`
+	Reason []string `json:"reason"`
 }
 
 // Slack contains slack configuration
@@ -52,6 +55,7 @@ func init() {
 	flag.StringVar(&slackToken, "slack-token", "", "Slack token")
 	flag.StringVar(&slackChannel, "slack-channel", "", "Slack channel")
 	flag.StringVar(&configFile, "config-file", "", "Configuration file")
+	flag.StringVar(&reasonFlag, "reason", "", "Filter event by events, comma separated string")
 }
 
 // New creates new config object
@@ -64,6 +68,8 @@ func New() *Config {
 
 // Load loads configuration from config file
 func (c *Config) Load() error {
+	defer loadFromFlag(c)
+
 	file, err := os.Open(c.FileName)
 	if err != nil {
 		return err
@@ -74,14 +80,7 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	errr := json.Unmarshal(b, c)
-	if errr != nil {
-		return err
-	}
-
-	loadFromFlag(c)
-
-	return nil
+	return json.Unmarshal(b, c)
 }
 
 func loadFromFlag(c *Config) {
@@ -90,6 +89,9 @@ func loadFromFlag(c *Config) {
 	}
 	if slackChannel != "" {
 		c.Handler.Slack.Channel = slackChannel
+	}
+	if reasonFlag != "" {
+		c.Reason = strings.Split(reasonFlag, ",")
 	}
 }
 

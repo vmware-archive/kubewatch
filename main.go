@@ -18,38 +18,16 @@ package main
 
 import (
 	"flag"
-	"log"
 
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/client"
-	"github.com/skippbox/kubewatch/pkg/handlers"
 )
-
-var handlerFlag string
-
-func init() {
-	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
-}
 
 func main() {
 	flag.Parse()
 
-	h, ok := handlers.Map[handlerFlag]
-	if !ok {
-		log.Fatal("Handler not found")
-	}
-
-	eventHandler, ok := h.(handlers.Handler)
-	if !ok {
-		log.Fatal("Not an Handler type")
-	}
-
 	c := config.New()
 	_ = c.Load()
 
-	if err := eventHandler.Init(c); err != nil {
-		log.Fatal(err)
-	}
-
-	client.Run(eventHandler.Handle)
+	client.Run(c)
 }

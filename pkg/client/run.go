@@ -17,23 +17,46 @@ limitations under the License.
 package client
 
 import (
+	"flag"
 	"log"
 
 	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/watch"
+
+	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
+var handlerFlag string
+
+func init() {
+	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
+}
+
 // Run runs the event loop processing with given handler
-func Run(f func(w watch.Event) error) {
-	c, err := New()
+func Run(conf *config.Config) {
+	client, err := New(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	w, err := c.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true})
+	h, ok := handlers.Map[handlerFlag]
+	if !ok {
+		log.Fatal("Handler not found")
+	}
+
+	eventHandler, ok := h.(handlers.Handler)
+	if !ok {
+		log.Fatal("Not an Handler type")
+	}
+
+	if err := eventHandler.Init(conf); err != nil {
+		log.Fatal(err)
+	}
+
+	w, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c.EventLoop(w, f)
+	client.EventLoop(w, eventHandler.Handle)
 }
