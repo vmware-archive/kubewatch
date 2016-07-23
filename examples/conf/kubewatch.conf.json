@@ -4,5 +4,6 @@
             "channel": "slack_channel",
             "token": "slack_token"
         }
-    }
+    },
+    "reason": ["Created", "Pulled", "Started"]
 }

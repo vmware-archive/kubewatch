@@ -29,7 +29,8 @@ var configStr = `
             "channel": "slack_channel",
             "token": "slack_token"
         }
-    }
+    },
+    "reason": ["Created", "Pulled", "Started"]
 }
 `
 
@@ -43,7 +44,7 @@ func Test_getConfigFile(t *testing.T) {
 	}
 }
 
-func TestLoad(t *testing.T) {
+func TestLoadOK(t *testing.T) {
 	content := []byte(configStr)
 	tmpConfigFile, err := ioutil.TempFile("", "kubewatch")
 	if err != nil {
@@ -67,5 +68,87 @@ func TestLoad(t *testing.T) {
 	err = c.Load()
 	if err != nil {
 		t.Fatalf("TestLoad(): %+v", err)
+	}
+}
+
+func TestLoadNotOK(t *testing.T) {
+	var Tests = []struct {
+		hasConfigFile bool
+		content       []byte
+	}{
+		{false, []byte(`""`)},
+		{true, []byte(`{"invalid json`)},
+	}
+
+	for _, tt := range Tests {
+		c := New()
+		if tt.hasConfigFile {
+			tmpConfigFile, err := ioutil.TempFile("", "kubewatch")
+			if err != nil {
+				t.Fatalf("TestLoadNotOK(): %+v", err)
+			}
+
+			defer func() {
+				_ = os.Remove(tmpConfigFile.Name())
+			}()
+
+			if _, err := tmpConfigFile.Write(tt.content); err != nil {
+				t.Fatalf("TestLoadNotOK(): %+v", err)
+			}
+			if err := tmpConfigFile.Close(); err != nil {
+				t.Fatalf("TestLoadNotOK(): %+v", err)
+			}
+			c.FileName = tmpConfigFile.Name()
+		} else {
+			c.FileName = ""
+		}
+
+		err := c.Load()
+		if err == nil {
+			t.Fatalf("TestLoadNotOK(): %+v", err)
+		}
+
+	}
+}
+
+func TestFilterConfig(t *testing.T) {
+	var Tests = []struct {
+		hasConfigFile bool
+		content       []byte
+		length        int
+	}{
+		{false, []byte(`""`), 0},
+		{true, []byte(`""`), 0},
+		{true, []byte(configStr), 3},
+	}
+
+	for _, tt := range Tests {
+		c := New()
+		if tt.hasConfigFile {
+			tmpConfigFile, err := ioutil.TempFile("", "kubewatch")
+			if err != nil {
+				t.Fatalf("TestFilterConfig(): %+v", err)
+			}
+
+			defer func() {
+				_ = os.Remove(tmpConfigFile.Name())
+			}()
+
+			if _, err := tmpConfigFile.Write(tt.content); err != nil {
+				t.Fatalf("TestFilterConfig(): %+v", err)
+			}
+			if err := tmpConfigFile.Close(); err != nil {
+				t.Fatalf("TestFilterConfig(): %+v", err)
+			}
+			c.FileName = tmpConfigFile.Name()
+		} else {
+			c.FileName = ""
+		}
+
+		_ = c.Load()
+		if len(c.Reason) != tt.length {
+			t.Fatalf("TestFilterConfig(): %+v", c)
+		}
+
 	}
 }
