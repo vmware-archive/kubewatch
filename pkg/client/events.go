@@ -52,7 +52,7 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 
 }
 
-// Filter checks whether event matchs configuration or not
+// Filter checks whether event matches configuration or not
 func (c *Client) Filter(e watch.Event) bool {
 	apiEvent := (e.Object).(*api.Event)
 	reason := apiEvent.Reason

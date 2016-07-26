@@ -53,7 +53,12 @@ func Run(conf *config.Config) {
 		log.Fatal(err)
 	}
 
-	w, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true})
+	eventList, err := client.Events(api.NamespaceAll).List(api.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true, ResourceVersion: eventList.ResourceVersion})
 	if err != nil {
 		log.Fatal(err)
 	}
