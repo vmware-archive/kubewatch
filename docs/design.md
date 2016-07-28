@@ -2,6 +2,8 @@
 
 Kubewatch contains three components: client, config, handler
 
+![Kubewatch Diagram](kubewatch.png?raw=true "Kubewatch Overview")
+
 ## Client
 
 The client gets events from `kubeapi-server`, filtering and applying handler to event.
