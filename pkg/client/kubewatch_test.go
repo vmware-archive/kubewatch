@@ -30,7 +30,7 @@ func assertEqual(t *testing.T, result interface{}, expect interface{}) {
 }
 
 func TestNew(t *testing.T) {
-	c, err := New(nil)
+	c, err := New(nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestEvents(t *testing.T) {
-	c, _ := New(nil)
+	c, _ := New(nil, nil)
 
 	e := c.Events(api.NamespaceAll)
 
