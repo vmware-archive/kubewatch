@@ -21,6 +21,7 @@ import (
 	"log"
 
 	"k8s.io/kubernetes/pkg/api"
+	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/handlers"
@@ -34,7 +35,13 @@ func init() {
 
 // Run runs the event loop processing with given handler
 func Run(conf *config.Config) {
-	client, err := New(conf)
+	factory := cmdutil.NewFactory(nil)
+	k8sClientConfig, err := factory.ClientConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client, err := New(conf, k8sClientConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

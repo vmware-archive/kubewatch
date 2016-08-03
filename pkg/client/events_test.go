@@ -76,7 +76,7 @@ func TestFilter(t *testing.T) {
 
 		_ = c.Load()
 
-		client, _ := New(c)
+		client, _ := New(c, nil)
 
 		e := watch.Event{}
 		apiEvent := &api.Event{}
