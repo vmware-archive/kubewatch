@@ -2,16 +2,12 @@ language: go
 
 go:
   - 1.6
+  - tip
 
 branches:
   only:
     - master
 
 install:
-  - go get github.com/Sirupsen/logrus
-  - go get github.com/cloudfoundry-incubator/candiedyaml
-  - go get github.com/opencontainers/runc/libcontainer/utils
-  - go get golang.org/x/sys/unix
-  - go get google.golang.org/appengine
   - go get github.com/tools/godep
   - godep restore
