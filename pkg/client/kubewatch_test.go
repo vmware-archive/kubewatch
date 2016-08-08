@@ -49,3 +49,15 @@ func TestEvents(t *testing.T) {
 		t.Fatal("Events(): wrong type")
 	}
 }
+
+func TestServices(t *testing.T) {
+	c, _ := New(nil, nil)
+
+	e := c.Services(api.NamespaceAll)
+
+	_, ok := e.(k8sClient.ServiceInterface)
+
+	if !ok {
+		t.Fatal("Services(): wrong type")
+	}
+}

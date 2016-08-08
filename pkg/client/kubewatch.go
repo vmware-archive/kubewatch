@@ -17,6 +17,8 @@ limitations under the License.
 package client
 
 import (
+	"sync"
+
 	"k8s.io/kubernetes/pkg/client/restclient"
 	k8sClient "k8s.io/kubernetes/pkg/client/unversioned"
 
@@ -27,9 +29,11 @@ const userAgent = "kubewatch-client"
 
 // Client represent the kubewatch client
 type Client struct {
-	client *k8sClient.Client
-	ua     string
-	Config *config.Config
+	client    *k8sClient.Client
+	ua        string
+	closeChan chan bool
+	waitGroup *sync.WaitGroup
+	Config    *config.Config
 }
 
 // New creates new kubewatch client
@@ -48,9 +52,11 @@ func New(conf *config.Config, k8sClientConfig *restclient.Config) (*Client, erro
 	}
 
 	kubeWatchClient := &Client{
-		client: c,
-		ua:     userAgent,
-		Config: conf,
+		client:    c,
+		ua:        userAgent,
+		closeChan: make(chan bool),
+		waitGroup: &sync.WaitGroup{},
+		Config:    conf,
 	}
 
 	return kubeWatchClient, nil
@@ -59,4 +65,15 @@ func New(conf *config.Config, k8sClientConfig *restclient.Config) (*Client, erro
 // Events returns k8sClient.EventInterface to work with events resource
 func (c *Client) Events(namespace string) k8sClient.EventInterface {
 	return c.client.Events(namespace)
+}
+
+// Services returns k8sClient.ServiceInterface to work with services resource
+func (c *Client) Services(namespace string) k8sClient.ServiceInterface {
+	return c.client.Services(namespace)
+}
+
+// Stop stops kubewatch client and all its goroutine
+func (c *Client) Stop() {
+	close(c.closeChan)
+	c.waitGroup.Wait()
 }

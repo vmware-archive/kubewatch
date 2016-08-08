@@ -18,8 +18,6 @@ package client
 
 import (
 	"log"
-	"os"
-	"os/signal"
 
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
@@ -28,9 +26,7 @@ import (
 // EventLoop process events in infinitive loop, apply handler function to each event
 // Stop when receive interrupt signal
 func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
-	defer signal.Stop(signals)
+	defer c.waitGroup.Done()
 
 	for {
 		select {
@@ -44,12 +40,11 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 					w.Stop()
 				}
 			}
-		case <-signals:
-			log.Println("Catched signal, quit normally.")
+		case <-c.closeChan:
+			log.Printf("Stopping watching events from %+v...\n", w)
 			w.Stop()
 		}
 	}
-
 }
 
 // Filter checks whether event matches configuration or not
