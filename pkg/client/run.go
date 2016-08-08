@@ -98,7 +98,6 @@ func Run(conf *config.Config) {
 
 	log.Println("Press Ctrl+C to quit...")
 	<-signals
-	log.Println("Exiting...")
 
 	client.Stop()
 	log.Println("Exited normally.")
