@@ -14,24 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package handlers
+package event
 
 import (
+	"log"
 	"testing"
 
+	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
-
-	"github.com/skippbox/kubewatch/pkg/event"
 )
 
-func TestDefaultHandle(t *testing.T) {
+func TestNewEvent(t *testing.T) {
+	e := watch.Event{}
+	apiEvent := &api.Event{}
+	apiEvent.Reason = "Test"
+	e.Object = apiEvent
 
-	w := watch.Event{}
-	d := &Default{}
+	kbEvent := New(e)
 
-	err := d.Handle(event.New(w))
-
-	if err != nil {
-		t.Fatal(err)
+	if kbEvent.Reason != apiEvent.Reason {
+		log.Fatalf("TestNewEvent()")
 	}
 }

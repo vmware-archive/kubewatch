@@ -21,10 +21,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/skippbox/kubewatch/config"
-
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
+
+	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/event"
 )
 
 var configStr = `
@@ -83,7 +84,7 @@ func TestFilter(t *testing.T) {
 		apiEvent.Reason = tt.reason
 		e.Object = apiEvent
 
-		if client.Filter(e) != tt.expected {
+		if client.Filter(event.New(e)) != tt.expected {
 			t.Fatalf("TestFilter(): %+v", client)
 		}
 	}

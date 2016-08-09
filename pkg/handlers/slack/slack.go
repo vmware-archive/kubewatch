@@ -22,10 +22,9 @@ import (
 	"os"
 
 	"github.com/nlopes/slack"
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/watch"
 
 	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/event"
 )
 
 var slackColors = map[string]string{
@@ -74,7 +73,7 @@ func (s *Slack) Init(c *config.Config) error {
 
 // Handle handles event for slack handler,
 // send notify event to slack channel
-func (s *Slack) Handle(e watch.Event) error {
+func (s *Slack) Handle(e event.Event) error {
 	err := checkMissingSlackVars(s)
 	if err != nil {
 		return err
@@ -103,17 +102,17 @@ func checkMissingSlackVars(s *Slack) error {
 	return nil
 }
 
-func prepareSlackAttachment(e watch.Event) slack.Attachment {
-	apiEvent := (e.Object).(*api.Event)
+func prepareSlackAttachment(e event.Event) slack.Attachment {
 
 	msg := fmt.Sprintf(
 		"In *Namespace* %s *Kind* %s from *Component* %s on *Host* %s had *Reason* %s",
-		apiEvent.ObjectMeta.Namespace,
-		apiEvent.InvolvedObject.Kind,
-		apiEvent.Source.Component,
-		apiEvent.Source.Host,
-		apiEvent.Reason,
+		e.Namespace,
+		e.Kind,
+		e.Component,
+		e.Host,
+		e.Reason,
 	)
+
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
 			slack.AttachmentField{
@@ -123,7 +122,7 @@ func prepareSlackAttachment(e watch.Event) slack.Attachment {
 		},
 	}
 
-	if color, ok := slackColors[apiEvent.Type]; ok {
+	if color, ok := slackColors[e.Status]; ok {
 		attachment.Color = color
 	}
 

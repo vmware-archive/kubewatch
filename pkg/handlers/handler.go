@@ -20,9 +20,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"k8s.io/kubernetes/pkg/watch"
-
 	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/event"
 	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 )
 
@@ -30,7 +29,7 @@ import (
 // The Handle method is used to process event
 type Handler interface {
 	Init(c *config.Config) error
-	Handle(w watch.Event) error
+	Handle(e event.Event) error
 }
 
 // Map maps each event handler function to a name for easily lookup
@@ -52,7 +51,7 @@ func (d *Default) Init(c *config.Config) error {
 
 // Handle handles event for default handler,
 // print event in json format, for testing or debugging
-func (d *Default) Handle(e watch.Event) error {
+func (d *Default) Handle(e event.Event) error {
 	b, err := json.Marshal(e)
 	if err != nil {
 		return err

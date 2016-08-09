@@ -18,19 +18,16 @@ package client
 
 import (
 	"log"
-	"os"
-	"os/signal"
 
-	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/watch"
+
+	kbEvent "github.com/skippbox/kubewatch/pkg/event"
 )
 
 // EventLoop process events in infinitive loop, apply handler function to each event
 // Stop when receive interrupt signal
-func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
-	defer signal.Stop(signals)
+func (c *Client) EventLoop(w watch.Interface, handler func(kbEvent.Event) error) {
+	defer c.waitGroup.Done()
 
 	for {
 		select {
@@ -38,24 +35,24 @@ func (c *Client) EventLoop(w watch.Interface, handler func(watch.Event) error) {
 			if !ok {
 				return
 			}
-			if c.Filter(event) {
-				if err := handler(event); err != nil {
+			e := kbEvent.New(event)
+			if c.Filter(e) {
+				if err := handler(e); err != nil {
 					log.Println(err)
 					w.Stop()
 				}
 			}
-		case <-signals:
-			log.Println("Catched signal, quit normally.")
+		case <-c.closeChan:
+			log.Printf("Stopping watching events from %+v...\n", w)
 			w.Stop()
+			return
 		}
 	}
-
 }
 
 // Filter checks whether event matches configuration or not
-func (c *Client) Filter(e watch.Event) bool {
-	apiEvent := (e.Object).(*api.Event)
-	reason := apiEvent.Reason
+func (c *Client) Filter(e kbEvent.Event) bool {
+	reason := e.Reason
 
 	if len(c.Config.Reason) == 0 {
 		return true

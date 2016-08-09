@@ -24,6 +24,7 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 
 	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/event"
 )
 
 func TestSlackInit(t *testing.T) {
@@ -55,7 +56,7 @@ func TestSlackHandle(t *testing.T) {
 	w := watch.Event{}
 	s := &Slack{}
 
-	err := s.Handle(w)
+	err := s.Handle(event.New(w))
 
 	if err == nil {
 		t.Fatalf("Handle(): %v", err)

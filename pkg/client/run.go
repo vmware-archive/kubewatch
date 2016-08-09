@@ -19,6 +19,8 @@ package client
 import (
 	"flag"
 	"log"
+	"os"
+	"os/signal"
 
 	"k8s.io/kubernetes/pkg/api"
 	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
@@ -65,10 +67,38 @@ func Run(conf *config.Config) {
 		log.Fatal(err)
 	}
 
-	w, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{Watch: true, ResourceVersion: eventList.ResourceVersion})
+	watchEvents, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{
+		Watch:           true,
+		ResourceVersion: eventList.ResourceVersion,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client.EventLoop(w, eventHandler.Handle)
+	serviceList, err := client.Services(api.NamespaceAll).List(api.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	watchServices, err := client.Services(api.NamespaceAll).Watch(api.ListOptions{
+		Watch:           true,
+		ResourceVersion: serviceList.ResourceVersion,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client.waitGroup.Add(2)
+	go client.EventLoop(watchEvents, eventHandler.Handle)
+	go client.EventLoop(watchServices, eventHandler.Handle)
+
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	defer signal.Stop(signals)
+
+	log.Println("Press Ctrl+C to quit...")
+	<-signals
+
+	client.Stop()
+	log.Println("Exited normally.")
 }
