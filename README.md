@@ -47,13 +47,17 @@ export KW_SLACK_CHANNEL='#channel_name'
 
 # Run in a Kubernetes cluster
 
-This is WIP. Enter your Bot SLACK toke in `kubewatch.yaml` then create the Pod.
-
+Create k8s secrets to hold slack token, channel:
+```sh
+kubectl create secret generic kubewatch --from-literal=token=<token> --from-literal=channel=<channel>
 ```
+
+Create the Pod:
+```sh
 kubectl create -f kubewatch.yaml
 ```
 
-It uses a kubectl side car container to reach the API server on localhost.
+It uses a `kubectl` side car container to reach the API server.
 
 
 # Testing
@@ -61,7 +65,3 @@ It uses a kubectl side car container to reach the API server on localhost.
 ```
 $ make test
 ```
-
-# Notes
-
-For now, `kubewatch` watches the `kube-apiserver` on localhost only.
