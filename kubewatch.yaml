@@ -10,9 +10,15 @@ spec:
       - --handler=slack
     env:
       - name: KW_SLACK_TOKEN
-        value: <PUT SLACK TOKEN HERE> 
+        valueFrom:
+          secretKeyRef:
+            name: kubewatch
+            key: token
       - name: KW_SLACK_CHANNEL
-        value: "#bot"
+        valueFrom:
+            secretKeyRef:
+              name: kubewatch
+              key: channel
     imagePullPolicy: Always
     name: kubewatch
   - image: gcr.io/skippbox/kubectl:v1.3.0
