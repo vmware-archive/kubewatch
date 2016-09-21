@@ -31,11 +31,12 @@ type Event struct {
 	Host      string
 	Reason    string
 	Status    string
+	Name      string
 }
 
 // New create new KubewatchEvent
 func New(e watch.Event) Event {
-	var namespace, kind, component, host, reason, status string
+	var namespace, kind, component, host, reason, status, name string
 
 	if apiEvent, ok := (e.Object).(*api.Event); ok {
 		namespace = apiEvent.ObjectMeta.Namespace
@@ -44,6 +45,7 @@ func New(e watch.Event) Event {
 		host = apiEvent.Source.Host
 		reason = apiEvent.Reason
 		status = apiEvent.Type
+		name = apiEvent.InvolvedObject.Name
 	}
 
 	if apiService, ok := (e.Object).(*api.Service); ok {
@@ -52,6 +54,7 @@ func New(e watch.Event) Event {
 		component = string(apiService.Spec.Type)
 		reason = string(e.Type)
 		status = "Normal"
+		name = apiService.Name
 	}
 
 	kbEvent := Event{
@@ -61,6 +64,7 @@ func New(e watch.Event) Event {
 		Host:      host,
 		Reason:    reason,
 		Status:    status,
+		Name:      name,
 	}
 
 	return kbEvent

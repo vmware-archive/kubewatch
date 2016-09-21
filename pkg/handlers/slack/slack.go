@@ -105,9 +105,10 @@ func checkMissingSlackVars(s *Slack) error {
 func prepareSlackAttachment(e event.Event) slack.Attachment {
 
 	msg := fmt.Sprintf(
-		"In *Namespace* %s *Kind* %s from *Component* %s on *Host* %s had *Reason* %s",
+		"In *Namespace* %s *Kind* %s *Name* %s from *Component* %s on *Host* %s had *Reason* %s",
 		e.Namespace,
 		e.Kind,
+		e.Name,
 		e.Component,
 		e.Host,
 		e.Reason,
