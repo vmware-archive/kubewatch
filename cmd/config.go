@@ -14,10 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package cmd
 
-import "github.com/skippbox/kubewatch/cmd"
+import (
+	"github.com/spf13/cobra"
+)
 
-func main() {
-	cmd.Execute()
+// configCmd represents the config command
+var configCmd = &cobra.Command{
+	Use:   "config SUBCOMMAND",
+	Short: "config modifies kubewatch configuration",
+	Long: `config command allows admin setup his own configuration for running kubewatch`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
+}
+
+func init() {
+	RootCmd.AddCommand(configCmd)
+	configCmd.AddCommand(slackConfigCmd)
+	configCmd.AddCommand(resourceConfigCmd)
 }
