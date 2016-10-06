@@ -16,18 +16,8 @@ limitations under the License.
 
 package main
 
-import (
-	"flag"
-
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/client"
-)
+import "github.com/skippbox/kubewatch/cmd"
 
 func main() {
-	flag.Parse()
-
-	c := config.New()
-	_ = c.Load()
-
-	client.Run(c)
+	cmd.Execute()
 }

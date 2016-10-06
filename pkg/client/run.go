@@ -26,6 +26,7 @@ import (
 	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 
 	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
@@ -48,14 +49,14 @@ func Run(conf *config.Config) {
 		log.Fatal(err)
 	}
 
-	h, ok := handlers.Map[handlerFlag]
-	if !ok {
-		log.Fatal("Handler not found")
-	}
 
-	eventHandler, ok := h.(handlers.Handler)
-	if !ok {
-		log.Fatal("Not an Handler type")
+
+	var eventHandler handlers.Handler
+	switch {
+	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
+		eventHandler = new(slack.Slack)
+	default:
+		eventHandler = new(handlers.Default)
 	}
 
 	if err := eventHandler.Init(conf); err != nil {
