@@ -39,10 +39,10 @@ $ go get -u github.com/skippbox/kubewatch
 ```
 
 # Configuration
-You can either configure `kubewatch` via config file or environment variables. There is an example configuration at `examples/conf/kubewatch.conf.json`.
+Kubewatch supports `config` command for configuration. Config file will be saved at $HOME/.kubewatch.yaml
 
 ```console
-$ kubewatch -handler slack -config-file examples/conf/kubewatch.conf.json
+$ kubewatch config slack --channel <slack_channel> --token <slack_token>
 ```
 
 ## Environment variables
@@ -51,7 +51,7 @@ Prepare your SLACK token, channel environment variables and run kubewatch like t
 ```console
 $ export KW_SLACK_TOKEN='XXXXXXXXXXXXXXXX'
 $ export KW_SLACK_CHANNEL='#channel_name'
-$ kubewatch -handler slack 
+$ kubewatch
 ```
 
 # Run kubewatch in a Kubernetes cluster
