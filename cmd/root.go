@@ -25,6 +25,7 @@ import (
 
 	c "github.com/skippbox/kubewatch/pkg/client"
 	"github.com/skippbox/kubewatch/config"
+	"github.com/Sirupsen/logrus"
 )
 
 var cfgFile string
@@ -37,7 +38,9 @@ var RootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := &config.Config{}
-		config.Load()
+		if err := config.Load(); err != nil {
+			logrus.Fatal(err)
+		}
 		c.Run(config)
 	},
 }
