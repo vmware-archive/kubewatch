@@ -18,6 +18,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/Sirupsen/logrus"
 )
 
 // resourceConfigCmd represents the resource subcommand
@@ -26,7 +28,50 @@ var resourceConfigCmd = &cobra.Command{
 	Short: "specific resources to be watched",
 	Long: `specific resources to be watched`,
 	Run: func(cmd *cobra.Command, args []string){
-		cmd.Help()
+		conf, err := config.New()
+		if err != nil {
+			logrus.Fatal(err)
+		}
+
+		var b bool
+		b, err = cmd.Flags().GetBool("svc")
+		if err == nil {
+			conf.Resource.Services = b
+		} else {
+			logrus.Fatal("svc", err)
+		}
+
+		b, err = cmd.Flags().GetBool("deployments")
+		if err == nil {
+			conf.Resource.Deployment = b
+		} else {
+			logrus.Fatal("deployments", err)
+		}
+
+		b, err = cmd.Flags().GetBool("po")
+		if err == nil {
+			conf.Resource.Pod = b
+		} else {
+			logrus.Fatal("po", err)
+		}
+
+		b, err = cmd.Flags().GetBool("rs")
+		if err == nil {
+			conf.Resource.ReplicaSet = b
+		} else {
+			logrus.Fatal("rs", err)
+		}
+
+		b, err = cmd.Flags().GetBool("rc")
+		if err == nil {
+			conf.Resource.ReplicationController = b
+		} else {
+			logrus.Fatal("rc", err)
+		}
+
+		if err = conf.Write(); err != nil {
+			logrus.Fatal(err)
+		}
 	},
 }
 

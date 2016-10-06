@@ -33,17 +33,11 @@ var cfgFile string
 var RootCmd = &cobra.Command{
 	Use:   "kubewatch",
 	Short: "A watcher for Kubernetes",
-	Long: ``,
+	Long: `A watcher for Kubernetes`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-
-		slack := config.Slack{
-			Token: "",
-			Channel: "",
-		}
 		config := &config.Config{}
-		config.Handler.Slack.Token = slack.Token
-		config.Handler.Slack.Channel = slack.Channel
+		config.Load()
 		c.Run(config)
 	},
 }
@@ -60,14 +54,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kubewatch.yaml)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	//RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -82,6 +69,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }

@@ -38,8 +38,12 @@ type Client struct {
 
 // New creates new kubewatch client
 func New(conf *config.Config, k8sClientConfig *restclient.Config) (*Client, error) {
+	var err error
 	if conf == nil {
-		conf = config.New()
+		conf, err = config.New()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if k8sClientConfig == nil {

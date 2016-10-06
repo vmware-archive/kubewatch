@@ -18,6 +18,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/Sirupsen/logrus"
 )
 
 // slackConfigCmd represents the slack subcommand
@@ -26,7 +28,31 @@ var slackConfigCmd = &cobra.Command{
 	Short: "specific slack configuration",
 	Long: `specific slack configuration`,
 	Run: func(cmd *cobra.Command, args []string){
-		cmd.Help()
+		conf, err := config.New()
+		if err != nil {
+			logrus.Fatal(err)
+		}
+
+		token, err := cmd.Flags().GetString("token")
+		if err == nil {
+			if len(token) > 0 {
+				conf.Handler.Slack.Token = token
+			}
+		} else {
+			logrus.Fatal(err)
+		}
+		channel, err := cmd.Flags().GetString("channel")
+		if err == nil {
+			if len(channel) > 0 {
+				conf.Handler.Slack.Channel = channel
+			}
+		} else {
+			logrus.Fatal(err)
+		}
+
+		if err = conf.Write(); err != nil {
+			logrus.Fatal(err)
+		}
 	},
 }
 

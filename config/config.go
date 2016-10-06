@@ -17,32 +17,35 @@ limitations under the License.
 package config
 
 import (
-	"encoding/json"
-	"flag"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"runtime"
-	"strings"
+	"io/ioutil"
+	"path/filepath"
+
+	"gopkg.in/yaml.v2"
 )
 
-var configFileName = "kubewatch.conf.json"
-var defaultConfigDir = "/etc/kubewatch"
+var configFileName = ".kubewatch.yaml"
 
-var (
-	slackToken   string
-	slackChannel string
-	configFile   string
-	reasonFlag   string
-)
+type Handler struct {
+	Slack Slack `json:"slack"`
+}
+
+// Resource contains resource configuration
+type Resource struct {
+	Deployment            bool `json:"deployment"`
+	ReplicationController bool `json:"rc"`
+	ReplicaSet            bool `json:"rs"`
+	DaemonSet             bool `json:"ds"`
+	Services              bool `json:"svc"`
+	Pod                   bool `json:"po"`
+}
 
 // Config struct contains kubewatch configuration
 type Config struct {
-	FileName string `json:"-"`
-	Handler  struct {
-		Slack `json:"slack"`
-	} `json:"handler"`
-	Reason []string `json:"reason"`
+	Handler  Handler  `json:"handler"`
+	Reason   []string `json:"reason"`
+	Resource Resource `json:"resource"`
 }
 
 // Slack contains slack configuration
@@ -51,26 +54,42 @@ type Slack struct {
 	Channel string `json:"channel"`
 }
 
-func init() {
-	flag.StringVar(&slackToken, "slack-token", "", "Slack token")
-	flag.StringVar(&slackChannel, "slack-channel", "", "Slack channel")
-	flag.StringVar(&configFile, "config-file", "", "Configuration file")
-	flag.StringVar(&reasonFlag, "reason", "", "Filter event by events, comma separated string")
+// New creates new config object
+func New() (*Config, error) {
+	c := &Config{}
+	if err := c.Load(); err != nil {
+		return c, err
+	}
+
+	return c, nil
 }
 
-// New creates new config object
-func New() *Config {
-	c := &Config{}
-	c.FileName = getConfigFile()
-
-	return c
+func createIfNotExist() error {
+	// create file if not exist
+	configFile := filepath.Join(homeDir(), configFileName)
+	_, err := os.Stat(configFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			file, err := os.Create(configFile)
+			if err != nil {
+				return err
+			}
+			file.Close()
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 // Load loads configuration from config file
 func (c *Config) Load() error {
-	defer loadFromFlag(c)
+	err := createIfNotExist()
+	if err != nil {
+		return err
+	}
 
-	file, err := os.Open(c.FileName)
+	file, err := os.Open(getConfigFile())
 	if err != nil {
 		return err
 	}
@@ -80,41 +99,30 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	return json.Unmarshal(b, c)
+	if len(b) != 0 {
+		return yaml.Unmarshal(b, c)
+	}
+	return nil
 }
 
-func loadFromFlag(c *Config) {
-	if slackToken != "" {
-		c.Handler.Slack.Token = slackToken
+func (c *Config) Write() error {
+	b, err := yaml.Marshal(c)
+	if err != nil {
+		return err
 	}
-	if slackChannel != "" {
-		c.Handler.Slack.Channel = slackChannel
+
+	err = ioutil.WriteFile(getConfigFile(), b, 0644)
+	if err != nil {
+		return err
 	}
-	if reasonFlag != "" {
-		c.Reason = strings.Split(reasonFlag, ",")
-	}
+
+	return nil
 }
 
 func getConfigFile() string {
-	if configFile != "" {
+	configFile := filepath.Join(homeDir(), configFileName)
+	if _, err := os.Stat(configFile); err == nil {
 		return configFile
-	}
-
-	curDir, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	configFiles := []string{
-		filepath.Join(curDir, configFileName),
-		filepath.Join(homeDir(), "."+configFileName),
-		filepath.Join(defaultConfigDir, configFileName),
-	}
-
-	for _, f := range configFiles {
-		if _, err := os.Stat(f); err == nil {
-			return f
-		}
 	}
 
 	return ""
