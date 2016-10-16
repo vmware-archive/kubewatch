@@ -17,7 +17,6 @@ limitations under the License.
 package client
 
 import (
-	"log"
 
 	"k8s.io/kubernetes/pkg/watch"
 
@@ -27,27 +26,7 @@ import (
 // EventLoop process events in infinitive loop, apply handler function to each event
 // Stop when receive interrupt signal
 func (c *Client) EventLoop(w watch.Interface, handler func(kbEvent.Event) error) {
-	defer c.waitGroup.Done()
 
-	for {
-		select {
-		case event, ok := <-w.ResultChan():
-			if !ok {
-				return
-			}
-			e := kbEvent.New(event)
-			if c.Filter(e) {
-				if err := handler(e); err != nil {
-					log.Println(err)
-					w.Stop()
-				}
-			}
-		case <-c.closeChan:
-			log.Printf("Stopping watching events from %+v...\n", w)
-			w.Stop()
-			return
-		}
-	}
 }
 
 // Filter checks whether event matches configuration or not

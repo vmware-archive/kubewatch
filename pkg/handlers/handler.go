@@ -17,11 +17,7 @@ limitations under the License.
 package handlers
 
 import (
-	"encoding/json"
-	"log"
-
 	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/event"
 	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 )
 
@@ -29,7 +25,8 @@ import (
 // The Handle method is used to process event
 type Handler interface {
 	Init(c *config.Config) error
-	Handle(e event.Event) error
+	ObjectCreated(obj interface{})
+	ObjectDeleted(obj interface{})
 }
 
 // Map maps each event handler function to a name for easily lookup
@@ -49,15 +46,10 @@ func (d *Default) Init(c *config.Config) error {
 	return nil
 }
 
-// Handle handles event for default handler,
-// print event in json format, for testing or debugging
-func (d *Default) Handle(e event.Event) error {
-	b, err := json.Marshal(e)
-	if err != nil {
-		return err
-	}
+func (d *Default) ObjectCreated(obj interface{}) {
 
-	log.Println(string(b))
+}
 
-	return nil
+func (d *Default) ObjectDeleted(obj interface{}) {
+
 }

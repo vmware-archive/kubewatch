@@ -25,6 +25,7 @@ import (
 
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/event"
+	kbEvent "github.com/skippbox/kubewatch/pkg/event"
 )
 
 var slackColors = map[string]string{
@@ -71,14 +72,16 @@ func (s *Slack) Init(c *config.Config) error {
 	return checkMissingSlackVars(s)
 }
 
-// Handle handles event for slack handler,
-// send notify event to slack channel
-func (s *Slack) Handle(e event.Event) error {
-	err := checkMissingSlackVars(s)
-	if err != nil {
-		return err
-	}
+func (s *Slack) ObjectCreated(obj interface{}) {
+	notifySlack(s, obj, "created")
+}
 
+func (s *Slack) ObjectDeleted(obj interface{}) {
+	notifySlack(s, obj, "deleted")
+}
+
+func notifySlack(s *Slack, obj interface{}, action string) {
+	e := kbEvent.New(obj, action)
 	api := slack.New(s.Token)
 	params := slack.PostMessageParameters{}
 	attachment := prepareSlackAttachment(e)
@@ -87,11 +90,10 @@ func (s *Slack) Handle(e event.Event) error {
 	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
-		return err
+		return
 	}
 
 	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
-	return nil
 }
 
 func checkMissingSlackVars(s *Slack) error {
@@ -103,15 +105,23 @@ func checkMissingSlackVars(s *Slack) error {
 }
 
 func prepareSlackAttachment(e event.Event) slack.Attachment {
+	//
+	//msg := fmt.Sprintf(
+	//	"In *Namespace* %s *Kind* %s *Name* %s from *Component* %s on *Host* %s had *Reason* %s",
+	//	e.Namespace,
+	//	e.Kind,
+	//	e.Name,
+	//	e.Component,
+	//	e.Host,
+	//	e.Reason,
+	//)
 
 	msg := fmt.Sprintf(
-		"In *Namespace* %s *Kind* %s *Name* %s from *Component* %s on *Host* %s had *Reason* %s",
-		e.Namespace,
+		"%s in namespace %s has been %s: %s",
 		e.Kind,
-		e.Name,
-		e.Component,
-		e.Host,
+		e.Namespace,
 		e.Reason,
+		e.Name,
 	)
 
 	attachment := slack.Attachment{

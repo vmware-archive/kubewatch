@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -13,29 +12,39 @@ import (
 	"k8s.io/kubernetes/pkg/fields"
 	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	"k8s.io/kubernetes/pkg/util/wait"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
-func Controller() {
+func Controller(conf *config.Config, eventHandler handlers.Handler) {
 
 	factory := cmdutil.NewFactory(nil)
-	kubeClient, err := factory.ClientConfig()
+	kubeConfig, err := factory.ClientConfig()
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	var podsStore cache.Store
-	podsStore = watchPods(kubeClient, podsStore)
+	kubeClient := client.NewOrDie(kubeConfig)
 
-	var servicesStore cache.Store
-	servicesStore = watchServices(kubeClient, servicesStore)
+	if conf.Resource.Pod {
+		var podsStore cache.Store
+		podsStore = watchPods(kubeClient, podsStore, eventHandler)
+	}
 
-	var rcStore cache.Store
-	rcStore = watchReplicationControllers(kubeClient, rcStore)
+	if conf.Resource.Services {
+		var servicesStore cache.Store
+		servicesStore = watchServices(kubeClient, servicesStore, eventHandler)
+	}
+
+	if conf.Resource.ReplicationController {
+		var rcStore cache.Store
+		rcStore = watchReplicationControllers(kubeClient, rcStore, eventHandler)
+	}
 
 	logrus.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func watchPods(client *client.Client, store cache.Store) cache.Store {
+func watchPods(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (Pods)
 	watchlist := cache.NewListWatchFromClient(client, "pods", api.NamespaceAll, fields.Everything())
 
@@ -47,8 +56,8 @@ func watchPods(client *client.Client, store cache.Store) cache.Store {
 		&api.Pod{},
 		resyncPeriod,
 		framework.ResourceEventHandlerFuncs{
-			AddFunc:    podCreated,
-			DeleteFunc: podDeleted,
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
 		},
 	)
 
@@ -58,17 +67,7 @@ func watchPods(client *client.Client, store cache.Store) cache.Store {
 	return eStore
 }
 
-func podCreated(obj interface{}) {
-	pod := obj.(*api.Pod)
-	fmt.Println("Pod created: " + pod.ObjectMeta.Name)
-}
-
-func podDeleted(obj interface{}) {
-	pod := obj.(*api.Pod)
-	fmt.Println("Pod deleted: " + pod.ObjectMeta.Name)
-}
-
-func watchServices(client *client.Client, store cache.Store) cache.Store {
+func watchServices(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (Services)
 	watchlist := cache.NewListWatchFromClient(client, "services", api.NamespaceAll, fields.Everything())
 
@@ -80,8 +79,8 @@ func watchServices(client *client.Client, store cache.Store) cache.Store {
 		&api.Service{},
 		resyncPeriod,
 		framework.ResourceEventHandlerFuncs{
-			AddFunc:    serviceCreated,
-			DeleteFunc: serviceDeleted,
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
 		},
 	)
 
@@ -91,17 +90,7 @@ func watchServices(client *client.Client, store cache.Store) cache.Store {
 	return eStore
 }
 
-func serviceCreated(obj interface{}) {
-	service := obj.(*api.Service)
-	fmt.Println("Service created: " + service.ObjectMeta.Name)
-}
-
-func serviceDeleted(obj interface{}) {
-	service := obj.(*api.Service)
-	fmt.Println("Service deleted: " + service.ObjectMeta.Name)
-}
-
-func watchReplicationControllers(client *client.Client, store cache.Store) cache.Store {
+func watchReplicationControllers(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (ReplicationControllers)
 	watchlist := cache.NewListWatchFromClient(client, "replicationcontrollers", api.NamespaceAll, fields.Everything())
 
@@ -113,8 +102,8 @@ func watchReplicationControllers(client *client.Client, store cache.Store) cache
 		&api.ReplicationController{},
 		resyncPeriod,
 		framework.ResourceEventHandlerFuncs{
-			AddFunc:    replicationcontrollerCreated,
-			DeleteFunc: replicationcontrollerDeleted,
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
 		},
 	)
 
@@ -122,14 +111,4 @@ func watchReplicationControllers(client *client.Client, store cache.Store) cache
 	go eController.Run(wait.NeverStop)
 
 	return eStore
-}
-
-func replicationcontrollerCreated(obj interface{}) {
-	replicationcontroller := obj.(*api.ReplicationController)
-	fmt.Println("ReplicationController created: " + replicationcontroller.ObjectMeta.Name)
-}
-
-func replicationcontrollerDeleted(obj interface{}) {
-	replicationcontroller := obj.(*api.ReplicationController)
-	fmt.Println("ReplicationController deleted: " + replicationcontroller.ObjectMeta.Name)
 }

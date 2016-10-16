@@ -18,7 +18,6 @@ package event
 
 import (
 	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/watch"
 )
 
 // Event represent an event got from k8s api server
@@ -35,26 +34,41 @@ type Event struct {
 }
 
 // New create new KubewatchEvent
-func New(e watch.Event) Event {
+func New(obj interface{}, action string) Event {
 	var namespace, kind, component, host, reason, status, name string
 
-	if apiEvent, ok := (e.Object).(*api.Event); ok {
-		namespace = apiEvent.ObjectMeta.Namespace
-		kind = apiEvent.InvolvedObject.Kind
-		component = apiEvent.Source.Component
-		host = apiEvent.Source.Host
-		reason = apiEvent.Reason
-		status = apiEvent.Type
-		name = apiEvent.InvolvedObject.Name
-	}
+	//if apiEvent, ok := obj.(*api.Event); ok {
+	//	namespace = apiEvent.ObjectMeta.Namespace
+	//	kind = apiEvent.InvolvedObject.Kind
+	//	component = apiEvent.Source.Component
+	//	host = apiEvent.Source.Host
+	//	reason = apiEvent.Reason
+	//	status = apiEvent.Type
+	//	name = apiEvent.InvolvedObject.Name
+	//}
 
-	if apiService, ok := (e.Object).(*api.Service); ok {
+	if apiService, ok := obj.(*api.Service); ok {
 		namespace = apiService.ObjectMeta.Namespace
-		kind = apiService.Kind
+		kind = apiService.TypeMeta.Kind
 		component = string(apiService.Spec.Type)
-		reason = string(e.Type)
+		reason = action
 		status = "Normal"
 		name = apiService.Name
+	} else
+	if apiPod, ok := obj.(*api.Pod); ok {
+		namespace = apiPod.ObjectMeta.Namespace
+		kind = apiPod.TypeMeta.Kind
+		reason = action
+		host = apiPod.Spec.NodeName
+		status = "Normal"
+		name = apiPod.Name
+	} else
+	if apiRC, ok := obj.(*api.ReplicationController); ok {
+		name = apiRC.TypeMeta.Kind
+		kind = apiRC.Kind
+		reason = action
+		status = "Normal"
+		name = apiRC.Name
 	}
 
 	kbEvent := Event{
