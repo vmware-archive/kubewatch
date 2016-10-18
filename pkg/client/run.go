@@ -17,40 +17,16 @@ limitations under the License.
 package client
 
 import (
-	"flag"
 	"log"
-	"os"
-	"os/signal"
-
-	"k8s.io/kubernetes/pkg/api"
-	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 
 	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 	"github.com/skippbox/kubewatch/pkg/handlers"
+	"github.com/skippbox/kubewatch/pkg/handlers/slack"
+	"github.com/skippbox/kubewatch/pkg/controller"
 )
-
-var handlerFlag string
-
-func init() {
-	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
-}
 
 // Run runs the event loop processing with given handler
 func Run(conf *config.Config) {
-	factory := cmdutil.NewFactory(nil)
-	k8sClientConfig, err := factory.ClientConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	client, err := New(conf, k8sClientConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-
-
 	var eventHandler handlers.Handler
 	switch {
 	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
@@ -63,43 +39,5 @@ func Run(conf *config.Config) {
 		log.Fatal(err)
 	}
 
-	eventList, err := client.Events(api.NamespaceAll).List(api.ListOptions{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	watchEvents, err := client.Events(api.NamespaceAll).Watch(api.ListOptions{
-		Watch:           true,
-		ResourceVersion: eventList.ResourceVersion,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	serviceList, err := client.Services(api.NamespaceAll).List(api.ListOptions{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	watchServices, err := client.Services(api.NamespaceAll).Watch(api.ListOptions{
-		Watch:           true,
-		ResourceVersion: serviceList.ResourceVersion,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	client.waitGroup.Add(2)
-	go client.EventLoop(watchEvents, eventHandler.Handle)
-	go client.EventLoop(watchServices, eventHandler.Handle)
-
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
-	defer signal.Stop(signals)
-
-	log.Println("Press Ctrl+C to quit...")
-	<-signals
-
-	client.Stop()
-	log.Println("Exited normally.")
+	controller.Controller(conf, eventHandler)
 }
