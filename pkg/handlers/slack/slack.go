@@ -31,13 +31,14 @@ import (
 var slackColors = map[string]string{
 	"Normal":  "good",
 	"Warning": "warning",
+	"Danger":  "danger",
 }
 
 var slackErrMsg = `
 %s
 
 You need to set both slack token and channel for slack notify,
-using "--slack-token" and "--slack-channel", or using environment variables:
+using "--token/-t" and "--channel/-c", or using environment variables:
 
 export KW_SLACK_TOKEN=slack_token
 export KW_SLACK_CHANNEL=slack_channel
@@ -87,6 +88,7 @@ func notifySlack(s *Slack, obj interface{}, action string) {
 	attachment := prepareSlackAttachment(e)
 
 	params.Attachments = []slack.Attachment{attachment}
+	params.AsUser = true
 	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
@@ -105,19 +107,8 @@ func checkMissingSlackVars(s *Slack) error {
 }
 
 func prepareSlackAttachment(e event.Event) slack.Attachment {
-	//
-	//msg := fmt.Sprintf(
-	//	"In *Namespace* %s *Kind* %s *Name* %s from *Component* %s on *Host* %s had *Reason* %s",
-	//	e.Namespace,
-	//	e.Kind,
-	//	e.Name,
-	//	e.Component,
-	//	e.Host,
-	//	e.Reason,
-	//)
-
 	msg := fmt.Sprintf(
-		"%s in namespace %s has been %s: %s",
+		"A %s in namespace %s has been %s: %s",
 		e.Kind,
 		e.Namespace,
 		e.Reason,

@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/cache"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
@@ -12,8 +14,6 @@ import (
 	"k8s.io/kubernetes/pkg/fields"
 	cmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	"k8s.io/kubernetes/pkg/util/wait"
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
 func Controller(conf *config.Config, eventHandler handlers.Handler) {

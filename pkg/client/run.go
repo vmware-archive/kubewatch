@@ -17,7 +17,6 @@ limitations under the License.
 package client
 
 import (
-	"flag"
 	"log"
 
 	"github.com/skippbox/kubewatch/config"
@@ -25,12 +24,6 @@ import (
 	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 	"github.com/skippbox/kubewatch/pkg/controller"
 )
-
-var handlerFlag string
-
-func init() {
-	flag.StringVar(&handlerFlag, "handler", "default", "Handler for event, can be [slack, default], default handler is printing event")
-}
 
 // Run runs the event loop processing with given handler
 func Run(conf *config.Config) {

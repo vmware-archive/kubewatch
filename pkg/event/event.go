@@ -33,41 +33,33 @@ type Event struct {
 	Name      string
 }
 
+var m = map[string]string{
+	"created": "Normal",
+	"deleted": "Danger",
+}
+
 // New create new KubewatchEvent
 func New(obj interface{}, action string) Event {
 	var namespace, kind, component, host, reason, status, name string
-
-	//if apiEvent, ok := obj.(*api.Event); ok {
-	//	namespace = apiEvent.ObjectMeta.Namespace
-	//	kind = apiEvent.InvolvedObject.Kind
-	//	component = apiEvent.Source.Component
-	//	host = apiEvent.Source.Host
-	//	reason = apiEvent.Reason
-	//	status = apiEvent.Type
-	//	name = apiEvent.InvolvedObject.Name
-	//}
-
 	if apiService, ok := obj.(*api.Service); ok {
 		namespace = apiService.ObjectMeta.Namespace
-		kind = apiService.TypeMeta.Kind
+		kind = "service"
 		component = string(apiService.Spec.Type)
 		reason = action
-		status = "Normal"
+		status = m[action]
 		name = apiService.Name
-	} else
-	if apiPod, ok := obj.(*api.Pod); ok {
+	} else if apiPod, ok := obj.(*api.Pod); ok {
 		namespace = apiPod.ObjectMeta.Namespace
-		kind = apiPod.TypeMeta.Kind
+		kind = "pod"
 		reason = action
 		host = apiPod.Spec.NodeName
-		status = "Normal"
+		status = m[action]
 		name = apiPod.Name
-	} else
-	if apiRC, ok := obj.(*api.ReplicationController); ok {
+	} else if apiRC, ok := obj.(*api.ReplicationController); ok {
 		name = apiRC.TypeMeta.Kind
-		kind = apiRC.Kind
+		kind = "replication controller"
 		reason = action
-		status = "Normal"
+		status = m[action]
 		name = apiRC.Name
 	}
 
