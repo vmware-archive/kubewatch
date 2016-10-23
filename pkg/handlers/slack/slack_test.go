@@ -21,14 +21,10 @@ import (
 	"reflect"
 	"testing"
 
-	"k8s.io/kubernetes/pkg/watch"
-
 	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/event"
 )
 
 func TestSlackInit(t *testing.T) {
-
 	s := &Slack{}
 	expectedError := fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 
@@ -48,17 +44,5 @@ func TestSlackInit(t *testing.T) {
 		if err := s.Init(c); !reflect.DeepEqual(err, tt.err) {
 			t.Fatalf("Init(): %v", err)
 		}
-	}
-}
-
-func TestSlackHandle(t *testing.T) {
-
-	w := watch.Event{}
-	s := &Slack{}
-
-	err := s.Handle(event.New(w))
-
-	if err == nil {
-		t.Fatalf("Handle(): %v", err)
 	}
 }

@@ -25,7 +25,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var configFileName = ".kubewatch.yaml"
+var ConfigFileName = ".kubewatch.yaml"
 
 type Handler struct {
 	Slack Slack `json:"slack"`
@@ -66,7 +66,7 @@ func New() (*Config, error) {
 
 func createIfNotExist() error {
 	// create file if not exist
-	configFile := filepath.Join(homeDir(), configFileName)
+	configFile := filepath.Join(homeDir(), ConfigFileName)
 	_, err := os.Stat(configFile)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -120,7 +120,7 @@ func (c *Config) Write() error {
 }
 
 func getConfigFile() string {
-	configFile := filepath.Join(homeDir(), configFileName)
+	configFile := filepath.Join(homeDir(), ConfigFileName)
 	if _, err := os.Stat(configFile); err == nil {
 		return configFile
 	}
