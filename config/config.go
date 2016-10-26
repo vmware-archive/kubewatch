@@ -25,7 +25,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var ConfigFileName = ".kubewatch.yaml"
+var ConfigFileName = "kubewatch.yaml"
 
 type Handler struct {
 	Slack Slack `json:"slack"`
@@ -44,7 +44,7 @@ type Resource struct {
 // Config struct contains kubewatch configuration
 type Config struct {
 	Handler  Handler  `json:"handler"`
-	Reason   []string `json:"reason"`
+	//Reason   []string `json:"reason"`
 	Resource Resource `json:"resource"`
 }
 
@@ -66,7 +66,7 @@ func New() (*Config, error) {
 
 func createIfNotExist() error {
 	// create file if not exist
-	configFile := filepath.Join(homeDir(), ConfigFileName)
+	configFile := filepath.Join(configDir(), ConfigFileName)
 	_, err := os.Stat(configFile)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -102,7 +102,29 @@ func (c *Config) Load() error {
 	if len(b) != 0 {
 		return yaml.Unmarshal(b, c)
 	}
+
 	return nil
+}
+
+func (c *Config) CheckMissingResourceEnvvars() {
+	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
+		c.Resource.DaemonSet = true
+	}
+	if !c.Resource.ReplicaSet && os.Getenv("KW_REPLICASET") == "true" {
+		c.Resource.ReplicaSet = true
+	}
+	if !c.Resource.Deployment && os.Getenv("KW_DEPLOYMENT") == "true" {
+		c.Resource.Deployment = true
+	}
+	if !c.Resource.Pod && os.Getenv("KW_POD") == "true" {
+		c.Resource.Pod = true
+	}
+	if !c.Resource.ReplicationController && os.Getenv("KW_REPLICATION_CONTROLLER") == "true" {
+		c.Resource.ReplicationController = true
+	}
+	if !c.Resource.Services && os.Getenv("KW_SERVICE") == "true" {
+		c.Resource.Services = true
+	}
 }
 
 func (c *Config) Write() error {
@@ -120,7 +142,7 @@ func (c *Config) Write() error {
 }
 
 func getConfigFile() string {
-	configFile := filepath.Join(homeDir(), ConfigFileName)
+	configFile := filepath.Join(configDir(), ConfigFileName)
 	if _, err := os.Stat(configFile); err == nil {
 		return configFile
 	}
@@ -128,10 +150,15 @@ func getConfigFile() string {
 	return ""
 }
 
-func homeDir() string {
+func configDir() string {
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("USERPROFILE")
 		return home
 	}
-	return os.Getenv("HOME")
+	//return os.Getenv("HOME")
+	path := "/etc/kubewatch"
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.Mkdir(path, 755)
+	}
+	return path
 }

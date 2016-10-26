@@ -43,7 +43,7 @@ var configStr = `
 `
 func TestLoadOK(t *testing.T) {
 	content := []byte(configStr)
-	tmpConfigFile, err := ioutil.TempFile(homeDir(), "kubewatch")
+	tmpConfigFile, err := ioutil.TempFile(configDir(), "kubewatch")
 	if err != nil {
 		t.Fatalf("TestLoad(): %+v", err)
 	}
