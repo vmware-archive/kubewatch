@@ -71,11 +71,12 @@ $ kubewatch
 
 # Run kubewatch in a Kubernetes cluster
 
-Create k8s secrets to hold slack token, channel:
-```console
-$ kubectl create secret generic kubewatch --from-literal=token=<token> --from-literal=channel=<channel>
-```
+In order to run kubewatch in a Kubernetes cluster, we suggest you to create a configMap to hold kubewatch configuration. An example is provided at `kubewatch-configmap.yaml`, do not forget to update your own slack channel and token parameters.
 
+Create k8s configmap:
+```console
+$ kubectl create -f kubewatch-configmap.yaml
+```
 Create the Pod:
 ```console
 $ kubectl create -f kubewatch.yaml
