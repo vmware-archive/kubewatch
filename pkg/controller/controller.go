@@ -57,7 +57,7 @@ func Controller(conf *config.Config, eventHandler handlers.Handler) {
 		rcStore = watchReplicationControllers(kubeClient, rcStore, eventHandler)
 	}
 
-	logrus.Fatal(http.ListenAndServe(":8080", nil))
+	logrus.Fatal(http.ListenAndServe(":8081", nil))
 }
 
 func watchPods(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {

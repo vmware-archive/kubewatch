@@ -5,22 +5,12 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: runseb/kubewatch:v0.0.1
-    args:
-      - --handler=slack
-    env:
-      - name: KW_SLACK_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: kubewatch
-            key: token
-      - name: KW_SLACK_CHANNEL
-        valueFrom:
-            secretKeyRef:
-              name: kubewatch
-              key: channel
+  - image: tuna/kubewatch:v0.0.1
     imagePullPolicy: Always
     name: kubewatch
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/kubewatch/
   - image: gcr.io/skippbox/kubectl:v1.3.0
     args:
       - proxy
@@ -29,3 +19,7 @@ spec:
     name: proxy
     imagePullPolicy: Always
   restartPolicy: Always
+  volumes:
+  - name: config-volume
+    configMap:
+      name: kubewatch

@@ -41,6 +41,7 @@ var RootCmd = &cobra.Command{
 		if err := config.Load(); err != nil {
 			logrus.Fatal(err)
 		}
+		config.CheckMissingResourceEnvvars()
 		c.Run(config)
 	},
 }

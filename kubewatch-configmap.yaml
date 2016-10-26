@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubewatch
+data:
+  kubewatch.yaml: |
+    handler:
+      slack:
+        token: <token>
+        channel: <channel>
+    resource:
+      deployment: false
+      replicationcontroller: false
+      replicaset: false
+      daemonset: false
+      services: true
+      pod: true
