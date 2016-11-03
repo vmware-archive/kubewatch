@@ -97,6 +97,7 @@ func watchServices(client *client.Client, store cache.Store, eventHandler handle
 		framework.ResourceEventHandlerFuncs{
 			AddFunc:    eventHandler.ObjectCreated,
 			DeleteFunc: eventHandler.ObjectDeleted,
+			UpdateFunc: eventHandler.ObjectUpdated,
 		},
 	)
 

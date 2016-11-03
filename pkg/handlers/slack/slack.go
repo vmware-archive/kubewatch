@@ -81,6 +81,10 @@ func (s *Slack) ObjectDeleted(obj interface{}) {
 	notifySlack(s, obj, "deleted")
 }
 
+func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
+	notifySlack(s, newObj, "updated")
+}
+
 func notifySlack(s *Slack, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 	api := slack.New(s.Token)
