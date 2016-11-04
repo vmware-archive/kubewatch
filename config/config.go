@@ -25,7 +25,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var ConfigFileName = "kubewatch.yaml"
+var ConfigFileName = ".kubewatch.yaml"
 
 type Handler struct {
 	Slack Slack `json:"slack"`
@@ -155,10 +155,10 @@ func configDir() string {
 		home := os.Getenv("USERPROFILE")
 		return home
 	}
-	//return os.Getenv("HOME")
-	path := "/etc/kubewatch"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, 755)
-	}
-	return path
+	return os.Getenv("HOME")
+	//path := "/etc/kubewatch"
+	//if _, err := os.Stat(path); os.IsNotExist(err) {
+	//	os.Mkdir(path, 755)
+	//}
+	//return path
 }
