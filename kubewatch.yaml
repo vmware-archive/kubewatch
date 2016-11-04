@@ -10,7 +10,7 @@ spec:
     name: kubewatch
     volumeMounts:
     - name: config-volume
-      mountPath: /etc/kubewatch/
+      mountPath: /root
   - image: gcr.io/skippbox/kubectl:v1.3.0
     args:
       - proxy

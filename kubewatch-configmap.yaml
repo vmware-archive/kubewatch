@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: kubewatch
 data:
-  kubewatch.yaml: |
+  .kubewatch.yaml: |
     handler:
       slack:
         token: <token>
