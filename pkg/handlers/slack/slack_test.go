@@ -21,27 +21,24 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/skippbox/kubewatch/config"
 )
 
 func TestSlackInit(t *testing.T) {
-	s := &Slack{}
+
 	expectedError := fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 
 	var Tests = []struct {
-		slack config.Slack
+		slack Slack
 		err   error
 	}{
-		{config.Slack{Token: "foo", Channel: "bar"}, nil},
-		{config.Slack{Token: "foo"}, expectedError},
-		{config.Slack{Channel: "bar"}, expectedError},
-		{config.Slack{}, expectedError},
+		{Slack{token: "foo", channel: "bar"}, nil},
+		{Slack{token: "foo"}, expectedError},
+		{Slack{channel: "bar"}, expectedError},
+		{Slack{}, expectedError},
 	}
 
 	for _, tt := range Tests {
-		c := &config.Config{}
-		c.Handler.Slack = tt.slack
-		if err := s.Init(c); !reflect.DeepEqual(err, tt.err) {
+		if err := tt.slack.Init(); !reflect.DeepEqual(err, tt.err) {
 			t.Fatalf("Init(): %v", err)
 		}
 	}

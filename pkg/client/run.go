@@ -19,27 +19,15 @@ package client
 import (
 	"log"
 
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers"
-	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 	"github.com/skippbox/kubewatch/pkg/controller"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
 // Run runs the event loop processing with given handler
-func Run(conf *config.Config) {
-	var eventHandler handlers.Handler
-	//switch {
-	//case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
-	//	eventHandler = new(slack.Slack)
-	//default:
-	//	eventHandler = new(handlers.Default)
-	//}
-	//TODO: temporary fix eventHandler = slack. Will add more later.
-	eventHandler = new(slack.Slack)
-
-	if err := eventHandler.Init(conf); err != nil {
+func Run(eventHandler handlers.Handler) {
+	if err := eventHandler.Init(); err != nil {
 		log.Fatal(err)
 	}
 
-	controller.Controller(conf, eventHandler)
+	controller.Controller(eventHandler)
 }

@@ -19,13 +19,12 @@ package slack
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/nlopes/slack"
 
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/event"
-	kbEvent "github.com/skippbox/kubewatch/pkg/event"
+	"github.com/skippbox/kubewatch/pkg/handlers"
 )
 
 var slackColors = map[string]string{
@@ -40,36 +39,39 @@ var slackErrMsg = `
 You need to set both slack token and channel for slack notify,
 using "--token/-t" and "--channel/-c", or using environment variables:
 
-export KW_SLACK_TOKEN=slack_token
-export KW_SLACK_CHANNEL=slack_channel
+export SLACK_TOKEN=slack_token
+export SLACK_CHANNEL=slack_channel
 
 Command line flags will override environment variables
 
 `
 
-// Slack handler implements handler.Handler interface,
-// Notify event to slack channel
+// Slack is the underlying struct used by the slack handler receivers
 type Slack struct {
-	Token   string
-	Channel string
+	token   string
+	channel string
+	config  *config.Config
+}
+
+// New returns a slack handler interface
+func New(conf *config.Config, channel string, token string) handlers.Handler {
+	c := Slack{
+		token:   token,
+		channel: channel,
+		config:  conf,
+	}
+	handler := handlers.Handler(&c)
+	return handler
+}
+
+// Config returns the config data that will be used by the handler
+func (s *Slack) Config() *config.Config {
+	return s.config
 }
 
 // Init prepares slack configuration
-func (s *Slack) Init(c *config.Config) error {
-	token := c.Handler.Slack.Token
-	channel := c.Handler.Slack.Channel
-
-	if token == "" {
-		token = os.Getenv("KW_SLACK_TOKEN")
-	}
-
-	if channel == "" {
-		channel = os.Getenv("KW_SLACK_CHANNEL")
-	}
-
-	s.Token = token
-	s.Channel = channel
-
+func (s *Slack) Init() error {
+	fmt.Println(s.channel, s.token)
 	return checkMissingSlackVars(s)
 }
 
@@ -86,14 +88,14 @@ func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
 }
 
 func notifySlack(s *Slack, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
-	api := slack.New(s.Token)
+	e := event.New(obj, action)
+	api := slack.New(s.token)
 	params := slack.PostMessageParameters{}
 	attachment := prepareSlackAttachment(e)
 
 	params.Attachments = []slack.Attachment{attachment}
 	params.AsUser = true
-	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	channelID, timestamp, err := api.PostMessage(s.channel, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
@@ -103,7 +105,7 @@ func notifySlack(s *Slack, obj interface{}, action string) {
 }
 
 func checkMissingSlackVars(s *Slack) error {
-	if s.Token == "" || s.Channel == "" {
+	if s.token == "" || s.channel == "" {
 		return fmt.Errorf(slackErrMsg, "Missing slack token or channel")
 	}
 

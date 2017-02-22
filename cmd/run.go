@@ -20,17 +20,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// configCmd represents the config command
-var configCmd = &cobra.Command{
-	Use:   "config SUBCOMMAND",
-	Short: "config modifies kubewatch configuration",
-	Long:  `config command allows admin setup his own configuration for running kubewatch`,
+// runCmd represents the run command
+var runCmd = &cobra.Command{
+	Use:   "run SUBCOMMAND",
+	Short: "run modifies kubewatch runuration",
+	Long:  `run command allows admin setup his own runuration for running kubewatch`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(configCmd)
-	configCmd.AddCommand(resourceConfigCmd)
+	RootCmd.AddCommand(runCmd)
+	runCmd.AddCommand(slackCmd, alertManagerCmd)
 }
