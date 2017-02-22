@@ -23,8 +23,8 @@ import (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run SUBCOMMAND",
-	Short: "run modifies kubewatch runuration",
-	Long:  `run command allows admin setup his own runuration for running kubewatch`,
+	Short: "run is used run a backend handler",
+	Long:  `run command allows you to start the kubewatch service for a particular backend handler`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

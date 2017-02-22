@@ -50,4 +50,6 @@ func init() {
 	slackCmd.Flags().StringP(tokenKey, "t", "", "Specify slack token")
 	viper.BindPFlag(channelKey, slackCmd.Flags().Lookup(channelKey))
 	viper.BindPFlag(tokenKey, slackCmd.Flags().Lookup(tokenKey))
+	viper.BindEnv(channelKey)
+	viper.BindEnv(tokenKey)
 }

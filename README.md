@@ -134,6 +134,5 @@ kubewatch run alertmanager
 
 ##### Environment Variables
 
-* `ALERTMANAGER_LABEL`
 * `ALERTMANAGER_URL`
 

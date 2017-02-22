@@ -49,4 +49,5 @@ func init() {
 	alertManagerCmd.Flags().StringSliceP(labelKey, "l", []string{}, "Add one or more labels to the alertmanager event, --label mylabel=blah")
 	viper.BindPFlag(urlKey, alertManagerCmd.Flags().Lookup(urlKey))
 	viper.BindPFlag(labelKey, alertManagerCmd.Flags().Lookup(labelKey))
+	viper.BindEnv(urlKey)
 }
