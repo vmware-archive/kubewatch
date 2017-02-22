@@ -1,6 +1,11 @@
 FROM alpine:3.4
+
+ENV KUBEWATCH_HANDLER slack
+
 RUN apk add --update ca-certificates
 
 COPY kubewatch /bin/kubewatch
 
-ENTRYPOINT ["/bin/kubewatch"]
+RUN chmod 755 /bin/kubewatch
+
+CMD /bin/kubewatch run ${KUBEWATCH_HANDLER}

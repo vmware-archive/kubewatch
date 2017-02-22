@@ -1,11 +1,14 @@
 # Kubewatch
 [![Build Status](https://travis-ci.org/skippbox/kubewatch.svg?branch=master)](https://travis-ci.org/skippbox/kubewatch) [![Join us on Slack](https://s3.eu-central-1.amazonaws.com/ngtuna/join-us-on-slack.png)](https://skippbox.herokuapp.com)
 
-`kubewatch` is a Kubernetes watcher that currently publishes notification to Slack. Run it in your k8s cluster, and you will get event notifications in a slack channel.
+`kubewatch` is a Kubernetes watcher that currently publishes notification to the following backend event handlers:
+
+* Slack
+* Alertmanager
 
 ## Run kubewatch in a Kubernetes cluster
 
-In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains a SLACK API token, channel.
+In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration.
 
 An example is provided at [`kubewatch-configmap.yaml`](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml), do not forget to update your own slack channel and token parameters. Alternatively, you could use secrets.
 
@@ -22,7 +25,7 @@ $ kubectl create -f kubewatch.yaml
 
 A `kubewatch` container will be created along with `kubectl` sidecar container in order to reach the API server.
 
-Once the Pod is running, you will start seeing Kubernetes events in your configured Slack channel. Here is a screenshot:
+Once the Pod is running, you will start seeing Kubernetes events in your configured backend event handler. Here is a screenshot of using the Slack backend handler:
 
 ![slack](./docs/slack.png)
 
@@ -82,12 +85,6 @@ $ go get -u github.com/skippbox/kubewatch
 ## Configuration
 Kubewatch supports `config` command for configuration. Config file will be saved at $HOME/.kubewatch.yaml
 
-### Configure slack
-
-```console
-$ kubewatch config slack --channel <slack_channel> --token <slack_token>
-```
-
 ### Configure resources to be watched
 
 ```console
@@ -98,16 +95,44 @@ $ kubewatch config resource --rc --po --svc
 $ kubewatch config resource --svc
 ```
 
-### Environment variables
-You have an altenative choice to set your SLACK token, channel via environment variables:
+### Backend event handlers
 
-```console
-$ export KW_SLACK_TOKEN='XXXXXXXXXXXXXXXX'
-$ export KW_SLACK_CHANNEL='#channel_name'
+#### Slack
+
+Provides event handler integrations with your Slack channels.
+
+##### Running
+
+``` 
+kubewatch run slack
 ```
 
-### Run kubewatch locally
+##### Parameters
 
-```console
-$ kubewatch
+* `-c, --channel`
+* `-t, --token`
+
+##### Environment Variables
+
+* `SLACK_CHANNEL`
+* `SLACK_TOKEN`
+
+#### Alertmanager
+
+Provides event handler intergrations with Prometheus's Alertmanager
+ 
+##### Running 
+ 
+``` 
+kubewatch run alertmanager
 ```
+
+##### Parameters
+
+* `-l, --label`
+* `-u, --url `
+
+##### Environment Variables
+
+* `ALERTMANAGER_URL`
+

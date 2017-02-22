@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/handlers"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/cache"
@@ -32,7 +31,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/wait"
 )
 
-func Controller(conf *config.Config, eventHandler handlers.Handler) {
+func Controller(eventHandler handlers.Handler) {
 
 	factory := cmdutil.NewFactory(nil)
 	kubeConfig, err := factory.ClientConfig()
@@ -42,17 +41,19 @@ func Controller(conf *config.Config, eventHandler handlers.Handler) {
 
 	kubeClient := client.NewOrDie(kubeConfig)
 
-	if conf.Resource.Pod {
+	cfg := eventHandler.Config()
+
+	if cfg.Resource.Pod {
 		var podsStore cache.Store
 		podsStore = watchPods(kubeClient, podsStore, eventHandler)
 	}
 
-	if conf.Resource.Services {
+	if cfg.Resource.Services {
 		var servicesStore cache.Store
 		servicesStore = watchServices(kubeClient, servicesStore, eventHandler)
 	}
 
-	if conf.Resource.ReplicationController {
+	if cfg.Resource.ReplicationController {
 		var rcStore cache.Store
 		rcStore = watchReplicationControllers(kubeClient, rcStore, eventHandler)
 	}

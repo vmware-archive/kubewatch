@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/skippbox/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // resourceConfigCmd represents the resource subcommand
 var resourceConfigCmd = &cobra.Command{
 	Use:   "resource FLAG",
 	Short: "specific resources to be watched",
-	Long: `specific resources to be watched`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific resources to be watched`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
@@ -46,6 +46,13 @@ var resourceConfigCmd = &cobra.Command{
 			conf.Resource.Deployment = b
 		} else {
 			logrus.Fatal("deployments", err)
+		}
+
+		b, err = cmd.Flags().GetBool("ds")
+		if err == nil {
+			conf.Resource.DaemonSet = b
+		} else {
+			logrus.Fatal("ds", err)
 		}
 
 		b, err = cmd.Flags().GetBool("po")
@@ -78,6 +85,7 @@ var resourceConfigCmd = &cobra.Command{
 func init() {
 	resourceConfigCmd.Flags().Bool("svc", false, "watch for services")
 	resourceConfigCmd.Flags().Bool("deployments", false, "watch for deployments")
+	resourceConfigCmd.Flags().Bool("ds", false, "watch for daemonsets")
 	resourceConfigCmd.Flags().Bool("po", false, "watch for pods")
 	resourceConfigCmd.Flags().Bool("rc", false, "watch for replication controllers")
 	resourceConfigCmd.Flags().Bool("rs", false, "watch for replicasets")

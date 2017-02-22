@@ -17,19 +17,15 @@ limitations under the License.
 package config
 
 import (
-	"os"
-	"runtime"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"runtime"
 
 	"gopkg.in/yaml.v2"
 )
 
 var ConfigFileName = ".kubewatch.yaml"
-
-type Handler struct {
-	Slack Slack `json:"slack"`
-}
 
 // Resource contains resource configuration
 type Resource struct {
@@ -43,15 +39,8 @@ type Resource struct {
 
 // Config struct contains kubewatch configuration
 type Config struct {
-	Handler  Handler  `json:"handler"`
-	//Reason   []string `json:"reason"`
 	Resource Resource `json:"resource"`
-}
-
-// Slack contains slack configuration
-type Slack struct {
-	Token   string `json:"token"`
-	Channel string `json:"channel"`
+	Handler interface{} `json:"handler"`
 }
 
 // New creates new config object
@@ -124,12 +113,6 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Services && os.Getenv("KW_SERVICE") == "true" {
 		c.Resource.Services = true
-	}
-	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
-		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
-	}
-	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
-		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
 	}
 }
 

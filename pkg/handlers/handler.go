@@ -18,22 +18,16 @@ package handlers
 
 import (
 	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers/slack"
 )
 
 // Handler is implemented by any handler.
 // The Handle method is used to process event
 type Handler interface {
-	Init(c *config.Config) error
+	Init() error
+	Config() *config.Config
 	ObjectCreated(obj interface{})
 	ObjectDeleted(obj interface{})
 	ObjectUpdated(oldObj, newObj interface{})
-}
-
-// Map maps each event handler function to a name for easily lookup
-var Map = map[string]interface{}{
-	"default": &Default{},
-	"slack":   &slack.Slack{},
 }
 
 // Default handler implements Handler interface,

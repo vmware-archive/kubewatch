@@ -14,23 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package alertmanager
 
 import (
-	"github.com/spf13/cobra"
+	"fmt"
+	"reflect"
+	"testing"
+
 )
 
-// configCmd represents the config command
-var configCmd = &cobra.Command{
-	Use:   "config SUBCOMMAND",
-	Short: "config modifies kubewatch configuration",
-	Long:  `config command allows admin setup his own configuration for running kubewatch`,
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
-	},
-}
+func TestAlertManagerInit(t *testing.T) {
 
-func init() {
-	RootCmd.AddCommand(configCmd)
-	configCmd.AddCommand(resourceConfigCmd)
+	expectedError := fmt.Errorf(alertManagerErrMsg, "Missing alertmanager url")
+
+	var Tests = []struct {
+		alertManager AlertManager
+		err   error
+	}{
+		{AlertManager{url: "foo"}, nil},
+		{AlertManager{}, expectedError},
+	}
+
+	for _, tt := range Tests {
+		if err := tt.alertManager.Init(); !reflect.DeepEqual(err, tt.err) {
+			t.Fatalf("Init(): %v", err)
+		}
+	}
 }

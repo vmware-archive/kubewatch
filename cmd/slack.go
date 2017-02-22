@@ -17,46 +17,39 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/skippbox/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/skippbox/kubewatch/pkg/client"
+	"github.com/skippbox/kubewatch/pkg/handlers/slack"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-// slackConfigCmd represents the slack subcommand
-var slackConfigCmd = &cobra.Command{
-	Use:   "slack FLAG",
-	Short: "specific slack configuration",
-	Long: `specific slack configuration`,
-	Run: func(cmd *cobra.Command, args []string){
+// slackCmd represents the slack subcommand
+var slackCmd = &cobra.Command{
+	Use:   "slack SUBCOMMAND",
+	Short: "slack runs kubewatch using the slack handler",
+	Long: `slack command allows you to run kubewatch using the slack handler. this is used when
+	intergrating with slack channels.`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
 		}
+		channel := viper.GetString(channelKey)
+		token := viper.GetString(tokenKey)
+		handler := slack.New(conf, channel, token)
+		client.Run(handler)
 
-		token, err := cmd.Flags().GetString("token")
-		if err == nil {
-			if len(token) > 0 {
-				conf.Handler.Slack.Token = token
-			}
-		} else {
-			logrus.Fatal(err)
-		}
-		channel, err := cmd.Flags().GetString("channel")
-		if err == nil {
-			if len(channel) > 0 {
-				conf.Handler.Slack.Channel = channel
-			}
-		} else {
-			logrus.Fatal(err)
-		}
-
-		if err = conf.Write(); err != nil {
-			logrus.Fatal(err)
-		}
 	},
 }
 
 func init() {
-	slackConfigCmd.Flags().StringP("channel", "c", "", "Specify slack channel")
-	slackConfigCmd.Flags().StringP("token", "t", "", "Specify slack token")
+	viper.SetEnvPrefix("slack")
+	slackCmd.Flags().StringP(channelKey, "c", "", "Specify slack channel")
+	slackCmd.Flags().StringP(tokenKey, "t", "", "Specify slack token")
+	viper.BindPFlag(channelKey, slackCmd.Flags().Lookup(channelKey))
+	viper.BindPFlag(tokenKey, slackCmd.Flags().Lookup(tokenKey))
+	viper.BindEnv(channelKey)
+	viper.BindEnv(tokenKey)
 }
