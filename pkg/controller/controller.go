@@ -166,7 +166,7 @@ func watchDeployments(client *client.ExtensionsClient, eventHandler handlers.Han
 }
 
 func watchJobs(client *client.ExtensionsClient, eventHandler handlers.Handler) cache.Store {
-	//Define what we want to look for (Deployments)
+	//Define what we want to look for (Jobs)
 	watchlist := cache.NewListWatchFromClient(client, "jobs", api.NamespaceAll, fields.Everything())
 
 	resyncPeriod := 30 * time.Minute
@@ -189,7 +189,7 @@ func watchJobs(client *client.ExtensionsClient, eventHandler handlers.Handler) c
 }
 
 func watchPersistenVolumes(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
-	//Define what we want to look for (Deployments)
+	//Define what we want to look for (PersistenVolumes)
 	watchlist := cache.NewListWatchFromClient(client, "persistentvolumes", api.NamespaceAll, fields.Everything())
 
 	resyncPeriod := 30 * time.Minute
