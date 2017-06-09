@@ -45,29 +45,34 @@ func Controller(conf *config.Config, eventHandler handlers.Handler) {
 	kubeExtensionsClient := client.NewExtensionsOrDie(kubeConfig)
 
 	if conf.Resource.Pod {
-		var podsStore cache.Store
-		podsStore = watchPods(kubeClient, podsStore, eventHandler)
+		watchPods(kubeClient, eventHandler)
 	}
 
 	if conf.Resource.Services {
-		var servicesStore cache.Store
-		servicesStore = watchServices(kubeClient, servicesStore, eventHandler)
+		watchServices(kubeClient, eventHandler)
 	}
 
 	if conf.Resource.ReplicationController {
-		var rcStore cache.Store
-		rcStore = watchReplicationControllers(kubeClient, rcStore, eventHandler)
+		watchReplicationControllers(kubeClient, eventHandler)
 	}
 
 	if conf.Resource.Deployment {
-		var rcStore cache.Store
-		rcStore = watchDeployments(kubeExtensionsClient, rcStore, eventHandler)
+		watchDeployments(kubeExtensionsClient, eventHandler)
+	}
+
+	if conf.Resource.Job {
+		watchJobs(kubeExtensionsClient, eventHandler)
+	}
+
+	if conf.Resource.PersistentVolume {
+		var servicesStore cache.Store
+		servicesStore = watchPersistenVolumes(kubeClient, servicesStore, eventHandler)
 	}
 
 	logrus.Fatal(http.ListenAndServe(":8081", nil))
 }
 
-func watchPods(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
+func watchPods(client *client.Client, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (Pods)
 	watchlist := cache.NewListWatchFromClient(client, "pods", api.NamespaceAll, fields.Everything())
 
@@ -90,7 +95,7 @@ func watchPods(client *client.Client, store cache.Store, eventHandler handlers.H
 	return eStore
 }
 
-func watchServices(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
+func watchServices(client *client.Client, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (Services)
 	watchlist := cache.NewListWatchFromClient(client, "services", api.NamespaceAll, fields.Everything())
 
@@ -114,7 +119,7 @@ func watchServices(client *client.Client, store cache.Store, eventHandler handle
 	return eStore
 }
 
-func watchReplicationControllers(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
+func watchReplicationControllers(client *client.Client, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (ReplicationControllers)
 	watchlist := cache.NewListWatchFromClient(client, "replicationcontrollers", api.NamespaceAll, fields.Everything())
 
@@ -137,7 +142,7 @@ func watchReplicationControllers(client *client.Client, store cache.Store, event
 	return eStore
 }
 
-func watchDeployments(client *client.ExtensionsClient, store cache.Store, eventHandler handlers.Handler) cache.Store {
+func watchDeployments(client *client.ExtensionsClient, eventHandler handlers.Handler) cache.Store {
 	//Define what we want to look for (Deployments)
 	watchlist := cache.NewListWatchFromClient(client, "deployments", api.NamespaceAll, fields.Everything())
 
@@ -147,6 +152,52 @@ func watchDeployments(client *client.ExtensionsClient, store cache.Store, eventH
 	eStore, eController := framework.NewInformer(
 		watchlist,
 		&v1beta1.Deployment{},
+		resyncPeriod,
+		framework.ResourceEventHandlerFuncs{
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
+		},
+	)
+
+	//Run the controller as a goroutine
+	go eController.Run(wait.NeverStop)
+
+	return eStore
+}
+
+func watchJobs(client *client.ExtensionsClient, eventHandler handlers.Handler) cache.Store {
+	//Define what we want to look for (Deployments)
+	watchlist := cache.NewListWatchFromClient(client, "jobs", api.NamespaceAll, fields.Everything())
+
+	resyncPeriod := 30 * time.Minute
+
+	//Setup an informer to call functions when the watchlist changes
+	eStore, eController := framework.NewInformer(
+		watchlist,
+		&v1beta1.Job{},
+		resyncPeriod,
+		framework.ResourceEventHandlerFuncs{
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
+		},
+	)
+
+	//Run the controller as a goroutine
+	go eController.Run(wait.NeverStop)
+
+	return eStore
+}
+
+func watchPersistenVolumes(client *client.Client, store cache.Store, eventHandler handlers.Handler) cache.Store {
+	//Define what we want to look for (Deployments)
+	watchlist := cache.NewListWatchFromClient(client, "persistentvolumes", api.NamespaceAll, fields.Everything())
+
+	resyncPeriod := 30 * time.Minute
+
+	//Setup an informer to call functions when the watchlist changes
+	eStore, eController := framework.NewInformer(
+		watchlist,
+		&api.PersistentVolume{},
 		resyncPeriod,
 		framework.ResourceEventHandlerFuncs{
 			AddFunc:    eventHandler.ObjectCreated,

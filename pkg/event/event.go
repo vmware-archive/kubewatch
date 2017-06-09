@@ -19,6 +19,7 @@ package event
 import (
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/apis/extensions"
+	"k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 )
 
 // Event represent an event got from k8s api server
@@ -69,6 +70,18 @@ func New(obj interface{}, action string) Event {
 		reason = action
 		status = m[action]
 		name = apiDeployment.Name
+	} else if apiJob, ok := obj.(*v1beta1.Job); ok {
+		name = apiJob.TypeMeta.Kind
+		kind = "job"
+		reason = action
+		status = m[action]
+		name = apiJob.Name
+	} else if apiPV, ok := obj.(*api.PersistentVolume); ok {
+		name = apiPV.TypeMeta.Kind
+		kind = "persistent volume"
+		reason = action
+		status = m[action]
+		name = apiPV.Name
 	}
 
 	kbEvent := Event{
