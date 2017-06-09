@@ -24,6 +24,7 @@ import (
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/handlers"
 	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
 	"k8s.io/kubernetes/pkg/client/cache"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/controller/framework"
@@ -41,6 +42,7 @@ func Controller(conf *config.Config, eventHandler handlers.Handler) {
 	}
 
 	kubeClient := client.NewOrDie(kubeConfig)
+	kubeExtensionsClient := client.NewExtensionsOrDie(kubeConfig)
 
 	if conf.Resource.Pod {
 		var podsStore cache.Store
@@ -55,6 +57,11 @@ func Controller(conf *config.Config, eventHandler handlers.Handler) {
 	if conf.Resource.ReplicationController {
 		var rcStore cache.Store
 		rcStore = watchReplicationControllers(kubeClient, rcStore, eventHandler)
+	}
+
+	if conf.Resource.Deployment {
+		var rcStore cache.Store
+		rcStore = watchDeployments(kubeExtensionsClient, rcStore, eventHandler)
 	}
 
 	logrus.Fatal(http.ListenAndServe(":8081", nil))
@@ -117,6 +124,29 @@ func watchReplicationControllers(client *client.Client, store cache.Store, event
 	eStore, eController := framework.NewInformer(
 		watchlist,
 		&api.ReplicationController{},
+		resyncPeriod,
+		framework.ResourceEventHandlerFuncs{
+			AddFunc:    eventHandler.ObjectCreated,
+			DeleteFunc: eventHandler.ObjectDeleted,
+		},
+	)
+
+	//Run the controller as a goroutine
+	go eController.Run(wait.NeverStop)
+
+	return eStore
+}
+
+func watchDeployments(client *client.ExtensionsClient, store cache.Store, eventHandler handlers.Handler) cache.Store {
+	//Define what we want to look for (Deployments)
+	watchlist := cache.NewListWatchFromClient(client, "deployments", api.NamespaceAll, fields.Everything())
+
+	resyncPeriod := 30 * time.Minute
+
+	//Setup an informer to call functions when the watchlist changes
+	eStore, eController := framework.NewInformer(
+		watchlist,
+		&v1beta1.Deployment{},
 		resyncPeriod,
 		framework.ResourceEventHandlerFuncs{
 			AddFunc:    eventHandler.ObjectCreated,
