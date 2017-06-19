@@ -17,10 +17,10 @@ limitations under the License.
 package config
 
 import (
-	"os"
-	"runtime"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"runtime"
 
 	"gopkg.in/yaml.v2"
 )
@@ -39,11 +39,13 @@ type Resource struct {
 	DaemonSet             bool `json:"ds"`
 	Services              bool `json:"svc"`
 	Pod                   bool `json:"po"`
+	Job                   bool `json:"job"`
+	PersistentVolume      bool `json:"pv"`
 }
 
 // Config struct contains kubewatch configuration
 type Config struct {
-	Handler  Handler  `json:"handler"`
+	Handler Handler `json:"handler"`
 	//Reason   []string `json:"reason"`
 	Resource Resource `json:"resource"`
 }
@@ -124,6 +126,12 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Services && os.Getenv("KW_SERVICE") == "true" {
 		c.Resource.Services = true
+	}
+	if !c.Resource.Job && os.Getenv("KW_JOB") == "true" {
+		c.Resource.Job = true
+	}
+	if !c.Resource.PersistentVolume && os.Getenv("KW_PERSISTENT_VOLUME") == "true" {
+		c.Resource.PersistentVolume = true
 	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
