@@ -17,9 +17,9 @@ limitations under the License.
 package event
 
 import (
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/apis/extensions"
-	"k8s.io/kubernetes/pkg/apis/extensions/v1beta1"
+	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
+	"k8s.io/client-go/pkg/apis/batch"
 )
 
 // Event represent an event got from k8s api server
@@ -44,39 +44,39 @@ var m = map[string]string{
 // New create new KubewatchEvent
 func New(obj interface{}, action string) Event {
 	var namespace, kind, component, host, reason, status, name string
-	if apiService, ok := obj.(*api.Service); ok {
+	if apiService, ok := obj.(*v1.Service); ok {
 		namespace = apiService.ObjectMeta.Namespace
 		name = apiService.Name
 		kind = "service"
 		component = string(apiService.Spec.Type)
 		reason = action
 		status = m[action]
-	} else if apiPod, ok := obj.(*api.Pod); ok {
+	} else if apiPod, ok := obj.(*v1.Pod); ok {
 		namespace = apiPod.ObjectMeta.Namespace
 		name = apiPod.Name
 		kind = "pod"
 		reason = action
 		host = apiPod.Spec.NodeName
 		status = m[action]
-	} else if apiRC, ok := obj.(*api.ReplicationController); ok {
+	} else if apiRC, ok := obj.(*v1.ReplicationController); ok {
 		namespace = apiRC.ObjectMeta.Namespace
 		name = apiRC.Name
 		kind = "replication controller"
 		reason = action
 		status = m[action]
-	} else if apiDeployment, ok := obj.(*extensions.Deployment); ok {
+	} else if apiDeployment, ok := obj.(*v1beta1.Deployment); ok {
 		namespace = apiDeployment.ObjectMeta.Namespace
 		name = apiDeployment.Name
 		kind = "deployment"
 		reason = action
 		status = m[action]
-	} else if apiJob, ok := obj.(*v1beta1.Job); ok {
+	} else if apiJob, ok := obj.(*batch.Job); ok {
 		namespace = apiJob.ObjectMeta.Namespace
 		name = apiJob.Name
 		kind = "job"
 		reason = action
 		status = m[action]
-	} else if apiPV, ok := obj.(*api.PersistentVolume); ok {
+	} else if apiPV, ok := obj.(*v1.PersistentVolume); ok {
 		name = apiPV.Name
 		kind = "persistent volume"
 		reason = action
