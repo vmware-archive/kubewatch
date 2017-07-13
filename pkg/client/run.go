@@ -41,5 +41,5 @@ func Run(conf *config.Config) {
 		log.Fatal(err)
 	}
 
-	controller.Controller(conf, eventHandler)
+	controller.Start(conf, eventHandler)
 }
