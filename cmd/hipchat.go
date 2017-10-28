@@ -57,6 +57,7 @@ var hipchatConfigCmd = &cobra.Command{
 }
 
 func init() {
-	hipchatConfigCmd.Flags().StringP("channel", "c", "", "Specify hipchat channel")
+	hipchatConfigCmd.Flags().StringP("room", "c", "", "Specify hipchat room")
 	hipchatConfigCmd.Flags().StringP("token", "t", "", "Specify hipchat token")
+	hipchatConfigCmd.Flags().StringP("server-url", "u", "", "Specify hipchat server url")
 }

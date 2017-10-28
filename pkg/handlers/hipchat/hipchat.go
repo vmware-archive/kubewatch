@@ -48,27 +48,34 @@ Command line flags will override environment variables
 `
 
 // Hipchat handler implements handler.Handler interface,
-// Notify event to hipchat channel
+// Notify event to hipchat room
 type Hipchat struct {
 	Token   string
-	Channel string
+	Room 	string
+	Url     string
 }
 
 // Init prepares hipchat configuration
 func (s *Hipchat) Init(c *config.Config) error {
+	url	:= c.Handler.Hipchat.Url
+	room := c.Handler.Hipchat.Room
 	token := c.Handler.Hipchat.Token
-	channel := c.Handler.Hipchat.Channel
 
 	if token == "" {
 		token = os.Getenv("KW_HIPCHAT_TOKEN")
 	}
 
-	if channel == "" {
-		channel = os.Getenv("KW_HIPCHAT_CHANNEL")
+	if room == "" {
+		room = os.Getenv("KW_HIPCHAT_ROOM")
+	}
+
+	if url == "" {
+		url = os.Getenv("KW_HIPCHAT_URL")
 	}
 
 	s.Token = token
-	s.Channel = channel
+	s.Room  = room
+	s.Url   = url
 
 	return checkMissingHipchatVars(s)
 }
@@ -93,7 +100,7 @@ func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 
 	params.Attachments = []hipchat.Attachment{attachment}
 	params.AsUser = true
-	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	channelID, timestamp, err := api.PostMessage(s.Room, "", params)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
@@ -103,7 +110,7 @@ func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 }
 
 func checkMissingHipchatVars(s *Hipchat) error {
-	if s.Token == "" || s.Channel == "" {
+	if s.Token == "" || s.Room == "" {
 		return fmt.Errorf(hipchatErrMsg, "Missing hipchat token or channel")
 	}
 

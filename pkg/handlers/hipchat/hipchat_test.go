@@ -29,7 +29,7 @@ func TestSlackInit(t *testing.T) {
 	expectedError := fmt.Errorf(hipchatErrMsg, "Missing hipchat token or channel")
 
 	var Tests = []struct {
-		slack config.Hipchat
+		hipchat config.Hipchat
 		err   error
 	}{
 		{config.Hipchat{Token: "foo", Channel: "bar"}, nil},
