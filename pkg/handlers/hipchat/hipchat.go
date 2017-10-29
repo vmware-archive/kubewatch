@@ -28,10 +28,10 @@ import (
 	kbEvent "github.com/skippbox/kubewatch/pkg/event"
 )
 
-var hipchatColors = map[string]string{
-	"Normal":  "good",
-	"Warning": "warning",
-	"Danger":  "danger",
+var hipchatColors = map[string]hipchat.Color{
+	"Normal":  hipchat.ColorGreen,
+	"Warning": hipchat.ColorYellow,
+	"Danger":  hipchat.ColorRed,
 }
 
 var hipchatErrMsg = `
@@ -94,19 +94,17 @@ func (s *Hipchat) ObjectUpdated(oldObj, newObj interface{}) {
 
 func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
-	api := hipchat.NewClient(s.Token)
-	params := hipchat.PostMessageParameters{}
-	attachment := prepareHipchatAttachment(e)
+	client := hipchat.NewClient(s.Token)
 
-	params.Attachments = []hipchat.Attachment{attachment}
-	params.AsUser = true
-	channelID, timestamp, err := api.PostMessage(s.Room, "", params)
+	notificationRequest := prepareHipchatNotification(e)
+	_, err := client.Room.Notification(s.Room, &notificationRequest)
+
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
 	}
 
-	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
+	log.Printf("Message successfully sent to room %s", s.Room)
 }
 
 func checkMissingHipchatVars(s *Hipchat) error {
@@ -117,7 +115,7 @@ func checkMissingHipchatVars(s *Hipchat) error {
 	return nil
 }
 
-func prepareHipchatAttachment(e event.Event) hipchat.Attachment {
+func prepareHipchatNotification(e event.Event) hipchat.NotificationRequest {
 	msg := fmt.Sprintf(
 		"A %s in namespace %s has been %s: %s",
 		e.Kind,
@@ -126,20 +124,17 @@ func prepareHipchatAttachment(e event.Event) hipchat.Attachment {
 		e.Name,
 	)
 
-	attachment := hipchat.Attachment{
-		Fields: []hipchat.AttachmentField{
-			hipchat.AttachmentField{
-				Title: "kubewatch",
-				Value: msg,
-			},
-		},
+
+	notification := hipchat.NotificationRequest{
+		Message: msg,
+		Notify: true,
+		From: "kubewatch",
 	}
 
 	if color, ok := hipchatColors[e.Status]; ok {
-		attachment.Color = color
+
+		notification.Color = color
 	}
-
-	attachment.MarkdownIn = []string{"fields"}
-
-	return attachment
+	
+	return notification
 }

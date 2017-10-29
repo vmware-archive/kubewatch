@@ -60,7 +60,8 @@ type Slack struct {
 // Hipchat contains slack configuration
 type Hipchat struct {
 	Token   string `json:"token"`
-	Channel string `json:"channel"`
+	Room string `json:"room"`
+	Url string `json:"url"`
 }
 
 
