@@ -26,6 +26,7 @@ import (
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/event"
 	kbEvent "github.com/skippbox/kubewatch/pkg/event"
+	"net/url"
 )
 
 var hipchatColors = map[string]hipchat.Color{
@@ -94,17 +95,25 @@ func (s *Hipchat) ObjectUpdated(oldObj, newObj interface{}) {
 
 func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
+
 	client := hipchat.NewClient(s.Token)
+	if s.Url != "" {
+		baseUrl, err := url.Parse(s.Url)
+		if err != nil {
+			panic(err)
+		}
+		client.BaseURL = baseUrl
+	}
 
 	notificationRequest := prepareHipchatNotification(e)
-	_, err := client.Room.Notification(s.Room, &notificationRequest)
+	resp, err := client.Room.Notification(s.Room, &notificationRequest)
 
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
 	}
 
-	log.Printf("Message successfully sent to room %s", s.Room)
+	log.Printf("Message successfully sent to room %s with resp %s", s.Room, resp)
 }
 
 func checkMissingHipchatVars(s *Hipchat) error {
@@ -135,6 +144,6 @@ func prepareHipchatNotification(e event.Event) hipchat.NotificationRequest {
 
 		notification.Color = color
 	}
-	
+
 	return notification
 }

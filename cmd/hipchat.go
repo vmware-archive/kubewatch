@@ -41,10 +41,10 @@ var hipchatConfigCmd = &cobra.Command{
 		} else {
 			logrus.Fatal(err)
 		}
-		channel, err := cmd.Flags().GetString("channel")
+		room, err := cmd.Flags().GetString("room")
 		if err == nil {
-			if len(channel) > 0 {
-				conf.Handler.Hipchat.Channel = channel
+			if len(room) > 0 {
+				conf.Handler.Hipchat.Room = room
 			}
 		} else {
 			logrus.Fatal(err)
