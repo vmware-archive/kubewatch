@@ -114,7 +114,7 @@ func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 		return
 	}
 
-	log.Printf("Message successfully sent to room %s with resp %s", s.Room, resp)
+	log.Printf("Message successfully sent to room %s", s.Room)
 }
 
 func checkMissingHipchatVars(s *Hipchat) error {
