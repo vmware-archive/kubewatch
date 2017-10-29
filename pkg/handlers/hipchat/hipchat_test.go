@@ -24,7 +24,7 @@ import (
 	"github.com/skippbox/kubewatch/config"
 )
 
-func TestSlackInit(t *testing.T) {
+func TestHipchatInit(t *testing.T) {
 	s := &Hipchat{}
 	expectedError := fmt.Errorf(hipchatErrMsg, "Missing hipchat token or channel")
 
@@ -32,9 +32,9 @@ func TestSlackInit(t *testing.T) {
 		hipchat config.Hipchat
 		err   error
 	}{
-		{config.Hipchat{Token: "foo", Channel: "bar"}, nil},
+		{config.Hipchat{Token: "foo", Room: "bar"}, nil},
 		{config.Hipchat{Token: "foo"}, expectedError},
-		{config.Hipchat{Channel: "bar"}, expectedError},
+		{config.Hipchat{Room: "bar"}, expectedError},
 		{config.Hipchat{}, expectedError},
 	}
 

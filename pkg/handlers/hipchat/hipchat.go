@@ -38,11 +38,12 @@ var hipchatColors = map[string]hipchat.Color{
 var hipchatErrMsg = `
 %s
 
-You need to set both hipchat token and channel for hipchat notify,
-using "--token/-t" and "--channel/-c", or using environment variables:
+You need to set both hipchat token and room for hipchat notify,
+using "--token/-t", "--room/-r", and "--url/-u" or using environment variables:
 
 export KW_HIPCHAT_TOKEN=hipchat_token
-export KW_HIPCHAT_CHANNEL=hipchat_channel
+export KW_HIPCHAT_ROOM=hipchat_room
+export KW_HIPCHAT_URL=hipchat_url (defaults to https://api.hipchat.com/v2)
 
 Command line flags will override environment variables
 
