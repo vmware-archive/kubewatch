@@ -107,7 +107,7 @@ func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 	}
 
 	notificationRequest := prepareHipchatNotification(e)
-	resp, err := client.Room.Notification(s.Room, &notificationRequest)
+	_, err := client.Room.Notification(s.Room, &notificationRequest)
 
 	if err != nil {
 		log.Printf("%s\n", err)
