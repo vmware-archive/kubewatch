@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/skippbox/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // hipchatConfigCmd represents the hipchat subcommand
 var hipchatConfigCmd = &cobra.Command{
 	Use:   "hipchat FLAG",
 	Short: "specific hipchat configuration",
-	Long: `specific hipchat configuration`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific hipchat configuration`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)

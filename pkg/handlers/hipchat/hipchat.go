@@ -52,14 +52,14 @@ Command line flags will override environment variables
 // Hipchat handler implements handler.Handler interface,
 // Notify event to hipchat room
 type Hipchat struct {
-	Token   string
-	Room 	string
-	Url     string
+	Token string
+	Room  string
+	Url   string
 }
 
 // Init prepares hipchat configuration
 func (s *Hipchat) Init(c *config.Config) error {
-	url	:= c.Handler.Hipchat.Url
+	url := c.Handler.Hipchat.Url
 	room := c.Handler.Hipchat.Room
 	token := c.Handler.Hipchat.Token
 
@@ -76,8 +76,8 @@ func (s *Hipchat) Init(c *config.Config) error {
 	}
 
 	s.Token = token
-	s.Room  = room
-	s.Url   = url
+	s.Room = room
+	s.Url = url
 
 	return checkMissingHipchatVars(s)
 }
@@ -134,11 +134,10 @@ func prepareHipchatNotification(e event.Event) hipchat.NotificationRequest {
 		e.Name,
 	)
 
-
 	notification := hipchat.NotificationRequest{
 		Message: msg,
-		Notify: true,
-		From: "kubewatch",
+		Notify:  true,
+		From:    "kubewatch",
 	}
 
 	if color, ok := hipchatColors[e.Status]; ok {

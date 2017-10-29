@@ -30,7 +30,7 @@ func TestHipchatInit(t *testing.T) {
 
 	var Tests = []struct {
 		hipchat config.Hipchat
-		err   error
+		err     error
 	}{
 		{config.Hipchat{Token: "foo", Room: "bar"}, nil},
 		{config.Hipchat{Token: "foo"}, expectedError},
