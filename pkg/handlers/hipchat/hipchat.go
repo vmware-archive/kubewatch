@@ -118,7 +118,7 @@ func notifyHipchat(s *Hipchat, obj interface{}, action string) {
 
 func checkMissingHipchatVars(s *Hipchat) error {
 	if s.Token == "" || s.Room == "" {
-		return fmt.Errorf(hipchatErrMsg, "Missing hipchat token or channel")
+		return fmt.Errorf(hipchatErrMsg, "Missing hipchat token or room")
 	}
 
 	return nil
