@@ -26,7 +26,7 @@ import (
 
 func TestHipchatInit(t *testing.T) {
 	s := &Hipchat{}
-	expectedError := fmt.Errorf(hipchatErrMsg, "Missing hipchat token or channel")
+	expectedError := fmt.Errorf(hipchatErrMsg, "Missing hipchat token or room")
 
 	var Tests = []struct {
 		hipchat config.Hipchat
