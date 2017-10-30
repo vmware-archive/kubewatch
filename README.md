@@ -111,3 +111,4 @@ $ export KW_SLACK_CHANNEL='#channel_name'
 ```console
 $ kubewatch
 ```
+
