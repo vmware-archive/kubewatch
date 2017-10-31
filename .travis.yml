@@ -3,7 +3,7 @@ language: go
 sudo: required
 
 go:
-  - 1.6
+  - 1.8
   - tip
 
 branches:
@@ -11,5 +11,5 @@ branches:
     - master
 
 install:
-  - go get github.com/tools/godep
-  - godep restore
+  - go get -u github.com/golang/dep/cmd/dep
+  - dep ensure

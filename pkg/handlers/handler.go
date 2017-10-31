@@ -19,6 +19,7 @@ package handlers
 import (
 	"github.com/skippbox/kubewatch/config"
 	"github.com/skippbox/kubewatch/pkg/handlers/slack"
+	"github.com/skippbox/kubewatch/pkg/handlers/hipchat"
 )
 
 // Handler is implemented by any handler.
@@ -34,6 +35,7 @@ type Handler interface {
 var Map = map[string]interface{}{
 	"default": &Default{},
 	"slack":   &slack.Slack{},
+	"hipchat": &hipchat.Hipchat{},
 }
 
 // Default handler implements Handler interface,
