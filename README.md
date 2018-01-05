@@ -3,9 +3,51 @@
 
 `kubewatch` is a Kubernetes watcher that currently publishes notification to Slack. Run it in your k8s cluster, and you will get event notifications in a slack channel.
 
-## Run kubewatch in a Kubernetes cluster
+## Create a Slack bot
 
-In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains a SLACK API token, channel.
+Create a new Bot: [https://my.slack.com/services/new/bot](https://my.slack.com/services/new/bot)
+
+Edit the bot to customize it's name, icon and retreive the API token (it starts with `xoxb-`).
+
+Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Slack message area.
+
+
+## Installing kubewatch using helm
+
+When you have helm installed in your cluster, use the following setup:
+
+```console
+$ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+$ helm install kubewatch incubator/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
+```
+
+You may also provide a values file instead:
+
+```yaml
+rbac:
+  create: true
+resourcesToWatch:
+  daemonset: true
+  deployment: false
+  pod: true
+  replicaset: false
+  replicationcontroller: false
+  services: true
+slack:
+  channel: '#YOUR_CHANNEL'
+  token: 'xoxb-YOUR_TOKEN'
+```
+
+And use that:
+
+```console
+$ helm upgrade --install kubewatch incubator/kubewatch --values=values-file.yml
+```
+
+
+## Installing kubewatch using kubectl
+
+In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains the SLACK bot API token and channel to use.
 
 An example is provided at [`kubewatch-configmap.yaml`](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml), do not forget to update your own slack channel and token parameters. Alternatively, you could use secrets.
 
