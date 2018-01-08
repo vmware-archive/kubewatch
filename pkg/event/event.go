@@ -51,6 +51,11 @@ func New(obj interface{}, action string) Event {
 		component = string(apiService.Spec.Type)
 		reason = action
 		status = m[action]
+	} else if apiNamespace, ok := obj.(*v1.Namespace); ok {
+		name = apiNamespace.Name
+		kind = "namespace"
+		reason = action
+		status = m[action]
 	} else if apiPod, ok := obj.(*v1.Pod); ok {
 		namespace = apiPod.ObjectMeta.Namespace
 		name = apiPod.Name
