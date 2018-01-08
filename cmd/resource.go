@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/skippbox/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/skippbox/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // resourceConfigCmd represents the resource subcommand
 var resourceConfigCmd = &cobra.Command{
 	Use:   "resource FLAG",
 	Short: "specific resources to be watched",
-	Long: `specific resources to be watched`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific resources to be watched`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
@@ -69,6 +69,27 @@ var resourceConfigCmd = &cobra.Command{
 			logrus.Fatal("rc", err)
 		}
 
+		b, err = cmd.Flags().GetBool("ns")
+		if err == nil {
+			conf.Resource.Namespace = b
+		} else {
+			logrus.Fatal("ns", err)
+		}
+
+		b, err = cmd.Flags().GetBool("jobs")
+		if err == nil {
+			conf.Resource.Job = b
+		} else {
+			logrus.Fatal("jobs", err)
+		}
+
+		b, err = cmd.Flags().GetBool("pv")
+		if err == nil {
+			conf.Resource.PersistentVolume = b
+		} else {
+			logrus.Fatal("pv", err)
+		}
+
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)
 		}
@@ -81,4 +102,8 @@ func init() {
 	resourceConfigCmd.Flags().Bool("po", false, "watch for pods")
 	resourceConfigCmd.Flags().Bool("rc", false, "watch for replication controllers")
 	resourceConfigCmd.Flags().Bool("rs", false, "watch for replicasets")
+	resourceConfigCmd.Flags().Bool("ns", false, "watch for namespaces")
+	resourceConfigCmd.Flags().Bool("pv", false, "watch for persistent volumes")
+	resourceConfigCmd.Flags().Bool("jobs", false, "watch for jobs")
+
 }
