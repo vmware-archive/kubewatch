@@ -42,6 +42,7 @@ type Resource struct {
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
 	PersistentVolume      bool `json:"pv"`
+	Namespace	      bool `json:"ns"`
 }
 
 // Config struct contains kubewatch configuration
@@ -123,6 +124,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.ReplicaSet && os.Getenv("KW_REPLICASET") == "true" {
 		c.Resource.ReplicaSet = true
+	}
+	if !c.Resource.Namespace && os.Getenv("KW_NAMESPACE") == "true" {
+		c.Resource.Namespace = true
 	}
 	if !c.Resource.Deployment && os.Getenv("KW_DEPLOYMENT") == "true" {
 		c.Resource.Deployment = true
