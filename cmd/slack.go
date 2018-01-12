@@ -18,7 +18,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/skippbox/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/Sirupsen/logrus"
 )
 

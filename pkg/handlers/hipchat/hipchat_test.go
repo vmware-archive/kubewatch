@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/skippbox/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/config"
 )
 
 func TestHipchatInit(t *testing.T) {

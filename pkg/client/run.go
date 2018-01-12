@@ -19,11 +19,11 @@ package client
 import (
 	"log"
 
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers"
-	"github.com/skippbox/kubewatch/pkg/handlers/slack"
-	"github.com/skippbox/kubewatch/pkg/controller"
-	"github.com/skippbox/kubewatch/pkg/handlers/hipchat"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/controller"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 )
 
 // Run runs the event loop processing with given handler

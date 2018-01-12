@@ -17,9 +17,9 @@ limitations under the License.
 package handlers
 
 import (
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/handlers/slack"
-	"github.com/skippbox/kubewatch/pkg/handlers/hipchat"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 )
 
 // Handler is implemented by any handler.
