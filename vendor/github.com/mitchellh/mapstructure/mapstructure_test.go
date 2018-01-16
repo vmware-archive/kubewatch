@@ -42,6 +42,20 @@ type EmbeddedSquash struct {
 	Vunique string
 }
 
+type SliceAlias []string
+
+type EmbeddedSlice struct {
+	SliceAlias `mapstructure:"slice_alias"`
+	Vunique    string
+}
+
+type ArrayAlias [2]string
+
+type EmbeddedArray struct {
+	ArrayAlias `mapstructure:"array_alias"`
+	Vunique    string
+}
+
 type SquashOnNonStructType struct {
 	InvalidSquashType int `mapstructure:",squash"`
 }
@@ -78,6 +92,19 @@ type SliceOfStruct struct {
 	Value []Basic
 }
 
+type Array struct {
+	Vfoo string
+	Vbar [2]string
+}
+
+type ArrayOfStruct struct {
+	Value [2]Basic
+}
+
+type Func struct {
+	Foo func() string
+}
+
 type Tagged struct {
 	Extra string `mapstructure:"bar,what,what"`
 	Value string `mapstructure:"foo"`
@@ -101,12 +128,19 @@ type TypeConversionResult struct {
 	FloatToBool        bool
 	FloatToString      string
 	SliceUint8ToString string
+	ArrayUint8ToString string
 	StringToInt        int
 	StringToUint       uint
 	StringToBool       bool
 	StringToFloat      float32
+	StringToStrSlice   []string
+	StringToIntSlice   []int
+	StringToStrArray   [1]string
+	StringToIntArray   [1]int
 	SliceToMap         map[string]interface{}
 	MapToSlice         []interface{}
+	ArrayToMap         map[string]interface{}
+	MapToArray         [1]interface{}
 }
 
 func TestBasicTypes(t *testing.T) {
@@ -271,8 +305,64 @@ func TestDecode_EmbeddedPointer(t *testing.T) {
 
 	var result EmbeddedPointer
 	err := Decode(input, &result)
-	if err == nil {
-		t.Fatal("should get error")
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	expected := EmbeddedPointer{
+		Basic: &Basic{
+			Vstring: "innerfoo",
+		},
+		Vunique: "bar",
+	}
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("bad: %#v", result)
+	}
+}
+
+func TestDecode_EmbeddedSlice(t *testing.T) {
+	t.Parallel()
+
+	input := map[string]interface{}{
+		"slice_alias": []string{"foo", "bar"},
+		"vunique":     "bar",
+	}
+
+	var result EmbeddedSlice
+	err := Decode(input, &result)
+	if err != nil {
+		t.Fatalf("got an err: %s", err.Error())
+	}
+
+	if !reflect.DeepEqual(result.SliceAlias, SliceAlias([]string{"foo", "bar"})) {
+		t.Errorf("slice value: %#v", result.SliceAlias)
+	}
+
+	if result.Vunique != "bar" {
+		t.Errorf("vunique value should be 'bar': %#v", result.Vunique)
+	}
+}
+
+func TestDecode_EmbeddedArray(t *testing.T) {
+	t.Parallel()
+
+	input := map[string]interface{}{
+		"array_alias": [2]string{"foo", "bar"},
+		"vunique":     "bar",
+	}
+
+	var result EmbeddedArray
+	err := Decode(input, &result)
+	if err != nil {
+		t.Fatalf("got an err: %s", err.Error())
+	}
+
+	if !reflect.DeepEqual(result.ArrayAlias, ArrayAlias([2]string{"foo", "bar"})) {
+		t.Errorf("array value: %#v", result.ArrayAlias)
+	}
+
+	if result.Vunique != "bar" {
+		t.Errorf("vunique value should be 'bar': %#v", result.Vunique)
 	}
 }
 
@@ -391,7 +481,7 @@ func TestDecode_DecodeHookType(t *testing.T) {
 func TestDecode_Nil(t *testing.T) {
 	t.Parallel()
 
-	var input interface{} = nil
+	var input interface{}
 	result := Basic{
 		Vstring: "foo",
 	}
@@ -439,6 +529,42 @@ func TestDecode_NilInterfaceHook(t *testing.T) {
 
 	if result.W != nil {
 		t.Errorf("W should be nil: %#v", result.W)
+	}
+}
+
+func TestDecode_FuncHook(t *testing.T) {
+	t.Parallel()
+
+	input := map[string]interface{}{
+		"foo": "baz",
+	}
+
+	decodeHook := func(f, t reflect.Type, v interface{}) (interface{}, error) {
+		if t.Kind() != reflect.Func {
+			return v, nil
+		}
+		val := v.(string)
+		return func() string { return val }, nil
+	}
+
+	var result Func
+	config := &DecoderConfig{
+		DecodeHook: decodeHook,
+		Result:     &result,
+	}
+
+	decoder, err := NewDecoder(config)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	err = decoder.Decode(input)
+	if err != nil {
+		t.Fatalf("got an err: %s", err)
+	}
+
+	if result.Foo() != "baz" {
+		t.Errorf("Foo call result should be 'baz': %s", result.Foo())
 	}
 }
 
@@ -500,12 +626,19 @@ func TestDecode_TypeConversion(t *testing.T) {
 		"FloatToBool":        42.42,
 		"FloatToString":      42.42,
 		"SliceUint8ToString": []uint8("foo"),
+		"ArrayUint8ToString": [3]uint8{'f', 'o', 'o'},
 		"StringToInt":        "42",
 		"StringToUint":       "42",
 		"StringToBool":       "1",
 		"StringToFloat":      "42.42",
+		"StringToStrSlice":   "A",
+		"StringToIntSlice":   "42",
+		"StringToStrArray":   "A",
+		"StringToIntArray":   "42",
 		"SliceToMap":         []interface{}{},
 		"MapToSlice":         map[string]interface{}{},
+		"ArrayToMap":         []interface{}{},
+		"MapToArray":         map[string]interface{}{},
 	}
 
 	expectedResultStrict := TypeConversionResult{
@@ -538,12 +671,19 @@ func TestDecode_TypeConversion(t *testing.T) {
 		FloatToBool:        true,
 		FloatToString:      "42.42",
 		SliceUint8ToString: "foo",
+		ArrayUint8ToString: "foo",
 		StringToInt:        42,
 		StringToUint:       42,
 		StringToBool:       true,
 		StringToFloat:      42.42,
+		StringToStrSlice:   []string{"A"},
+		StringToIntSlice:   []int{42},
+		StringToStrArray:   [1]string{"A"},
+		StringToIntArray:   [1]int{42},
 		SliceToMap:         map[string]interface{}{},
 		MapToSlice:         []interface{}{},
+		ArrayToMap:         map[string]interface{}{},
+		MapToArray:         [1]interface{}{},
 	}
 
 	// Test strict type conversion
@@ -856,10 +996,103 @@ func TestSliceToMap(t *testing.T) {
 	t.Parallel()
 
 	input := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"foo": "bar",
 		},
-		map[string]interface{}{
+		{
+			"bar": "baz",
+		},
+	}
+
+	var result map[string]interface{}
+	err := WeakDecode(input, &result)
+	if err != nil {
+		t.Fatalf("got an error: %s", err)
+	}
+
+	expected := map[string]interface{}{
+		"foo": "bar",
+		"bar": "baz",
+	}
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("bad: %#v", result)
+	}
+}
+
+func TestArray(t *testing.T) {
+	t.Parallel()
+
+	inputStringArray := map[string]interface{}{
+		"vfoo": "foo",
+		"vbar": [2]string{"foo", "bar"},
+	}
+
+	inputStringArrayPointer := map[string]interface{}{
+		"vfoo": "foo",
+		"vbar": &[2]string{"foo", "bar"},
+	}
+
+	outputStringArray := &Array{
+		"foo",
+		[2]string{"foo", "bar"},
+	}
+
+	testArrayInput(t, inputStringArray, outputStringArray)
+	testArrayInput(t, inputStringArrayPointer, outputStringArray)
+}
+
+func TestInvalidArray(t *testing.T) {
+	t.Parallel()
+
+	input := map[string]interface{}{
+		"vfoo": "foo",
+		"vbar": 42,
+	}
+
+	result := Array{}
+	err := Decode(input, &result)
+	if err == nil {
+		t.Errorf("expected failure")
+	}
+}
+
+func TestArrayOfStruct(t *testing.T) {
+	t.Parallel()
+
+	input := map[string]interface{}{
+		"value": []map[string]interface{}{
+			{"vstring": "one"},
+			{"vstring": "two"},
+		},
+	}
+
+	var result ArrayOfStruct
+	err := Decode(input, &result)
+	if err != nil {
+		t.Fatalf("got unexpected error: %s", err)
+	}
+
+	if len(result.Value) != 2 {
+		t.Fatalf("expected two values, got %d", len(result.Value))
+	}
+
+	if result.Value[0].Vstring != "one" {
+		t.Errorf("first value should be 'one', got: %s", result.Value[0].Vstring)
+	}
+
+	if result.Value[1].Vstring != "two" {
+		t.Errorf("second value should be 'two', got: %s", result.Value[1].Vstring)
+	}
+}
+
+func TestArrayToMap(t *testing.T) {
+	t.Parallel()
+
+	input := []map[string]interface{}{
+		{
+			"foo": "bar",
+		},
+		{
 			"bar": "baz",
 		},
 	}
@@ -1090,6 +1323,34 @@ func testSliceInput(t *testing.T, input map[string]interface{}, expected *Slice)
 	}
 
 	if result.Vbar == nil {
+		t.Fatalf("Vbar a slice, got '%#v'", result.Vbar)
+	}
+
+	if len(result.Vbar) != len(expected.Vbar) {
+		t.Errorf("Vbar length should be %d, got %d", len(expected.Vbar), len(result.Vbar))
+	}
+
+	for i, v := range result.Vbar {
+		if v != expected.Vbar[i] {
+			t.Errorf(
+				"Vbar[%d] should be '%#v', got '%#v'",
+				i, expected.Vbar[i], v)
+		}
+	}
+}
+
+func testArrayInput(t *testing.T, input map[string]interface{}, expected *Array) {
+	var result Array
+	err := Decode(input, &result)
+	if err != nil {
+		t.Fatalf("got error: %s", err)
+	}
+
+	if result.Vfoo != expected.Vfoo {
+		t.Errorf("Vfoo expected '%s', got '%s'", expected.Vfoo, result.Vfoo)
+	}
+
+	if result.Vbar == [2]string{} {
 		t.Fatalf("Vbar a slice, got '%#v'", result.Vbar)
 	}
 

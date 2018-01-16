@@ -364,7 +364,7 @@ func TestFuzz_noCustom(t *testing.T) {
 			inner.Str = testPhrase
 		},
 	)
-	c := Continue{f: f, Rand: f.r}
+	c := Continue{fc: &fuzzerContext{fuzzer: f}, Rand: f.r}
 
 	// Fuzzer.Fuzz()
 	obj1 := Outer{}
@@ -404,5 +404,69 @@ func TestFuzz_noCustom(t *testing.T) {
 	}
 	if obj4.In.Str != testPhrase {
 		t.Errorf("expected Inner custom function to have been called")
+	}
+}
+
+func TestFuzz_NumElements(t *testing.T) {
+	f := New().NilChance(0).NumElements(0, 1)
+	obj := &struct {
+		A []int
+	}{}
+
+	tryFuzz(t, f, obj, func() (int, bool) {
+		if obj.A == nil {
+			return 1, false
+		}
+		return 2, len(obj.A) == 0
+	})
+	tryFuzz(t, f, obj, func() (int, bool) {
+		if obj.A == nil {
+			return 3, false
+		}
+		return 4, len(obj.A) == 1
+	})
+}
+
+func TestFuzz_Maxdepth(t *testing.T) {
+	type S struct {
+		S *S
+	}
+
+	f := New().NilChance(0)
+
+	f.MaxDepth(1)
+	for i := 0; i < 100; i++ {
+		obj := S{}
+		f.Fuzz(&obj)
+
+		if obj.S != nil {
+			t.Errorf("Expected nil")
+		}
+	}
+
+	f.MaxDepth(3) // field, ptr
+	for i := 0; i < 100; i++ {
+		obj := S{}
+		f.Fuzz(&obj)
+
+		if obj.S == nil {
+			t.Errorf("Expected obj.S not nil")
+		} else if obj.S.S != nil {
+			t.Errorf("Expected obj.S.S nil")
+		}
+	}
+
+	f.MaxDepth(5) // field, ptr, field, ptr
+	for i := 0; i < 100; i++ {
+		obj := S{}
+		f.Fuzz(&obj)
+
+		if obj.S == nil {
+			t.Errorf("Expected obj.S not nil")
+		} else if obj.S.S == nil {
+			t.Errorf("Expected obj.S.S not nil")
+		} else if obj.S.S.S != nil {
+			t.Errorf("Expected obj.S.S.S nil")
+		}
 	}
 }

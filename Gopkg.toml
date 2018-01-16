@@ -23,26 +23,36 @@
 
 [[constraint]]
   name = "github.com/Sirupsen/logrus"
+  version = "1.0.4"
 
 [[constraint]]
   name = "github.com/nlopes/slack"
+  version = "0.1.0"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
+  version = "0.0.1"
 
 [[constraint]]
   name = "github.com/spf13/viper"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/tbruyelle/hipchat-go"
   version = "1.2.0"
 
 [[constraint]]
+  branch = "v2"
   name = "gopkg.in/yaml.v2"
 
 [[constraint]]
+  revision = "11147472b7c934c474a2c484af3c0c5210b7a3af"
+  name = "k8s.io/api"
+
+[[constraint]]
+  revision = "180eddb345a5be3a157cea1c624700ad5bd27b8f"
   name = "k8s.io/apimachinery"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "5.0.1"
+  revision = "78700dec6369ba22221b72770783300f143df150" 

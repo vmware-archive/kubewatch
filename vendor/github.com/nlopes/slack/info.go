@@ -136,15 +136,9 @@ type Team struct {
 
 // Icons XXX: needs further investigation
 type Icons struct {
-	Image48 string `json:"image_48"`
-}
-
-// Bot contains information about a bot
-type Bot struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Deleted bool   `json:"deleted"`
-	Icons   Icons  `json:"icons"`
+	Image36 string `json:"image_36,omitempty"`
+	Image48 string `json:"image_48,omitempty"`
+	Image72 string `json:"image_72,omitempty"`
 }
 
 // Info contains various details about Users, Channels, Bots and the authenticated user.
@@ -200,6 +194,16 @@ func (info Info) GetGroupByID(groupID string) *Group {
 	for _, group := range info.Groups {
 		if group.ID == groupID {
 			return &group
+		}
+	}
+	return nil
+}
+
+// GetIMByID returns an IM given an IM id
+func (info Info) GetIMByID(imID string) *IM {
+	for _, im := range info.IMs {
+		if im.ID == imID {
+			return &im
 		}
 	}
 	return nil

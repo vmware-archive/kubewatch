@@ -5,21 +5,45 @@
 package ssh_test
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 func ExampleNewServerConn() {
+	// Public key authentication is done by comparing
+	// the public key of a received connection
+	// with the entries in the authorized_keys file.
+	authorizedKeysBytes, err := ioutil.ReadFile("authorized_keys")
+	if err != nil {
+		log.Fatalf("Failed to load authorized_keys, err: %v", err)
+	}
+
+	authorizedKeysMap := map[string]bool{}
+	for len(authorizedKeysBytes) > 0 {
+		pubKey, _, _, rest, err := ssh.ParseAuthorizedKey(authorizedKeysBytes)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		authorizedKeysMap[string(pubKey.Marshal())] = true
+		authorizedKeysBytes = rest
+	}
+
 	// An SSH server is represented by a ServerConfig, which holds
 	// certificate details and handles authentication of ServerConns.
 	config := &ssh.ServerConfig{
+		// Remove to disable password auth.
 		PasswordCallback: func(c ssh.ConnMetadata, pass []byte) (*ssh.Permissions, error) {
 			// Should use constant-time compare (or better, salt+hash) in
 			// a production setting.
@@ -27,6 +51,19 @@ func ExampleNewServerConn() {
 				return nil, nil
 			}
 			return nil, fmt.Errorf("password rejected for %q", c.User())
+		},
+
+		// Remove to disable public key auth.
+		PublicKeyCallback: func(c ssh.ConnMetadata, pubKey ssh.PublicKey) (*ssh.Permissions, error) {
+			if authorizedKeysMap[string(pubKey.Marshal())] {
+				return &ssh.Permissions{
+					// Record the public key used for authentication.
+					Extensions: map[string]string{
+						"pubkey-fp": ssh.FingerprintSHA256(pubKey),
+					},
+				}, nil
+			}
+			return nil, fmt.Errorf("unknown public key for %q", c.User())
 		},
 	}
 
@@ -55,10 +92,12 @@ func ExampleNewServerConn() {
 
 	// Before use, a handshake must be performed on the incoming
 	// net.Conn.
-	_, chans, reqs, err := ssh.NewServerConn(nConn, config)
+	conn, chans, reqs, err := ssh.NewServerConn(nConn, config)
 	if err != nil {
 		log.Fatal("failed to handshake: ", err)
 	}
+	log.Printf("logged in with key %s", conn.Permissions.Extensions["pubkey-fp"])
+
 	// The incoming Request channel must be serviced.
 	go ssh.DiscardRequests(reqs)
 
@@ -74,7 +113,7 @@ func ExampleNewServerConn() {
 		}
 		channel, requests, err := newChannel.Accept()
 		if err != nil {
-			log.Fatal("could not accept channel: ", err)
+			log.Fatalf("Could not accept channel: %v", err)
 		}
 
 		// Sessions have out-of-band requests such as "shell",
@@ -82,18 +121,7 @@ func ExampleNewServerConn() {
 		// "shell" request.
 		go func(in <-chan *ssh.Request) {
 			for req := range in {
-				ok := false
-				switch req.Type {
-				case "shell":
-					ok = true
-					if len(req.Payload) > 0 {
-						// We don't accept any
-						// commands, only the
-						// default shell.
-						ok = false
-					}
-				}
-				req.Reply(ok, nil)
+				req.Reply(req.Type == "shell", nil)
 			}
 		}(requests)
 
@@ -112,16 +140,59 @@ func ExampleNewServerConn() {
 	}
 }
 
+func ExampleHostKeyCheck() {
+	// Every client must provide a host key check.  Here is a
+	// simple-minded parse of OpenSSH's known_hosts file
+	host := "hostname"
+	file, err := os.Open(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var hostKey ssh.PublicKey
+	for scanner.Scan() {
+		fields := strings.Split(scanner.Text(), " ")
+		if len(fields) != 3 {
+			continue
+		}
+		if strings.Contains(fields[0], host) {
+			var err error
+			hostKey, _, _, _, err = ssh.ParseAuthorizedKey(scanner.Bytes())
+			if err != nil {
+				log.Fatalf("error parsing %q: %v", fields[2], err)
+			}
+			break
+		}
+	}
+
+	if hostKey == nil {
+		log.Fatalf("no hostkey for %s", host)
+	}
+
+	config := ssh.ClientConfig{
+		User:            os.Getenv("USER"),
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
+	}
+
+	_, err = ssh.Dial("tcp", host+":22", &config)
+	log.Println(err)
+}
+
 func ExampleDial() {
+	var hostKey ssh.PublicKey
 	// An SSH client is represented with a ClientConn.
 	//
 	// To authenticate with the remote server you must pass at least one
-	// implementation of AuthMethod via the Auth field in ClientConfig.
+	// implementation of AuthMethod via the Auth field in ClientConfig,
+	// and provide a HostKeyCallback.
 	config := &ssh.ClientConfig{
 		User: "username",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("yourpassword"),
 		},
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 	client, err := ssh.Dial("tcp", "yourserver.com:22", config)
 	if err != nil {
@@ -147,6 +218,7 @@ func ExampleDial() {
 }
 
 func ExamplePublicKeys() {
+	var hostKey ssh.PublicKey
 	// A public key may be used to authenticate against the remote
 	// server by using an unencrypted PEM-encoded private key file.
 	//
@@ -169,6 +241,7 @@ func ExamplePublicKeys() {
 			// Use the PublicKeys method for remote authentication.
 			ssh.PublicKeys(signer),
 		},
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 
 	// Connect to the remote server and perform the SSH handshake.
@@ -180,11 +253,13 @@ func ExamplePublicKeys() {
 }
 
 func ExampleClient_Listen() {
+	var hostKey ssh.PublicKey
 	config := &ssh.ClientConfig{
 		User: "username",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("password"),
 		},
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 	// Dial your ssh server.
 	conn, err := ssh.Dial("tcp", "localhost:22", config)
@@ -207,12 +282,14 @@ func ExampleClient_Listen() {
 }
 
 func ExampleSession_RequestPty() {
+	var hostKey ssh.PublicKey
 	// Create client config
 	config := &ssh.ClientConfig{
 		User: "username",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("password"),
 		},
+		HostKeyCallback: ssh.FixedHostKey(hostKey),
 	}
 	// Connect to ssh server
 	conn, err := ssh.Dial("tcp", "localhost:22", config)
@@ -233,7 +310,7 @@ func ExampleSession_RequestPty() {
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
 	// Request pseudo terminal
-	if err := session.RequestPty("xterm", 80, 40, modes); err != nil {
+	if err := session.RequestPty("xterm", 40, 80, modes); err != nil {
 		log.Fatal("request for pseudo terminal failed: ", err)
 	}
 	// Start remote shell

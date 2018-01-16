@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ugorji/go/codec"
+	jsoniter "github.com/json-iterator/go"
 )
 
 func TestVerbsUgorjiMarshalJSON(t *testing.T) {
@@ -29,9 +29,9 @@ func TestVerbsUgorjiMarshalJSON(t *testing.T) {
 		input  APIResource
 		result string
 	}{
-		{APIResource{}, `{"name":"","namespaced":false,"kind":"","verbs":null}`},
-		{APIResource{Verbs: Verbs([]string{})}, `{"name":"","namespaced":false,"kind":"","verbs":[]}`},
-		{APIResource{Verbs: Verbs([]string{"delete"})}, `{"name":"","namespaced":false,"kind":"","verbs":["delete"]}`},
+		{APIResource{}, `{"name":"","singularName":"","namespaced":false,"kind":"","verbs":null}`},
+		{APIResource{Verbs: Verbs([]string{})}, `{"name":"","singularName":"","namespaced":false,"kind":"","verbs":[]}`},
+		{APIResource{Verbs: Verbs([]string{"delete"})}, `{"name":"","singularName":"","namespaced":false,"kind":"","verbs":["delete"]}`},
 	}
 
 	for i, c := range cases {
@@ -58,7 +58,7 @@ func TestVerbsUgorjiUnmarshalJSON(t *testing.T) {
 
 	for i, c := range cases {
 		var result APIResource
-		if err := codec.NewDecoderBytes([]byte(c.input), new(codec.JsonHandle)).Decode(&result); err != nil {
+		if err := jsoniter.ConfigFastest.Unmarshal([]byte(c.input), &result); err != nil {
 			t.Errorf("[%d] Failed to unmarshal input '%v': %v", i, c.input, err)
 		}
 		if !reflect.DeepEqual(result, c.result) {
