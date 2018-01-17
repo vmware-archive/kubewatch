@@ -2,6 +2,7 @@ package slack
 
 import (
 	"errors"
+	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -86,10 +87,14 @@ type File struct {
 	IsStarred       bool     `json:"is_starred"`
 }
 
-// FileUploadParameters contains all the parameters necessary (including the optional ones) for an UploadFile() request
+// FileUploadParameters contains all the parameters necessary (including the optional ones) for an UploadFile() request.
+//
+// There are three ways to upload a file. You can either set Content if file is small, set Reader if file is large,
+// or provide a local file path in File to upload it from your filesystem.
 type FileUploadParameters struct {
 	File           string
 	Content        string
+	Reader         io.Reader
 	Filetype       string
 	Filename       string
 	Title          string
@@ -168,12 +173,11 @@ func (api *Client) GetFiles(params GetFilesParameters) ([]File, *Paging, error) 
 	if params.Channel != DEFAULT_FILES_CHANNEL {
 		values.Add("channel", params.Channel)
 	}
-	// XXX: this is broken. fix it with a proper unix timestamp
 	if params.TimestampFrom != DEFAULT_FILES_TS_FROM {
-		values.Add("ts_from", params.TimestampFrom.String())
+		values.Add("ts_from", strconv.FormatInt(int64(params.TimestampFrom), 10))
 	}
 	if params.TimestampTo != DEFAULT_FILES_TS_TO {
-		values.Add("ts_to", params.TimestampTo.String())
+		values.Add("ts_to", strconv.FormatInt(int64(params.TimestampTo), 10))
 	}
 	if params.Types != DEFAULT_FILES_TYPES {
 		values.Add("types", params.Types)
@@ -222,7 +226,9 @@ func (api *Client) UploadFile(params FileUploadParameters) (file *File, err erro
 		values.Add("content", params.Content)
 		err = post("files.upload", values, response, api.debug)
 	} else if params.File != "" {
-		err = postWithMultipartResponse("files.upload", params.File, values, response, api.debug)
+		err = postLocalWithMultipartResponse("files.upload", params.File, "file", values, response, api.debug)
+	} else if params.Reader != nil {
+		err = postWithMultipartResponse("files.upload", params.Filename, "file", values, params.Reader, response, api.debug)
 	}
 	if err != nil {
 		return nil, err

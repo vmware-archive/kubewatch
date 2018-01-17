@@ -47,16 +47,16 @@ $ helm upgrade --install kubewatch incubator/kubewatch --values=values-file.yml
 
 ## Installing kubewatch using kubectl
 
-In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains the SLACK bot API token and channel to use.
+In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/bitnami-labs/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains the SLACK bot API token and channel to use.
 
-An example is provided at [`kubewatch-configmap.yaml`](https://github.com/skippbox/kubewatch/blob/master/kubewatch-configmap.yaml), do not forget to update your own slack channel and token parameters. Alternatively, you could use secrets.
+An example is provided at [`kubewatch-configmap.yaml`](https://github.com/bitnami-labs/kubewatch/blob/master/kubewatch-configmap.yaml), do not forget to update your own slack channel and token parameters. Alternatively, you could use secrets.
 
 Create k8s configmap:
 
 ```console
 $ kubectl create -f kubewatch-configmap.yaml
 ```
-Create the [Pod](https://github.com/skippbox/kubewatch/blob/master/kubewatch.yaml) directly, or create your own deployment:
+Create the [Pod](https://github.com/bitnami-labs/kubewatch/blob/master/kubewatch.yaml) directly, or create your own deployment:
 
 ```console
 $ kubectl create -f kubewatch.yaml
@@ -118,7 +118,7 @@ kubewatch-builder   latest              6b2d325a3b88        About a minute ago  
 ## Download kubewatch package
 
 ```console
-$ go get -u github.com/skippbox/kubewatch
+$ go get -u github.com/bitnami-labs/kubewatch
 ```
 
 ## Configuration

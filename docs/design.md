@@ -27,4 +27,4 @@ With each event get from k8s and matched filtering from configuration, it is pas
 
 More handlers will be added in future.
 
-Each handler must implement the [Handler interface](https://github.com/skippbox/kubewatch/blob/master/pkg/handlers/handler.go#L31)
+Each handler must implement the [Handler interface](https://github.com/bitnami-labs/kubewatch/blob/master/pkg/handlers/handler.go#L31)

@@ -1,8 +1,15 @@
 package slack
 
 import (
+	"encoding/json"
 	"errors"
 	"net/url"
+)
+
+const (
+	DEFAULT_USER_PHOTO_CROP_X = -1
+	DEFAULT_USER_PHOTO_CROP_Y = -1
+	DEFAULT_USER_PHOTO_CROP_W = -1
 )
 
 // UserProfile contains all the information details of a given user
@@ -21,6 +28,10 @@ type UserProfile struct {
 	Image192           string `json:"image_192"`
 	ImageOriginal      string `json:"image_original"`
 	Title              string `json:"title"`
+	BotID              string `json:"bot_id,omitempty"`
+	ApiAppID           string `json:"api_app_id,omitempty"`
+	StatusText         string `json:"status_text,omitempty"`
+	StatusEmoji        string `json:"status_emoji,omitempty"`
 }
 
 // User contains all the information of a user
@@ -55,11 +66,58 @@ type UserPresence struct {
 	LastActivity    JSONTime `json:"last_activity,omitempty"`
 }
 
+type UserIdentityResponse struct {
+	User UserIdentity `json:"user"`
+	Team TeamIdentity `json:"team"`
+	SlackResponse
+}
+
+type UserIdentity struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Image24  string `json:"image_24"`
+	Image32  string `json:"image_32"`
+	Image48  string `json:"image_48"`
+	Image72  string `json:"image_72"`
+	Image192 string `json:"image_192"`
+	Image512 string `json:"image_512"`
+}
+
+type TeamIdentity struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Domain        string `json:"domain"`
+	Image34       string `json:"image_34"`
+	Image44       string `json:"image_44"`
+	Image68       string `json:"image_68"`
+	Image88       string `json:"image_88"`
+	Image102      string `json:"image_102"`
+	Image132      string `json:"image_132"`
+	Image230      string `json:"image_230"`
+	ImageDefault  bool   `json:"image_default"`
+	ImageOriginal string `json:"image_original"`
+}
+
 type userResponseFull struct {
 	Members      []User                  `json:"members,omitempty"` // ListUsers
 	User         `json:"user,omitempty"` // GetUserInfo
 	UserPresence                         // GetUserPresence
 	SlackResponse
+}
+
+type UserSetPhotoParams struct {
+	CropX int
+	CropY int
+	CropW int
+}
+
+func NewUserSetPhotoParams() UserSetPhotoParams {
+	return UserSetPhotoParams{
+		CropX: DEFAULT_USER_PHOTO_CROP_X,
+		CropY: DEFAULT_USER_PHOTO_CROP_Y,
+		CropW: DEFAULT_USER_PHOTO_CROP_W,
+	}
 }
 
 func userRequest(path string, values url.Values, debug bool) (*userResponseFull, error) {
@@ -87,7 +145,7 @@ func (api *Client) GetUserPresence(user string) (*UserPresence, error) {
 	return &response.UserPresence, nil
 }
 
-// GetUserInfo will retrive the complete user information
+// GetUserInfo will retrieve the complete user information
 func (api *Client) GetUserInfo(user string) (*User, error) {
 	values := url.Values{
 		"token": {api.config.token},
@@ -137,4 +195,115 @@ func (api *Client) SetUserPresence(presence string) error {
 	}
 	return nil
 
+}
+
+// GetUserIdentity will retrieve user info available per identity scopes
+func (api *Client) GetUserIdentity() (*UserIdentityResponse, error) {
+	values := url.Values{
+		"token": {api.config.token},
+	}
+	response := &UserIdentityResponse{}
+	err := post("users.identity", values, response, api.debug)
+	if err != nil {
+		return nil, err
+	}
+	if !response.Ok {
+		return nil, errors.New(response.Error)
+	}
+	return response, nil
+}
+
+// SetUserPhoto changes the currently authenticated user's profile image
+func (api *Client) SetUserPhoto(image string, params UserSetPhotoParams) error {
+	response := &SlackResponse{}
+	values := url.Values{
+		"token": {api.config.token},
+	}
+	if params.CropX != DEFAULT_USER_PHOTO_CROP_X {
+		values.Add("crop_x", string(params.CropX))
+	}
+	if params.CropY != DEFAULT_USER_PHOTO_CROP_Y {
+		values.Add("crop_y", string(params.CropY))
+	}
+	if params.CropW != DEFAULT_USER_PHOTO_CROP_W {
+		values.Add("crop_w", string(params.CropW))
+	}
+	err := postLocalWithMultipartResponse("users.setPhoto", image, "image", values, response, api.debug)
+	if err != nil {
+		return err
+	}
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+	return nil
+}
+
+// DeleteUserPhoto deletes the current authenticated user's profile image
+func (api *Client) DeleteUserPhoto() error {
+	response := &SlackResponse{}
+	values := url.Values{
+		"token": {api.config.token},
+	}
+	err := post("users.deletePhoto", values, response, api.debug)
+	if err != nil {
+		return err
+	}
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+	return nil
+}
+
+// SetUserCustomStatus will set a custom status and emoji for the currently
+// authenticated user. If statusEmoji is "" and statusText is not, the Slack API
+// will automatically set it to ":speech_balloon:". Otherwise, if both are ""
+// the Slack API will unset the custom status/emoji.
+func (api *Client) SetUserCustomStatus(statusText, statusEmoji string) error {
+	// XXX(theckman): this anonymous struct is for making requests to the Slack
+	// API for setting and unsetting a User's Custom Status/Emoji. To change
+	// these values we must provide a JSON document as the profile POST field.
+	//
+	// We use an anonymous struct over UserProfile because to unset the values
+	// on the User's profile we cannot use the `json:"omitempty"` tag. This is
+	// because an empty string ("") is what's used to unset the values. Check
+	// out the API docs for more details:
+	//
+	// - https://api.slack.com/docs/presence-and-status#custom_status
+	profile, err := json.Marshal(
+		&struct {
+			StatusText  string `json:"status_text"`
+			StatusEmoji string `json:"status_emoji"`
+		}{
+			StatusText:  statusText,
+			StatusEmoji: statusEmoji,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	values := url.Values{
+		"token":   {api.config.token},
+		"profile": {string(profile)},
+	}
+
+	response := &userResponseFull{}
+
+	if err = post("users.profile.set", values, response, api.debug); err != nil {
+		return err
+	}
+
+	if !response.Ok {
+		return errors.New(response.Error)
+	}
+
+	return nil
+}
+
+// UnsetUserCustomStatus removes the custom status message for the currently
+// authenticated user. This is a convenience method that wraps
+// (*Client).SetUserCustomStatus().
+func (api *Client) UnsetUserCustomStatus() error {
+	return api.SetUserCustomStatus("", "")
 }

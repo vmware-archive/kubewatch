@@ -13,6 +13,7 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -332,6 +333,59 @@ func testParse(f *FlagSet, t *testing.T) {
 	}
 }
 
+func testParseAll(f *FlagSet, t *testing.T) {
+	if f.Parsed() {
+		t.Error("f.Parse() = true before Parse")
+	}
+	f.BoolP("boola", "a", false, "bool value")
+	f.BoolP("boolb", "b", false, "bool2 value")
+	f.BoolP("boolc", "c", false, "bool3 value")
+	f.BoolP("boold", "d", false, "bool4 value")
+	f.StringP("stringa", "s", "0", "string value")
+	f.StringP("stringz", "z", "0", "string value")
+	f.StringP("stringx", "x", "0", "string value")
+	f.StringP("stringy", "y", "0", "string value")
+	f.Lookup("stringx").NoOptDefVal = "1"
+	args := []string{
+		"-ab",
+		"-cs=xx",
+		"--stringz=something",
+		"-d=true",
+		"-x",
+		"-y",
+		"ee",
+	}
+	want := []string{
+		"boola", "true",
+		"boolb", "true",
+		"boolc", "true",
+		"stringa", "xx",
+		"stringz", "something",
+		"boold", "true",
+		"stringx", "1",
+		"stringy", "ee",
+	}
+	got := []string{}
+	store := func(flag *Flag, value string) error {
+		got = append(got, flag.Name)
+		if len(value) > 0 {
+			got = append(got, value)
+		}
+		return nil
+	}
+	if err := f.ParseAll(args, store); err != nil {
+		t.Errorf("expected no error, got %s", err)
+	}
+	if !f.Parsed() {
+		t.Errorf("f.Parse() = false after Parse")
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("f.ParseAll() fail to restore the args")
+		t.Errorf("Got: %v", got)
+		t.Errorf("Want: %v", want)
+	}
+}
+
 func TestShorthand(t *testing.T) {
 	f := NewFlagSet("shorthand", ContinueOnError)
 	if f.Parsed() {
@@ -392,9 +446,50 @@ func TestShorthand(t *testing.T) {
 	}
 }
 
+func TestShorthandLookup(t *testing.T) {
+	f := NewFlagSet("shorthand", ContinueOnError)
+	if f.Parsed() {
+		t.Error("f.Parse() = true before Parse")
+	}
+	f.BoolP("boola", "a", false, "bool value")
+	f.BoolP("boolb", "b", false, "bool2 value")
+	args := []string{
+		"-ab",
+	}
+	f.SetOutput(ioutil.Discard)
+	if err := f.Parse(args); err != nil {
+		t.Error("expected no error, got ", err)
+	}
+	if !f.Parsed() {
+		t.Error("f.Parse() = false after Parse")
+	}
+	flag := f.ShorthandLookup("a")
+	if flag == nil {
+		t.Errorf("f.ShorthandLookup(\"a\") returned nil")
+	}
+	if flag.Name != "boola" {
+		t.Errorf("f.ShorthandLookup(\"a\") found %q instead of \"boola\"", flag.Name)
+	}
+	flag = f.ShorthandLookup("")
+	if flag != nil {
+		t.Errorf("f.ShorthandLookup(\"\") did not return nil")
+	}
+	defer func() {
+		recover()
+	}()
+	flag = f.ShorthandLookup("ab")
+	// should NEVER get here. lookup should panic. defer'd func should recover it.
+	t.Errorf("f.ShorthandLookup(\"ab\") did not panic")
+}
+
 func TestParse(t *testing.T) {
 	ResetForTesting(func() { t.Error("bad parse") })
 	testParse(GetCommandLine(), t)
+}
+
+func TestParseAll(t *testing.T) {
+	ResetForTesting(func() { t.Error("bad parse") })
+	testParseAll(GetCommandLine(), t)
 }
 
 func TestFlagSetParse(t *testing.T) {
@@ -403,10 +498,10 @@ func TestFlagSetParse(t *testing.T) {
 
 func TestChangedHelper(t *testing.T) {
 	f := NewFlagSet("changedtest", ContinueOnError)
-	_ = f.Bool("changed", false, "changed bool")
-	_ = f.Bool("settrue", true, "true to true")
-	_ = f.Bool("setfalse", false, "false to false")
-	_ = f.Bool("unchanged", false, "unchanged bool")
+	f.Bool("changed", false, "changed bool")
+	f.Bool("settrue", true, "true to true")
+	f.Bool("setfalse", false, "false to false")
+	f.Bool("unchanged", false, "unchanged bool")
 
 	args := []string{"--changed", "--settrue", "--setfalse=false"}
 	if err := f.Parse(args); err != nil {
@@ -873,18 +968,40 @@ func TestHiddenFlagUsage(t *testing.T) {
 	}
 }
 
-const defaultOutput = `      --A                    for bootstrapping, allow 'any' type
-      --Alongflagname        disable bounds checking
-  -C, --CCC                  a boolean defaulting to true (default true)
-      --D path               set relative path for local imports
-      --F number             a non-zero number (default 2.7)
-      --G float              a float that defaults to zero
-      --N int                a non-zero int (default 27)
-      --ND1 string[="bar"]   a string with NoOptDefVal (default "foo")
-      --ND2 num[=4321]       a num with NoOptDefVal (default 1234)
-      --Z int                an int that defaults to zero
-      --maxT timeout         set timeout for dial
+const defaultOutput = `      --A                         for bootstrapping, allow 'any' type
+      --Alongflagname             disable bounds checking
+  -C, --CCC                       a boolean defaulting to true (default true)
+      --D path                    set relative path for local imports
+  -E, --EEE num[=1234]            a num with NoOptDefVal (default 4321)
+      --F number                  a non-zero number (default 2.7)
+      --G float                   a float that defaults to zero
+      --IP ip                     IP address with no default
+      --IPMask ipMask             Netmask address with no default
+      --IPNet ipNet               IP network with no default
+      --Ints intSlice             int slice with zero default
+      --N int                     a non-zero int (default 27)
+      --ND1 string[="bar"]        a string with NoOptDefVal (default "foo")
+      --ND2 num[=4321]            a num with NoOptDefVal (default 1234)
+      --StringArray stringArray   string array with zero default
+      --StringSlice stringSlice   string slice with zero default
+      --Z int                     an int that defaults to zero
+      --custom custom             custom Value implementation
+      --customP custom            a VarP with default (default 10)
+      --maxT timeout              set timeout for dial
 `
+
+// Custom value that satisfies the Value interface.
+type customValue int
+
+func (cv *customValue) String() string { return fmt.Sprintf("%v", *cv) }
+
+func (cv *customValue) Set(s string) error {
+	v, err := strconv.ParseInt(s, 0, 64)
+	*cv = customValue(v)
+	return err
+}
+
+func (cv *customValue) Type() string { return "custom" }
 
 func TestPrintDefaults(t *testing.T) {
 	fs := NewFlagSet("print defaults test", ContinueOnError)
@@ -897,12 +1014,27 @@ func TestPrintDefaults(t *testing.T) {
 	fs.Float64("F", 2.7, "a non-zero `number`")
 	fs.Float64("G", 0, "a float that defaults to zero")
 	fs.Int("N", 27, "a non-zero int")
+	fs.IntSlice("Ints", []int{}, "int slice with zero default")
+	fs.IP("IP", nil, "IP address with no default")
+	fs.IPMask("IPMask", nil, "Netmask address with no default")
+	fs.IPNet("IPNet", net.IPNet{}, "IP network with no default")
 	fs.Int("Z", 0, "an int that defaults to zero")
 	fs.Duration("maxT", 0, "set `timeout` for dial")
 	fs.String("ND1", "foo", "a string with NoOptDefVal")
 	fs.Lookup("ND1").NoOptDefVal = "bar"
 	fs.Int("ND2", 1234, "a `num` with NoOptDefVal")
 	fs.Lookup("ND2").NoOptDefVal = "4321"
+	fs.IntP("EEE", "E", 4321, "a `num` with NoOptDefVal")
+	fs.ShorthandLookup("E").NoOptDefVal = "1234"
+	fs.StringSlice("StringSlice", []string{}, "string slice with zero default")
+	fs.StringArray("StringArray", []string{}, "string array with zero default")
+
+	var cv customValue
+	fs.Var(&cv, "custom", "custom Value implementation")
+
+	cv2 := customValue(10)
+	fs.VarP(&cv2, "customP", "", "a VarP with default")
+
 	fs.PrintDefaults()
 	got := buf.String()
 	if got != defaultOutput {
@@ -910,4 +1042,44 @@ func TestPrintDefaults(t *testing.T) {
 		fmt.Println("\n" + defaultOutput)
 		t.Errorf("got %q want %q\n", got, defaultOutput)
 	}
+}
+
+func TestVisitAllFlagOrder(t *testing.T) {
+	fs := NewFlagSet("TestVisitAllFlagOrder", ContinueOnError)
+	fs.SortFlags = false
+	// https://github.com/spf13/pflag/issues/120
+	fs.SetNormalizeFunc(func(f *FlagSet, name string) NormalizedName {
+		return NormalizedName(name)
+	})
+
+	names := []string{"C", "B", "A", "D"}
+	for _, name := range names {
+		fs.Bool(name, false, "")
+	}
+
+	i := 0
+	fs.VisitAll(func(f *Flag) {
+		if names[i] != f.Name {
+			t.Errorf("Incorrect order. Expected %v, got %v", names[i], f.Name)
+		}
+		i++
+	})
+}
+
+func TestVisitFlagOrder(t *testing.T) {
+	fs := NewFlagSet("TestVisitFlagOrder", ContinueOnError)
+	fs.SortFlags = false
+	names := []string{"C", "B", "A", "D"}
+	for _, name := range names {
+		fs.Bool(name, false, "")
+		fs.Set(name, "true")
+	}
+
+	i := 0
+	fs.Visit(func(f *Flag) {
+		if names[i] != f.Name {
+			t.Errorf("Incorrect order. Expected %v, got %v", names[i], f.Name)
+		}
+		i++
+	})
 }

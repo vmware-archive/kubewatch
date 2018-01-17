@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
 	"testing"
@@ -91,7 +91,7 @@ func RunRestfulCurlyRouterServer() {
 	u := UserResource{map[string]User{}}
 	u.Register(wsContainer)
 
-	log.Printf("start listening on localhost:8090")
+	log.Print("start listening on localhost:8090")
 	server := &http.Server{Addr: ":8090", Handler: wsContainer}
 	log.Fatal(server.ListenAndServe())
 }
@@ -103,7 +103,7 @@ func waitForServerUp(serverURL string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("waiting for server timed out")
+	return errors.New("waiting for server timed out")
 }
 
 func TestServer(t *testing.T) {

@@ -23,9 +23,9 @@ import (
 
 	hipchat "github.com/tbruyelle/hipchat-go/hipchat"
 
-	"github.com/skippbox/kubewatch/config"
-	"github.com/skippbox/kubewatch/pkg/event"
-	kbEvent "github.com/skippbox/kubewatch/pkg/event"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
+	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 	"net/url"
 )
 
