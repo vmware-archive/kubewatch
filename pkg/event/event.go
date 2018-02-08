@@ -14,9 +14,9 @@ limitations under the License.
 package event
 
 import (
+	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
-	"k8s.io/api/extensions/v1beta1"
 )
 
 // Event represent an event got from k8s api server
@@ -66,7 +66,7 @@ func New(obj interface{}, action string) Event {
 		kind = "replication controller"
 		reason = action
 		status = m[action]
-	} else if apiDeployment, ok := obj.(*v1beta1.Deployment); ok {
+	} else if apiDeployment, ok := obj.(*apps_v1beta1.Deployment); ok {
 		namespace = apiDeployment.ObjectMeta.Namespace
 		name = apiDeployment.Name
 		kind = "deployment"
