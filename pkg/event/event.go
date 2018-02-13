@@ -17,6 +17,7 @@ import (
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
+	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
 )
 
 // Event represent an event got from k8s api server
@@ -81,6 +82,18 @@ func New(obj interface{}, action string) Event {
 	} else if apiPV, ok := obj.(*api_v1.PersistentVolume); ok {
 		name = apiPV.Name
 		kind = "persistent volume"
+		reason = action
+		status = m[action]
+	} else if apiDS, ok := obj.(*ext_v1beta1.DaemonSet); ok {
+		namespace = apiDS.ObjectMeta.Namespace
+		name = apiDS.Name
+		kind = "daemon set"
+		reason = action
+		status = m[action]
+	} else if apiRS, ok := obj.(*ext_v1beta1.ReplicaSet); ok {
+		namespace = apiRS.ObjectMeta.Namespace
+		name = apiRS.Name
+		kind = "replica set"
 		reason = action
 		status = m[action]
 	}
