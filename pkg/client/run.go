@@ -24,6 +24,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
 )
 
 // Run runs the event loop processing with given handler
@@ -34,6 +35,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(slack.Slack)
 	case len(conf.Handler.Hipchat.Room) > 0 || len(conf.Handler.Hipchat.Token) > 0:
 		eventHandler = new(hipchat.Hipchat)
+	case len(conf.Handler.Mattermost.Channel) > 0 || len(conf.Handler.Mattermost.Url) > 0:
+		eventHandler = new(mattermost.Mattermost)
 	default:
 		eventHandler = new(handlers.Default)
 	}

@@ -30,6 +30,7 @@ var ConfigFileName = ".kubewatch.yaml"
 type Handler struct {
 	Slack Slack `json:"slack"`
 	Hipchat Hipchat `json:"hipchat"`
+	Mattermost Mattermost `json:"mattermost"`
 }
 
 // Resource contains resource configuration
@@ -58,13 +59,19 @@ type Slack struct {
 	Channel string `json:"channel"`
 }
 
-// Hipchat contains slack configuration
+// Hipchat contains hipchat configuration
 type Hipchat struct {
 	Token   string `json:"token"`
 	Room string `json:"room"`
 	Url string `json:"url"`
 }
 
+// Mattermost contains mattermost configuration
+type Mattermost struct {
+	Channel string `json:"room"`
+	Url string `json:"url"`
+	Username string `json:"username"`
+}
 
 // New creates new config object
 func New() (*Config, error) {
