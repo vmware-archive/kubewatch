@@ -1,0 +1,14 @@
+handler:
+  mattermost:
+    url: "url of incoming webhook"
+    channel: "channel"
+    username: "username"
+resource:
+  deployment: true
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: false
+  pod: false
+  job: false
+  persistentvolume: false
