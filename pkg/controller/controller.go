@@ -31,6 +31,7 @@ import (
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
+	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -50,7 +51,6 @@ type Controller struct {
 	queue        workqueue.RateLimitingInterface
 	informer     cache.SharedIndexInformer
 	eventHandler handlers.Handler
-	kubType      string
 }
 
 func Start(conf *config.Config, eventHandler handlers.Handler) {
@@ -72,6 +72,50 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "pod")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
+	if conf.Resource.DaemonSet {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.ExtensionsV1beta1().DaemonSets(meta_v1.NamespaceAll).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.ExtensionsV1beta1().DaemonSets(meta_v1.NamespaceAll).Watch(options)
+				},
+			},
+			&ext_v1beta1.DaemonSet{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "daemonset")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
+	if conf.Resource.ReplicaSet {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.ExtensionsV1beta1().ReplicaSets(meta_v1.NamespaceAll).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.ExtensionsV1beta1().ReplicaSets(meta_v1.NamespaceAll).Watch(options)
+				},
+			},
+			&ext_v1beta1.ReplicaSet{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "replicaset")
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -289,14 +333,13 @@ func (c *Controller) runWorker() {
 
 func (c *Controller) processNextItem() bool {
 	key, quit := c.queue.Get()
-	kobj := c.kubType
 
 	if quit {
 		return false
 	}
 	defer c.queue.Done(key)
 
-	err := c.processItem(key.(string), kobj)
+	err := c.processItem(key.(string))
 	if err == nil {
 		// No error, reset the ratelimit counters
 		c.queue.Forget(key)
@@ -313,7 +356,7 @@ func (c *Controller) processNextItem() bool {
 	return true
 }
 
-func (c *Controller) processItem(key string, kobj string) error {
+func (c *Controller) processItem(key string) error {
 	obj, exists, err := c.informer.GetIndexer().GetByKey(key)
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", key, err)
