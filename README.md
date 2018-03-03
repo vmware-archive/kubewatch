@@ -130,6 +130,12 @@ Kubewatch supports `config` command for configuration. Config file will be saved
 $ kubewatch config slack --channel <slack_channel> --token <slack_token>
 ```
 
+### Configure flock
+
+```console
+$ kubewatch config flock --url <flock_webhook_url>
+```
+
 ### Configure resources to be watched
 
 ```console
@@ -146,6 +152,11 @@ You have an altenative choice to set your SLACK token, channel via environment v
 ```console
 $ export KW_SLACK_TOKEN='XXXXXXXXXXXXXXXX'
 $ export KW_SLACK_CHANNEL='#channel_name'
+```
+
+You have an altenative choice to set your FLOCK URL
+```console
+$ export KW_FLOCK_URL='https://api.flock.com/hooks/sendMessage/XXXXXXXX'
 ```
 
 ### Run kubewatch locally
