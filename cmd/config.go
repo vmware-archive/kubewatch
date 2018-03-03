@@ -36,4 +36,5 @@ func init() {
 	configCmd.AddCommand(hipchatConfigCmd)
 	configCmd.AddCommand(mattermostConfigCmd)
 	configCmd.AddCommand(resourceConfigCmd)
+	configCmd.AddCommand(flockConfigCmd)
 }

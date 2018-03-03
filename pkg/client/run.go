@@ -25,6 +25,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 )
 
 // Run runs the event loop processing with given handler
@@ -37,6 +38,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(hipchat.Hipchat)
 	case len(conf.Handler.Mattermost.Channel) > 0 || len(conf.Handler.Mattermost.Url) > 0:
 		eventHandler = new(mattermost.Mattermost)
+	case len(conf.Handler.Flock.Url) > 0:
+		eventHandler = new(flock.Flock)
 	default:
 		eventHandler = new(handlers.Default)
 	}
@@ -44,6 +47,5 @@ func Run(conf *config.Config) {
 	if err := eventHandler.Init(conf); err != nil {
 		log.Fatal(err)
 	}
-
 	controller.Start(conf, eventHandler)
 }
