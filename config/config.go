@@ -31,6 +31,7 @@ type Handler struct {
 	Slack Slack `json:"slack"`
 	Hipchat Hipchat `json:"hipchat"`
 	Mattermost Mattermost `json:"mattermost"`
+	Flock Flock `json:"flock"`
 }
 
 // Resource contains resource configuration
@@ -71,6 +72,11 @@ type Mattermost struct {
 	Channel string `json:"room"`
 	Url string `json:"url"`
 	Username string `json:"username"`
+}
+
+// Flock contains flock configuration
+type Flock struct {
+	Url string `json:"url"`
 }
 
 // New creates new config object

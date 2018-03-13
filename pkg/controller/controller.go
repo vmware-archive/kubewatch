@@ -55,7 +55,6 @@ type Controller struct {
 
 func Start(conf *config.Config, eventHandler handlers.Handler) {
 	kubeClient := utils.GetClientOutOfCluster()
-
 	if conf.Resource.Pod {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{

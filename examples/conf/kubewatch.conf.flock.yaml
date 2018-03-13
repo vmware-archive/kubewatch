@@ -1,0 +1,12 @@
+handler:
+  flock:
+    url: "https://api.flock.com/hooks/sendMessage/XXXXXXXX" # XXXXXXXX to be replaced with incomming webhooks of the flock channl
+resource:
+  deployment: true
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: false
+  pod: false
+  job: false
+  persistentvolume: false

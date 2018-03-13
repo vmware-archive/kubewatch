@@ -21,6 +21,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 )
 
 // Handler is implemented by any handler.
@@ -38,6 +39,7 @@ var Map = map[string]interface{}{
 	"slack":   &slack.Slack{},
 	"hipchat": &hipchat.Hipchat{},
 	"mattermost": &mattermost.Mattermost{},
+	"flock": &flock.Flock{},
 }
 
 // Default handler implements Handler interface,
