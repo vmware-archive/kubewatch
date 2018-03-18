@@ -14,6 +14,8 @@ limitations under the License.
 package event
 
 import (
+	"fmt"
+
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
@@ -109,4 +111,27 @@ func New(obj interface{}, action string) Event {
 	}
 
 	return kbEvent
+}
+
+// Message returns event message in standard format.
+// included as a part of event packege to enhance code resuablity across handlers.
+func (e *Event) Message() (msg string) {
+	// using switch over if..else, since the format could vary based on the kind of the object in future.
+	switch e.Kind {
+	case "namespace":
+		msg = fmt.Sprintf(
+			"A namespace %s has been %s",
+			e.Name,
+			e.Reason,
+		)
+	default:
+		msg = fmt.Sprintf(
+			"A %s in namespace %s has been %s: %s",
+			e.Kind,
+			e.Namespace,
+			e.Reason,
+			e.Name,
+		)
+	}
+	return msg
 }

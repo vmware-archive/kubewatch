@@ -21,12 +21,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/bitnami-labs/kubewatch/config"
-	"net/http"
-	"encoding/json"
-	"time"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 	"bytes"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/bitnami-labs/kubewatch/config"
+	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 var flockColors = map[string]string{
@@ -54,19 +55,19 @@ type Flock struct {
 }
 
 type FlockMessage struct {
-	Notification   string `json:"notification"`
-	Text        string `json:"text"`
+	Notification string                    `json:"notification"`
+	Text         string                    `json:"text"`
 	Attachements []FlockMessageAttachement `json:"attachments"`
 }
 
 type FlockMessageAttachement struct {
-	Title       string `json:"title"`
-	Color       string `json:"color"`
-    Views       FlockMessageAttachementViews `json:"views"`
+	Title string                       `json:"title"`
+	Color string                       `json:"color"`
+	Views FlockMessageAttachementViews `json:"views"`
 }
 
 type FlockMessageAttachementViews struct {
-    Flockml       string `json:"flockml"`
+	Flockml string `json:"flockml"`
 }
 
 // Init prepares Flock configuration
@@ -117,39 +118,20 @@ func checkMissingFlockVars(s *Flock) error {
 }
 
 func prepareFlockMessage(e kbEvent.Event, f *Flock) *FlockMessage {
-	msg := fmt.Sprintf(
-		"<flockml> A %s: %s in namespace %s has been %s </flockml>",
-		e.Kind,
-		e.Name,
-		e.Namespace,
-		e.Reason,
-	)
-
-	title := fmt.Sprintf(
-		"%s: %s has been %s",
-		e.Namespace,
-		e.Kind,
-		e.Reason,
-	)
-
-	log.Println(e)
 
 	return &FlockMessage{
-		Text: "Kubewatch Alert",
+		Text:         "Kubewatch Alert",
 		Notification: "Kubewatch Alert",
 		Attachements: []FlockMessageAttachement{
 			{
-				Title: title,
+				Title: e.Message(),
 				Color: flockColors[e.Status],
-                Views: FlockMessageAttachementViews{         
-            		Flockml: msg,
-        		},
 			},
 		},
 	}
 }
 
-func postMessage(url string, flockMessage *FlockMessage) (error){
+func postMessage(url string, flockMessage *FlockMessage) error {
 	message, err := json.Marshal(flockMessage)
 	if err != nil {
 		return err
@@ -169,4 +151,3 @@ func postMessage(url string, flockMessage *FlockMessage) (error){
 
 	return nil
 }
-
