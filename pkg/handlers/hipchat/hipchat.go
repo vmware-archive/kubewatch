@@ -23,10 +23,11 @@ import (
 
 	hipchat "github.com/tbruyelle/hipchat-go/hipchat"
 
+	"net/url"
+
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
 	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
-	"net/url"
 )
 
 var hipchatColors = map[string]hipchat.Color{
@@ -126,16 +127,9 @@ func checkMissingHipchatVars(s *Hipchat) error {
 }
 
 func prepareHipchatNotification(e event.Event) hipchat.NotificationRequest {
-	msg := fmt.Sprintf(
-		"A %s in namespace %s has been %s: %s",
-		e.Kind,
-		e.Namespace,
-		e.Reason,
-		e.Name,
-	)
 
 	notification := hipchat.NotificationRequest{
-		Message: msg,
+		Message: e.Message(),
 		Notify:  true,
 		From:    "kubewatch",
 	}

@@ -21,12 +21,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/bitnami-labs/kubewatch/config"
-	"net/http"
-	"encoding/json"
-	"time"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 	"bytes"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/bitnami-labs/kubewatch/config"
+	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 var mattermostColors = map[string]string{
@@ -52,22 +53,22 @@ Command line flags will override environment variables
 // Mattermost handler implements handler.Handler interface,
 // Notify event to Mattermost channel
 type Mattermost struct {
-	Channel string
-	Url string
+	Channel  string
+	Url      string
 	Username string
 }
 
 type MattermostMessage struct {
-	Channel     string `json:"channel"`
-	Username    string `json:"username"`
-	IconUrl     string `json:"icon_url"`
-	Text        string `json:"text"`
+	Channel      string                         `json:"channel"`
+	Username     string                         `json:"username"`
+	IconUrl      string                         `json:"icon_url"`
+	Text         string                         `json:"text"`
 	Attachements []MattermostMessageAttachement `json:"attachments"`
 }
 
 type MattermostMessageAttachement struct {
-	Title       string `json:"title"`
-	Color       string `json:"color"`
+	Title string `json:"title"`
+	Color string `json:"color"`
 }
 
 // Init prepares Mattermost configuration
@@ -130,28 +131,21 @@ func checkMissingMattermostVars(s *Mattermost) error {
 }
 
 func prepareMattermostMessage(e kbEvent.Event, m *Mattermost) *MattermostMessage {
-	msg := fmt.Sprintf(
-		"A %s in namespace %s has been %s: %s",
-		e.Kind,
-		e.Namespace,
-		e.Reason,
-		e.Name,
-	)
 
 	return &MattermostMessage{
-		Channel: m.Channel,
+		Channel:  m.Channel,
 		Username: m.Username,
-		IconUrl: "https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo_with_border.png",
+		IconUrl:  "https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo_with_border.png",
 		Attachements: []MattermostMessageAttachement{
 			{
-				Title: msg,
+				Title: e.Message(),
 				Color: mattermostColors[e.Status],
 			},
 		},
 	}
 }
 
-func postMessage(url string, mattermostMessage *MattermostMessage) (error){
+func postMessage(url string, mattermostMessage *MattermostMessage) error {
 	message, err := json.Marshal(mattermostMessage)
 	if err != nil {
 		return err
@@ -171,4 +165,3 @@ func postMessage(url string, mattermostMessage *MattermostMessage) (error){
 
 	return nil
 }
-

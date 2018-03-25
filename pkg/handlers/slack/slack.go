@@ -111,19 +111,12 @@ func checkMissingSlackVars(s *Slack) error {
 }
 
 func prepareSlackAttachment(e event.Event) slack.Attachment {
-	msg := fmt.Sprintf(
-		"A %s in namespace %s has been %s: %s",
-		e.Kind,
-		e.Namespace,
-		e.Reason,
-		e.Name,
-	)
 
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
 			slack.AttachmentField{
 				Title: "kubewatch",
-				Value: msg,
+				Value: e.Message(),
 			},
 		},
 	}
