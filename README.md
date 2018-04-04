@@ -1,4 +1,5 @@
 # Kubewatch
+
 [![Build Status](https://travis-ci.org/bitnami-labs/kubewatch.svg?branch=master)](https://travis-ci.org/bitnami-labs/kubewatch) [![Join us on Slack](https://s3.eu-central-1.amazonaws.com/ngtuna/join-us-on-slack.png)](https://skippbox.herokuapp.com)
 
 `kubewatch` is a Kubernetes watcher that currently publishes notification to Slack. Run it in your k8s cluster, and you will get event notifications in a slack channel.
@@ -10,7 +11,6 @@ Create a new Bot: [https://my.slack.com/services/new/bot](https://my.slack.com/s
 Edit the bot to customize it's name, icon and retreive the API token (it starts with `xoxb-`).
 
 Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Slack message area.
-
 
 ## Installing kubewatch using helm
 
@@ -44,7 +44,6 @@ And use that:
 $ helm upgrade --install kubewatch incubator/kubewatch --values=values-file.yml
 ```
 
-
 ## Installing kubewatch using kubectl
 
 In order to run kubewatch in a Kubernetes cluster quickly, the easiest way is for you to create a [ConfigMap](https://github.com/bitnami-labs/kubewatch/blob/master/kubewatch-configmap.yaml) to hold kubewatch configuration. It contains the SLACK bot API token and channel to use.
@@ -56,6 +55,7 @@ Create k8s configmap:
 ```console
 $ kubectl create -f kubewatch-configmap.yaml
 ```
+
 Create the [Pod](https://github.com/bitnami-labs/kubewatch/blob/master/kubewatch.yaml) directly, or create your own deployment:
 
 ```console
@@ -80,12 +80,32 @@ resource:
       pod: true
 ```
 
+### Working with RBAC
+
+Kubernetes Engine clusters running versions 1.6 or higher introduced Role-Based Access Control (RBAC). We can create `ServiceAccount` for it to work with RBAC.
+
+```console
+$ kubectl create -f kubewatch-service-account.yaml
+```
+
+If you do not have permission to create it, you need to become a admin first. Do this:
+
+```
+$ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=REPLACE_EMAIL_HERE
+```
+
+Append `serviceAccountName: kubewatch` below `spec:` in `kubewatch.yaml`. Then created again with:
+
+```console
+$ kubectl create -f kubewatch.yaml
+```
+
 ## Building
 
 ### Building with go
 
-- you need go v1.5 or later.
-- if your working copy is not in your `GOPATH`, you need to set it accordingly.
+* you need go v1.5 or later.
+* if your working copy is not in your `GOPATH`, you need to set it accordingly.
 
 ```console
 $ go build -o kubewatch main.go
@@ -122,6 +142,7 @@ $ go get -u github.com/bitnami-labs/kubewatch
 ```
 
 ## Configuration
+
 Kubewatch supports `config` command for configuration. Config file will be saved at $HOME/.kubewatch.yaml
 
 ### Configure slack
@@ -147,6 +168,7 @@ $ kubewatch config resource --svc
 ```
 
 ### Environment variables
+
 You have an altenative choice to set your SLACK token, channel via environment variables:
 
 ```console
@@ -155,6 +177,7 @@ $ export KW_SLACK_CHANNEL='#channel_name'
 ```
 
 You have an altenative choice to set your FLOCK URL
+
 ```console
 $ export KW_FLOCK_URL='https://api.flock.com/hooks/sendMessage/XXXXXXXX'
 ```
@@ -164,4 +187,3 @@ $ export KW_FLOCK_URL='https://api.flock.com/hooks/sendMessage/XXXXXXXX'
 ```console
 $ kubewatch
 ```
-
