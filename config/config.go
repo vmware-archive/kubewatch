@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,6 +31,7 @@ type Handler struct {
 	Hipchat Hipchat `json:"hipchat"`
 	Mattermost Mattermost `json:"mattermost"`
 	Flock Flock `json:"flock"`
+	Webhook Webhook `json:"webhook"`
 }
 
 // Resource contains resource configuration
@@ -45,6 +45,7 @@ type Resource struct {
 	Job                   bool `json:"job"`
 	PersistentVolume      bool `json:"pv"`
 	Namespace	      bool `json:"ns"`
+	Secret                bool `json:"secret"`
 }
 
 // Config struct contains kubewatch configuration
@@ -76,6 +77,11 @@ type Mattermost struct {
 
 // Flock contains flock configuration
 type Flock struct {
+	Url string `json:"url"`
+}
+
+// Webhook contains mattermost configuration
+type Webhook struct {
 	Url string `json:"url"`
 }
 
@@ -164,6 +170,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
 		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
+	}
+	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
+		c.Resource.Secret = true
 	}
 }
 

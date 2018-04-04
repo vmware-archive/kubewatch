@@ -97,6 +97,13 @@ var resourceConfigCmd = &cobra.Command{
 			logrus.Fatal("ds", err)
 		}
 
+		b, err = cmd.Flags().GetBool("secret")
+		if err == nil {
+			conf.Resource.Secret= b
+		} else {
+			logrus.Fatal("secret", err)
+		}
+
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)
 		}
@@ -113,4 +120,5 @@ func init() {
 	resourceConfigCmd.Flags().Bool("pv", false, "watch for persistent volumes")
 	resourceConfigCmd.Flags().Bool("jobs", false, "watch for jobs")
 	resourceConfigCmd.Flags().Bool("ds", false, "watch for daemonsets")
+	resourceConfigCmd.Flags().Bool("secret", false, "watch for plain secrets")
 }

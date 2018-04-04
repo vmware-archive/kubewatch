@@ -25,9 +25,8 @@ import (
 var configStr = `
 {
     "handler": {
-        "slack": {
-            "channel": "slack_channel",
-            "token": "slack_token"
+        "webhook": {
+            "url": "http://localhost:8080"
         }
     },
     "reason": ["created", "deleted", "updated"],
@@ -38,6 +37,7 @@ var configStr = `
     	"daemonset": "false",
     	"services": "false",
     	"pod": "false",
+    	"secret": "true",
     },
 }
 `
