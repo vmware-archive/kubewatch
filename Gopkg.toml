@@ -55,4 +55,4 @@
 
 [[constraint]]
   name = "k8s.io/client-go"
-  revision = "78700dec6369ba22221b72770783300f143df150" 
+  revision = "v6.0.0"
