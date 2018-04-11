@@ -18,10 +18,11 @@ package handlers
 
 import (
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/custodian"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 )
 
 // Handler is implemented by any handler.
@@ -35,11 +36,12 @@ type Handler interface {
 
 // Map maps each event handler function to a name for easily lookup
 var Map = map[string]interface{}{
-	"default": &Default{},
-	"slack":   &slack.Slack{},
-	"hipchat": &hipchat.Hipchat{},
+	"default":    &Default{},
+	"slack":      &slack.Slack{},
+	"hipchat":    &hipchat.Hipchat{},
 	"mattermost": &mattermost.Mattermost{},
-	"flock": &flock.Flock{},
+	"flock":      &flock.Flock{},
+	"custodian":  &custodian.Custodian{},
 }
 
 // Default handler implements Handler interface,

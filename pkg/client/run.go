@@ -20,12 +20,13 @@ import (
 	"log"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/custodian"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 )
 
 // Run runs the event loop processing with given handler
@@ -40,6 +41,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(mattermost.Mattermost)
 	case len(conf.Handler.Flock.Url) > 0:
 		eventHandler = new(flock.Flock)
+	case len(conf.Handler.Custodian.Foo) > 0:
+		eventHandler = new(custodian.Custodian)
 	default:
 		eventHandler = new(handlers.Default)
 	}

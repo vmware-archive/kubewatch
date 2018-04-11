@@ -28,10 +28,11 @@ import (
 var ConfigFileName = ".kubewatch.yaml"
 
 type Handler struct {
-	Slack Slack `json:"slack"`
-	Hipchat Hipchat `json:"hipchat"`
+	Slack      Slack      `json:"slack"`
+	Hipchat    Hipchat    `json:"hipchat"`
 	Mattermost Mattermost `json:"mattermost"`
-	Flock Flock `json:"flock"`
+	Flock      Flock      `json:"flock"`
+	Custodian  Custodian  `json:"custodian"`
 }
 
 // Resource contains resource configuration
@@ -44,7 +45,7 @@ type Resource struct {
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
 	PersistentVolume      bool `json:"pv"`
-	Namespace	      bool `json:"ns"`
+	Namespace             bool `json:"ns"`
 }
 
 // Config struct contains kubewatch configuration
@@ -62,21 +63,26 @@ type Slack struct {
 
 // Hipchat contains hipchat configuration
 type Hipchat struct {
-	Token   string `json:"token"`
-	Room string `json:"room"`
-	Url string `json:"url"`
+	Token string `json:"token"`
+	Room  string `json:"room"`
+	Url   string `json:"url"`
 }
 
 // Mattermost contains mattermost configuration
 type Mattermost struct {
-	Channel string `json:"room"`
-	Url string `json:"url"`
+	Channel  string `json:"room"`
+	Url      string `json:"url"`
 	Username string `json:"username"`
 }
 
 // Flock contains flock configuration
 type Flock struct {
 	Url string `json:"url"`
+}
+
+// Custodian contains custodian configuration
+type Custodian struct {
+	Foo string `json:"foo"`
 }
 
 // New creates new config object

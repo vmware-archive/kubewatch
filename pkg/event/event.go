@@ -20,6 +20,8 @@ import (
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
+	api_meta "k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Event represent an event got from k8s api server
@@ -33,6 +35,7 @@ type Event struct {
 	Reason    string
 	Status    string
 	Name      string
+	Labels    map[string]string
 }
 
 var m = map[string]string{
@@ -100,6 +103,9 @@ func New(obj interface{}, action string) Event {
 		status = m[action]
 	}
 
+	accessor := api_meta.NewAccessor()
+	labels, _ := accessor.Labels(obj.(runtime.Object))
+
 	kbEvent := Event{
 		Namespace: namespace,
 		Kind:      kind,
@@ -108,6 +114,7 @@ func New(obj interface{}, action string) Event {
 		Reason:    reason,
 		Status:    status,
 		Name:      name,
+		Labels:    labels,
 	}
 
 	return kbEvent
