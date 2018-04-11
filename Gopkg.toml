@@ -46,11 +46,11 @@
   name = "gopkg.in/yaml.v2"
 
 [[constraint]]
-  revision = "11147472b7c934c474a2c484af3c0c5210b7a3af"
+  revision = "kubernetes-1.9.0"
   name = "k8s.io/api"
 
 [[constraint]]
-  revision = "180eddb345a5be3a157cea1c624700ad5bd27b8f"
+  revision = "kubernetes-1.9.0"
   name = "k8s.io/apimachinery"
 
 [[constraint]]
