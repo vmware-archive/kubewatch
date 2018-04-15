@@ -44,6 +44,8 @@ import (
 
 const maxRetries = 5
 
+var serverStartTime time.Time
+
 // Controller object
 type Controller struct {
 	logger       *logrus.Entry
@@ -301,6 +303,7 @@ func (c *Controller) Run(stopCh <-chan struct{}) {
 	defer c.queue.ShutDown()
 
 	c.logger.Info("Starting kubewatch controller")
+	serverStartTime = time.Now().Local()
 
 	go c.informer.Run(stopCh)
 
@@ -355,17 +358,28 @@ func (c *Controller) processNextItem() bool {
 	return true
 }
 
+/* TODOs
+- Enhance event creation using client-side cacheing machanisms
+- Enhance the processItem to classify events
+- Send alerts correspoding to events
+*/
 func (c *Controller) processItem(key string) error {
 	obj, exists, err := c.informer.GetIndexer().GetByKey(key)
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", key, err)
 	}
+	// get object's metedata
+	objectMeta := utils.GetObjectMetaData(obj)
 
 	if !exists {
 		c.eventHandler.ObjectDeleted(obj)
 		return nil
 	}
 
-	c.eventHandler.ObjectCreated(obj)
+	// compare CreationTimestamp and serverStartTime and alert only on latest events
+	// Could be Replaced by using Delta or DeltaFIFO
+	if objectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
+		c.eventHandler.ObjectCreated(obj)
+	}
 	return nil
 }
