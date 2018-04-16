@@ -45,11 +45,11 @@ Command line flags will override environment variables
 // Webhook handler implements handler.Handler interface,
 // Notify event to Webhook channel
 type Webhook struct {
-	Url      string
+	Url string
 }
 
 type WebhookMessage struct {
-	Text         string                         `json:"text"`
+	Text string `json:"text"`
 }
 
 // Init prepares Webhook configuration
@@ -88,7 +88,7 @@ func notifyWebhook(m *Webhook, obj interface{}, action string) {
 		return
 	}
 
-	log.Printf("Message successfully sent to %s at %s ", m.Url , time.Now())
+	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
 }
 
 func checkMissingWebhookVars(s *Webhook) error {
@@ -100,9 +100,9 @@ func checkMissingWebhookVars(s *Webhook) error {
 }
 
 func prepareWebhookMessage(e kbEvent.Event, m *Webhook) *WebhookMessage {
-      return &WebhookMessage{
-        e.Message(),
-        }
+	return &WebhookMessage{
+		e.Message(),
+	}
 
 }
 

@@ -165,14 +165,14 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.PersistentVolume && os.Getenv("KW_PERSISTENT_VOLUME") == "true" {
 		c.Resource.PersistentVolume = true
 	}
+	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
+		c.Resource.Secret = true
+	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
 	}
 	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
 		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
-	}
-	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
-		c.Resource.Secret = true
 	}
 }
 

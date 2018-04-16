@@ -30,9 +30,9 @@ func TestWebhookInit(t *testing.T) {
 
 	var Tests = []struct {
 		webhook config.Webhook
-		err   error
+		err     error
 	}{
-		{config.Webhook{Url: "foo"}, nil },
+		{config.Webhook{Url: "foo"}, nil},
 		{config.Webhook{}, expectedError},
 	}
 
