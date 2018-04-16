@@ -33,6 +33,7 @@ resourcesToWatch:
   replicaset: false
   replicationcontroller: false
   services: true
+  secret: false
 slack:
   channel: '#YOUR_CHANNEL'
   token: 'xoxb-YOUR_TOKEN'
@@ -78,6 +79,7 @@ resource:
       daemonset: false
       services: true
       pod: true
+      secret: false
 ```
 
 ## Building

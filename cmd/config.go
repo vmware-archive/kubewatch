@@ -37,4 +37,5 @@ func init() {
 	configCmd.AddCommand(mattermostConfigCmd)
 	configCmd.AddCommand(resourceConfigCmd)
 	configCmd.AddCommand(flockConfigCmd)
+	configCmd.AddCommand(webhookConfigCmd)
 }

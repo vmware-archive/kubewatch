@@ -98,6 +98,12 @@ func New(obj interface{}, action string) Event {
 		kind = "replica set"
 		reason = action
 		status = m[action]
+	} else if apiSecret , ok := obj.(*api_v1.Secret); ok {
+		namespace = apiSecret.ObjectMeta.Namespace
+		name = apiSecret.Name
+		kind = "secret"
+		reason = action
+		status = m[action]
 	}
 
 	kbEvent := Event{
