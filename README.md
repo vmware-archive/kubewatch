@@ -80,7 +80,6 @@ resource:
       services: true
       pod: true
       secret: false
-      sealedsecret: false
 ```
 
 ## Building

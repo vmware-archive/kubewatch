@@ -80,7 +80,7 @@ type Flock struct {
 	Url string `json:"url"`
 }
 
-// Webhook contains mattermost configuration
+// Webhook contains webhook configuration
 type Webhook struct {
 	Url string `json:"url"`
 }
