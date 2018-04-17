@@ -88,13 +88,19 @@ Kubernetes Engine clusters running versions 1.6 or higher introduced Role-Based 
 $ kubectl create -f kubewatch-service-account.yaml
 ```
 
-If you do not have permission to create it, you need to become a admin first. Do this:
+If you do not have permission to create it, you need to become a admin first. For example, in GKE you would run:
 
 ```
 $ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=REPLACE_EMAIL_HERE
 ```
 
-Append `serviceAccountName: kubewatch` below `spec:` in `kubewatch.yaml`. Then created again with:
+Edit `kubewatch.yaml`, and create a new field under `spec` with `serviceAccountName: kubewatch`, you can achieve this by running:
+
+```console
+$ sed -i '/spec:/a\ \ serviceAccountName: kubewatch' kubewatch.yaml
+```
+
+Then just create `pod` as usual with:
 
 ```console
 $ kubectl create -f kubewatch.yaml
