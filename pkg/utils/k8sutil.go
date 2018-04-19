@@ -72,6 +72,8 @@ func GetObjectMetaData(obj interface{}) meta_v1.ObjectMeta {
 		objectMeta = object.ObjectMeta
 	case *api_v1.Namespace:
 		objectMeta = object.ObjectMeta
+	case *api_v1.Secret:
+		objectMeta = object.ObjectMeta
 	}
 	return objectMeta
 }

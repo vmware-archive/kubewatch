@@ -38,6 +38,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 )
@@ -56,7 +57,13 @@ type Controller struct {
 }
 
 func Start(conf *config.Config, eventHandler handlers.Handler) {
-	kubeClient := utils.GetClientOutOfCluster()
+	var kubeClient kubernetes.Interface
+	_, err := rest.InClusterConfig()
+	if err != nil {
+		kubeClient = utils.GetClientOutOfCluster()
+	} else {
+		kubeClient = utils.GetClient()
+	}
 	if conf.Resource.Pod {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
