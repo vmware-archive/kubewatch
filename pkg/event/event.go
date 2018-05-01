@@ -104,6 +104,12 @@ func New(obj interface{}, action string) Event {
 		kind = "secret"
 		reason = action
 		status = m[action]
+	} else if apiIngress, ok := obj.(*ext_v1beta1.Ingress); ok {
+		namespace = apiIngress.ObjectMeta.Namespace
+		name = apiIngress.Name
+		kind = "ingress"
+		reason = action
+		status = m[action]
 	}
 
 	kbEvent := Event{
