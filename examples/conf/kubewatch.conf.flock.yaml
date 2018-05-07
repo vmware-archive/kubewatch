@@ -10,3 +10,4 @@ resource:
   pod: false
   job: false
   persistentvolume: false
+  ingress: false

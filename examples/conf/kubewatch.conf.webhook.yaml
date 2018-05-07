@@ -25,3 +25,4 @@ resource:
   persistentvolume: false
   namespace: true
   secret: false
+  ingress: false

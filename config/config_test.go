@@ -42,6 +42,7 @@ var configStr = `
     	"services": "false",
     	"pod": "false",
     	"secret": "true",
+        "ingress": "false",
     },
 }
 `
