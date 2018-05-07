@@ -100,13 +100,13 @@ func (e *Event) Message() (msg string) {
 	switch e.Kind {
 	case "namespace":
 		msg = fmt.Sprintf(
-			"A namespace %s has been %s",
+			"A namespace `%s` has been `%s`",
 			e.Name,
 			e.Reason,
 		)
 	default:
 		msg = fmt.Sprintf(
-			"A %s in namespace %s has been %s: %s",
+			"A `%s` in namespace `%s` has been `%s`:\n`%s`",
 			e.Kind,
 			e.Namespace,
 			e.Reason,
