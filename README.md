@@ -128,20 +128,11 @@ $ make build
 
 ### Building with Docker
 
-Buiding builder image:
-
 ```console
-$ make builder-image
-```
-
-Using the `kubewatch-builder` image to build `kubewatch` binary:
-
-```console
-$ make binary-image
+$ make docker-image
 $ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE
-kubewatch           latest              f1ade726c6e2        31 seconds ago       33.08 MB
-kubewatch-builder   latest              6b2d325a3b88        About a minute ago   514.2 MB
+kubewatch           latest              919896d3cd90        3 minutes ago       27.9MB
 ```
 
 ## Download kubewatch package
