@@ -25,6 +25,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
 
@@ -46,6 +47,14 @@ import (
 const maxRetries = 5
 
 var serverStartTime time.Time
+
+// Event indicate the informerEvent
+type Event struct {
+	key          string
+	eventType    string
+	namespace    string
+	resourceType string
+}
 
 // Controller object
 type Controller struct {
@@ -315,27 +324,35 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 
 func newResourceController(client kubernetes.Interface, eventHandler handlers.Handler, informer cache.SharedIndexInformer, resourceType string) *Controller {
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
-
+	var newEvent Event
+	var err error
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(obj)
-			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, key)
+			newEvent.key, err = cache.MetaNamespaceKeyFunc(obj)
+			newEvent.eventType = "create"
+			newEvent.resourceType = resourceType
+			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
 			if err == nil {
-				queue.Add(key)
+				queue.Add(newEvent)
 			}
 		},
 		UpdateFunc: func(old, new interface{}) {
-			key, err := cache.MetaNamespaceKeyFunc(new)
-			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, key)
+			newEvent.key, err = cache.MetaNamespaceKeyFunc(old)
+			newEvent.eventType = "update"
+			newEvent.resourceType = resourceType
+			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, newEvent.key)
 			if err == nil {
-				queue.Add(key)
+				queue.Add(newEvent)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
-			key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
-			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, key)
+			newEvent.key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
+			newEvent.eventType = "delete"
+			newEvent.resourceType = resourceType
+			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
+			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, newEvent.key)
 			if err == nil {
-				queue.Add(key)
+				queue.Add(newEvent)
 			}
 		},
 	})
@@ -386,24 +403,23 @@ func (c *Controller) runWorker() {
 }
 
 func (c *Controller) processNextItem() bool {
-	key, quit := c.queue.Get()
+	newEvent, quit := c.queue.Get()
 
 	if quit {
 		return false
 	}
-	defer c.queue.Done(key)
-
-	err := c.processItem(key.(string))
+	defer c.queue.Done(newEvent)
+	err := c.processItem(newEvent.(Event))
 	if err == nil {
 		// No error, reset the ratelimit counters
-		c.queue.Forget(key)
-	} else if c.queue.NumRequeues(key) < maxRetries {
-		c.logger.Errorf("Error processing %s (will retry): %v", key, err)
-		c.queue.AddRateLimited(key)
+		c.queue.Forget(newEvent)
+	} else if c.queue.NumRequeues(newEvent) < maxRetries {
+		c.logger.Errorf("Error processing %s (will retry): %v", newEvent.(Event).key, err)
+		c.queue.AddRateLimited(newEvent)
 	} else {
 		// err != nil and too many retries
-		c.logger.Errorf("Error processing %s (giving up): %v", key, err)
-		c.queue.Forget(key)
+		c.logger.Errorf("Error processing %s (giving up): %v", newEvent.(Event).key, err)
+		c.queue.Forget(newEvent)
 		utilruntime.HandleError(err)
 	}
 
@@ -411,27 +427,46 @@ func (c *Controller) processNextItem() bool {
 }
 
 /* TODOs
-- Enhance event creation using client-side cacheing machanisms
-- Enhance the processItem to classify events
-- Send alerts correspoding to events
+- Enhance event creation using client-side cacheing machanisms - pending
+- Enhance the processItem to classify events - done
+- Send alerts correspoding to events - done
 */
-func (c *Controller) processItem(key string) error {
-	obj, exists, err := c.informer.GetIndexer().GetByKey(key)
+
+func (c *Controller) processItem(newEvent Event) error {
+	obj, _, err := c.informer.GetIndexer().GetByKey(newEvent.key)
 	if err != nil {
-		return fmt.Errorf("Error fetching object with key %s from store: %v", key, err)
+		return fmt.Errorf("Error fetching object with key %s from store: %v", newEvent.key, err)
 	}
 	// get object's metedata
 	objectMeta := utils.GetObjectMetaData(obj)
 
-	if !exists {
-		c.eventHandler.ObjectDeleted(obj)
+	// process events based on its type
+	switch newEvent.eventType {
+	case "create":
+		// compare CreationTimestamp and serverStartTime and alert only on latest events
+		// Could be Replaced by using Delta or DeltaFIFO
+		if objectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
+			c.eventHandler.ObjectCreated(obj)
+			return nil
+		}
+	case "update":
+		/* TODOs
+		- enahace update event processing in such a way that, it send alerts about what got changed.
+		*/
+		kbEvent := event.Event{
+			Kind: newEvent.resourceType,
+			Name: newEvent.key,
+		}
+		c.eventHandler.ObjectUpdated(obj, kbEvent)
 		return nil
-	}
-
-	// compare CreationTimestamp and serverStartTime and alert only on latest events
-	// Could be Replaced by using Delta or DeltaFIFO
-	if objectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
-		c.eventHandler.ObjectCreated(obj)
+	case "delete":
+		kbEvent := event.Event{
+			Kind:      newEvent.resourceType,
+			Name:      newEvent.key,
+			Namespace: newEvent.namespace,
+		}
+		c.eventHandler.ObjectDeleted(kbEvent)
+		return nil
 	}
 	return nil
 }
