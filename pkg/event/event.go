@@ -77,8 +77,6 @@ func New(obj interface{}, action string) Event {
 		component = string(object.Spec.Type)
 	case *api_v1.Secret:
 		kind = "secret"
-		reason = action
-		status = m[action]
 	case Event:
 		name = object.Name
 		kind = object.Kind
