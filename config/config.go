@@ -46,6 +46,7 @@ type Resource struct {
 	PersistentVolume      bool `json:"pv"`
 	Namespace	      bool `json:"ns"`
 	Secret                bool `json:"secret"`
+	Ingress               bool `json:"ing"`
 }
 
 // Config struct contains kubewatch configuration
@@ -167,6 +168,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
 		c.Resource.Secret = true
+	}
+	if !c.Resource.Ingress && os.Getenv("KW_INGRESS") == "true" {
+		c.Resource.Ingress = true
 	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")

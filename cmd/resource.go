@@ -104,6 +104,14 @@ var resourceConfigCmd = &cobra.Command{
 			logrus.Fatal("secret", err)
 		}
 
+		b, err = cmd.Flags().GetBool("ing")
+		if err == nil {
+			conf.Resource.Ingress = b
+		} else {
+			logrus.Fatal("ing", err)
+		}
+
+
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)
 		}
@@ -121,4 +129,5 @@ func init() {
 	resourceConfigCmd.Flags().Bool("jobs", false, "watch for jobs")
 	resourceConfigCmd.Flags().Bool("ds", false, "watch for daemonsets")
 	resourceConfigCmd.Flags().Bool("secret", false, "watch for plain secrets")
+	resourceConfigCmd.Flags().Bool("ing", false, "watch for ingresses")
 }

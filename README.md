@@ -80,6 +80,7 @@ resource:
       services: true
       pod: true
       secret: false
+      ingress: false
 ```
 
 ### Working with RBAC
