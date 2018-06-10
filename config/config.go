@@ -33,6 +33,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	Exec       Exec       `json:"exec"`
 }
 
 // Resource contains resource configuration
@@ -89,6 +90,11 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	Url string `json:"url"`
+}
+
+// Exec contains exec configuration
+type Exec struct {
+	Cmd string `json:"cmd"`
 }
 
 // New creates new config object

@@ -17,26 +17,37 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/Sirupsen/logrus"
+	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/spf13/cobra"
 )
 
-// configCmd represents the config command
-var configCmd = &cobra.Command{
-	Use:   "config SUBCOMMAND",
-	Short: "config modifies kubewatch configuration",
-	Long:  `config command allows admin setup his own configuration for running kubewatch`,
+// execConfigCmd represents the exec subcommand
+var execConfigCmd = &cobra.Command{
+	Use:   "exec FLAG",
+	Short: "specific exec configuration",
+	Long:  `specific exec configuration`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		conf, err := config.New()
+		if err != nil {
+			logrus.Fatal(err)
+		}
+
+		execCmd, err := cmd.Flags().GetString("cmd")
+		if err == nil {
+			if len(execCmd) > 0 {
+				conf.Handler.Exec.Cmd = execCmd
+			}
+		} else {
+			logrus.Fatal(err)
+		}
+
+		if err = conf.Write(); err != nil {
+			logrus.Fatal(err)
+		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(configCmd)
-	configCmd.AddCommand(slackConfigCmd)
-	configCmd.AddCommand(hipchatConfigCmd)
-	configCmd.AddCommand(mattermostConfigCmd)
-	configCmd.AddCommand(resourceConfigCmd)
-	configCmd.AddCommand(flockConfigCmd)
-	configCmd.AddCommand(webhookConfigCmd)
-	configCmd.AddCommand(execConfigCmd)
+	execConfigCmd.Flags().StringP("cmd", "c", "", "Specify local command/shell to run")
 }
