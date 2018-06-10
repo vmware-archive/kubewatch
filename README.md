@@ -34,6 +34,7 @@ resourcesToWatch:
   replicationcontroller: false
   services: true
   secret: false
+  configmap: false
 slack:
   channel: '#YOUR_CHANNEL'
   token: 'xoxb-YOUR_TOKEN'
@@ -80,6 +81,7 @@ resource:
       services: true
       pod: true
       secret: false
+      configmap: false
       ingress: false
 ```
 

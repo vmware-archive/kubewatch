@@ -16,3 +16,4 @@ data:
       services: true
       pod: true
       secret: false
+      configmap: false

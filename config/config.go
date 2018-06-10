@@ -21,17 +21,18 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+
 	"gopkg.in/yaml.v2"
 )
 
 var ConfigFileName = ".kubewatch.yaml"
 
 type Handler struct {
-	Slack Slack `json:"slack"`
-	Hipchat Hipchat `json:"hipchat"`
+	Slack      Slack      `json:"slack"`
+	Hipchat    Hipchat    `json:"hipchat"`
 	Mattermost Mattermost `json:"mattermost"`
-	Flock Flock `json:"flock"`
-	Webhook Webhook `json:"webhook"`
+	Flock      Flock      `json:"flock"`
+	Webhook    Webhook    `json:"webhook"`
 }
 
 // Resource contains resource configuration
@@ -44,8 +45,9 @@ type Resource struct {
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
 	PersistentVolume      bool `json:"pv"`
-	Namespace	      bool `json:"ns"`
+	Namespace             bool `json:"ns"`
 	Secret                bool `json:"secret"`
+	ConfigMap             bool `json:"configmap"`
 	Ingress               bool `json:"ing"`
 }
 
@@ -64,15 +66,15 @@ type Slack struct {
 
 // Hipchat contains hipchat configuration
 type Hipchat struct {
-	Token   string `json:"token"`
-	Room string `json:"room"`
-	Url string `json:"url"`
+	Token string `json:"token"`
+	Room  string `json:"room"`
+	Url   string `json:"url"`
 }
 
 // Mattermost contains mattermost configuration
 type Mattermost struct {
-	Channel string `json:"room"`
-	Url string `json:"url"`
+	Channel  string `json:"room"`
+	Url      string `json:"url"`
 	Username string `json:"username"`
 }
 
@@ -168,6 +170,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
 		c.Resource.Secret = true
+	}
+	if !c.Resource.ConfigMap && os.Getenv("KW_CONFIGMAP") == "true" {
+		c.Resource.ConfigMap = true
 	}
 	if !c.Resource.Ingress && os.Getenv("KW_INGRESS") == "true" {
 		c.Resource.Ingress = true
