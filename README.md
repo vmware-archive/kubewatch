@@ -159,6 +159,21 @@ $ kubewatch config slack --channel <slack_channel> --token <slack_token>
 $ kubewatch config flock --url <flock_webhook_url>
 ```
 
+### Configure exec
+
+Config the `exec` handler to run local command when receive the event
+
+```console
+$ kubewatch config exec --cmd "<local_command>"
+```
+the local command can have arguments and here are the placeholders substituted by each event object:
+* \{reason\} - the reason of the event, "created", "deleted", "updated"
+* \{name\} - the name of the event source object, in format of "<namespace>/<k8s_object_name>", Ex., 'default/my-test-configmap'
+Example of using placeholder:
+```console
+$ kubewatch config exec --cmd "echo {name} {reason}"
+```
+
 ### Configure resources to be watched
 
 ```console
