@@ -77,6 +77,8 @@ func New(obj interface{}, action string) Event {
 		component = string(object.Spec.Type)
 	case *api_v1.Secret:
 		kind = "secret"
+	case *api_v1.ConfigMap:
+		kind = "configmap"
 	case Event:
 		name = object.Name
 		kind = object.Kind

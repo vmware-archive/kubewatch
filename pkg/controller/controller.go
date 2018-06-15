@@ -293,6 +293,28 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		go c.Run(stopCh)
 	}
 
+	if conf.Resource.ConfigMap {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.CoreV1().ConfigMaps(meta_v1.NamespaceAll).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.CoreV1().ConfigMaps(meta_v1.NamespaceAll).Watch(options)
+				},
+			},
+			&api_v1.ConfigMap{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "configmap")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
 	if conf.Resource.Ingress {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -306,7 +328,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			&ext_v1beta1.Ingress{},
 			0, //Skip resync
 			cache.Indexers{},
-	        )
+		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "ingress")
 		stopCh := make(chan struct{})
@@ -314,7 +336,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 
 		go c.Run(stopCh)
 	}
-
 
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGTERM)
