@@ -56,6 +56,9 @@ type Config struct {
 	Handler Handler `json:"handler"`
 	//Reason   []string `json:"reason"`
 	Resource Resource `json:"resource"`
+	// for watching specific namespace, leave it empty for watching all.
+	// this config is ignored when watching namespaces
+	Namespace string `json:"namespace,omitempty"`
 }
 
 // Slack contains slack configuration
