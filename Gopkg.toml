@@ -22,8 +22,8 @@
 
 
 [[constraint]]
-  name = "github.com/Sirupsen/logrus"
-  version = "1.0.4"
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.5"
 
 [[constraint]]
   name = "github.com/nlopes/slack"

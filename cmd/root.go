@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	c "github.com/bitnami-labs/kubewatch/pkg/client"
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/Sirupsen/logrus"
+	c "github.com/bitnami-labs/kubewatch/pkg/client"
+	"github.com/sirupsen/logrus"
 )
 
 var cfgFile string
@@ -34,7 +34,7 @@ var cfgFile string
 var RootCmd = &cobra.Command{
 	Use:   "kubewatch",
 	Short: "A watcher for Kubernetes",
-	Long: `A watcher for Kubernetes`,
+	Long:  `A watcher for Kubernetes`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := &config.Config{}
@@ -68,8 +68,8 @@ func initConfig() {
 	}
 
 	viper.SetConfigName(".kubewatch.yaml") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.AddConfigPath("$HOME")           // adding home directory as first search path
+	viper.AutomaticEnv()                   // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
