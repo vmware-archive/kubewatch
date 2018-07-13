@@ -85,6 +85,8 @@ func (m *GoogleChat) Init(c *config.Config) error {
 
 	m.Url = url
 
+
+	log.Printf("Google chat initialized")
 	return checkMissingGChatVars(m)
 }
 
