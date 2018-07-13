@@ -54,8 +54,8 @@ type GoogleChatMessage struct {
 }
 
 type GoogleCard struct{
-	Header GoogleCardHeader `json:header`
-	Sections []GoogleCardSection `json:sections`
+	Header GoogleCardHeader `json:"header"`
+	Sections []GoogleCardSection `json:"sections"`
 }
 
 type GoogleCardHeader struct{
@@ -106,13 +106,15 @@ func (m *GoogleChat) ObjectUpdated(oldObj, newObj interface{}) {
 func notifyGoogleChat(m *GoogleChat, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 
-	chatMessage := prepareChatMessage(e, m)
+	chatMessage := prepareChatMessage(e)
 
 	err := postMessage(m.Url, chatMessage)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
 	}
+	res2B, _ := json.Marshal(chatMessage)
+	fmt.Println(string(res2B))
 
 	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
 }
@@ -125,7 +127,7 @@ func checkMissingGChatVars(s *GoogleChat) error {
 	return nil
 }
 
-func prepareChatMessage(e kbEvent.Event, m *GoogleChat) *GoogleChatMessage {
+func prepareChatMessage(e kbEvent.Event) *GoogleChatMessage {
 	return &GoogleChatMessage{
 		Text: "",
 		Cards: []GoogleCard{

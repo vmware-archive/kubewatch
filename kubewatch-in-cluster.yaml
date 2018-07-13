@@ -5,8 +5,8 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: gcr.io/platformer-november/kubewatch:v1
-    imagePullPolicy: Always
+  - image: kubewatch:v5
+    imagePullPolicy: IfNotPresent
     name: kubewatch
     volumeMounts:
     - name: config-volume

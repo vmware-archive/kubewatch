@@ -16,6 +16,6 @@ RUN apk add --update ca-certificates
 
 COPY --from=builder /kubewatch /bin/kubewatch
 
-ENV KW_GOOGLECHAT_URL=https://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3Dhttps://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3D
+# ENV KW_GOOGLECHAT_URL=https://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3Dhttps://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3D
 
 ENTRYPOINT ["/bin/kubewatch"]

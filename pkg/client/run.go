@@ -18,7 +18,6 @@ package client
 
 import (
 	"log"
-
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
