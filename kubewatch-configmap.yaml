@@ -10,11 +10,11 @@ data:
         token: <token>
         channel: <channel>
     resource:
-      deployment: false
-      replicationcontroller: false
-      replicaset: false
-      daemonset: false
+      deployment: true
+      replicationcontroller: true
+      replicaset: true
+      daemonset: true
       services: true
       pod: true
-      secret: false
-      configmap: false
+      secret: true
+      configmap: true
