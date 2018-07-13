@@ -4,34 +4,17 @@ metadata:
   name: kubewatch
 data:
   .kubewatch.yaml: |
-    namespace: default
+    namespace: ""
     handler:
       slack:
-        token: ""
-        channel: ""
-      hipchat:
-        token: ""
-        room: ""
-        url: ""
-      mattermost:
-        channel: ""
-        url: ""
-        username: ""
-      flock:
-        url: ""
-      webhook:
-        url: ""
-      googlechat:
-        url: "https://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3Dhttps://chat.googleapis.com/v1/spaces/AAAAosXkqiA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=soK8YP_o6jn_ShJi_QErkn95XVIWOc7wletgqtHUNnY%3D"
+        token: <token>
+        channel: <channel>
     resource:
-      deployment: true
-      replicationcontroller: true
-      replicaset: true
-      daemonset: true
+      deployment: false
+      replicationcontroller: false
+      replicaset: false
+      daemonset: false
       services: true
       pod: true
-      job: true
-      persistentvolume: true
-      namespace: true
-      secret: true
-      ingress: true
+      secret: false
+      configmap: false
