@@ -33,6 +33,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	GoogleChat GoogleChat `json:"googlechat"`
 }
 
 // Resource contains resource configuration
@@ -88,6 +89,11 @@ type Flock struct {
 
 // Webhook contains webhook configuration
 type Webhook struct {
+	Url string `json:"url"`
+}
+
+// GoogleChat contains googlechat configuration
+type GoogleChat struct {
 	Url string `json:"url"`
 }
 

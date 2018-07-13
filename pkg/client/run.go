@@ -27,6 +27,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/googlechat"
 )
 
 // Run runs the event loop processing with given handler
@@ -43,6 +44,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(flock.Flock)
 	case len(conf.Handler.Webhook.Url) > 0:
 		eventHandler = new(webhook.Webhook)
+	case len(conf.Handler.GoogleChat.Url) > 0:
+		eventHandler = new(googlechat.GoogleChat)
 	default:
 		eventHandler = new(handlers.Default)
 	}
