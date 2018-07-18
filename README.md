@@ -17,8 +17,7 @@ Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Sla
 When you have helm installed in your cluster, use the following setup:
 
 ```console
-$ helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-$ helm install kubewatch incubator/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
+helm install kubewatch stable/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
 ```
 
 You may also provide a values file instead:
