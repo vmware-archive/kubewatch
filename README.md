@@ -8,7 +8,7 @@
 
 Create a new Bot: [https://my.slack.com/services/new/bot](https://my.slack.com/services/new/bot)
 
-Edit the bot to customize it's name, icon and retreive the API token (it starts with `xoxb-`).
+Edit the Bot to customize its name, icon and retrieve the API token (it starts with `xoxb-`).
 
 Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Slack message area.
 
