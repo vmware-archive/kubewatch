@@ -180,11 +180,11 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.Ingress && os.Getenv("KW_INGRESS") == "true" {
 		c.Resource.Ingress = true
 	}
-	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
-		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
+	if (c.Handler.Slack.Channel == "") && (os.Getenv("KW_SLACK_CHANNEL") != "") {
+		c.Handler.Slack.Channel = os.Getenv("KW_SLACK_CHANNEL")
 	}
-	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
-		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
+	if (c.Handler.Slack.Token == "") && (os.Getenv("KW_SLACK_TOKEN") != "") {
+		c.Handler.Slack.Token = os.Getenv("KW_SLACK_TOKEN")
 	}
 }
 
