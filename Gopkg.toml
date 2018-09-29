@@ -20,6 +20,9 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+required = [
+  "k8s.io/client-go/plugin/pkg/client/auth",
+]
 
 [[constraint]]
   name = "github.com/Sirupsen/logrus"
@@ -56,3 +59,7 @@
 [[constraint]]
   name = "k8s.io/client-go"
   revision = "78700dec6369ba22221b72770783300f143df150" 
+
+[[override]]
+  name = "github.com/Azure/go-autorest"
+  revision = "e14a70c556c8e0db173358d1a903dca345a8e75e"
