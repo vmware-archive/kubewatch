@@ -45,7 +45,9 @@ func GetClientOutOfCluster() kubernetes.Interface {
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
-
+	if err != nil {
+		logrus.Fatalf("clienset: %v", err)
+	}
 	return clientset
 }
 
