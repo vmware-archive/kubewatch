@@ -352,6 +352,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "create"
 			newEvent.resourceType = resourceType
+			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
@@ -361,6 +362,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(old)
 			newEvent.eventType = "update"
 			newEvent.resourceType = resourceType
+			newEvent.namespace = utils.GetObjectMetaData(new).Namespace
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
@@ -477,6 +479,7 @@ func (c *Controller) processItem(newEvent Event) error {
 		kbEvent := event.Event{
 			Kind: newEvent.resourceType,
 			Name: newEvent.key,
+			Namespace: newEvent.namespace,
 		}
 		c.eventHandler.ObjectUpdated(obj, kbEvent)
 		return nil
