@@ -42,7 +42,7 @@ slack:
 And use that:
 
 ```console
-$ helm upgrade --install kubewatch incubator/kubewatch --values=values-file.yml
+$ helm upgrade --install kubewatch stable/kubewatch --values=values-file.yml
 ```
 
 ## Installing kubewatch using kubectl
