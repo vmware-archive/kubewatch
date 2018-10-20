@@ -266,6 +266,15 @@
   revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
+  digest = "1:fdcc87d2380fcb2525d248e1ec3a7221ebf6c7a80015074deb3af74e5c4aaadc"
+  name = "gopkg.in/icq.v1"
+  packages = ["."]
+  pruneopts = ""
+  revision = "8774933522c188b1362f6eca8c9db01c2a968849"
+  source = "https://github.com/go-icq/icq"
+  version = "v1.0.0"
+
+[[projects]]
   name = "gopkg.in/inf.v0"
   packages = ["."]
   revision = "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4"

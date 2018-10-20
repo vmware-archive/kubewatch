@@ -24,7 +24,7 @@ import (
 var configCmd = &cobra.Command{
 	Use:   "config SUBCOMMAND",
 	Short: "config modifies kubewatch configuration",
-	Long: `config command allows admin setup his own configuration for running kubewatch`,
+	Long:  `config command allows admin setup his own configuration for running kubewatch`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
@@ -38,4 +38,5 @@ func init() {
 	configCmd.AddCommand(resourceConfigCmd)
 	configCmd.AddCommand(flockConfigCmd)
 	configCmd.AddCommand(webhookConfigCmd)
+	configCmd.AddCommand(icqConfigCmd)
 }
