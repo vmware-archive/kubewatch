@@ -1,0 +1,14 @@
+handler:
+  icq:
+    token: 000.0000000.00000000:00000000 # Get token from megabot bot.
+    uid: 00000@chat.agent # Change UID.
+resource:
+  deployment: true
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: false
+  pod: false
+  job: false
+  persistentvolume: false
+  ingress: false
