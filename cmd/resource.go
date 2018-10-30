@@ -36,84 +36,120 @@ var resourceConfigCmd = &cobra.Command{
 		var b bool
 		b, err = cmd.Flags().GetBool("svc")
 		if err == nil {
-			conf.Resource.Services = b
+			conf.Resource.Services.Watch = b
+			conf.Resource.Services.Events.Create = b
+			conf.Resource.Services.Events.Update = b
+			conf.Resource.Services.Events.Delete = b
 		} else {
 			logrus.Fatal("svc", err)
 		}
 
 		b, err = cmd.Flags().GetBool("deployments")
 		if err == nil {
-			conf.Resource.Deployment = b
+			conf.Resource.Deployment.Watch = b
+			conf.Resource.Deployment.Events.Create = b
+			conf.Resource.Deployment.Events.Update = b
+			conf.Resource.Deployment.Events.Delete = b
 		} else {
 			logrus.Fatal("deployments", err)
 		}
 
 		b, err = cmd.Flags().GetBool("po")
 		if err == nil {
-			conf.Resource.Pod = b
+			conf.Resource.Pod.Watch = b
+			conf.Resource.Pod.Events.Create = b
+			conf.Resource.Pod.Events.Update = b
+			conf.Resource.Pod.Events.Delete = b
 		} else {
 			logrus.Fatal("po", err)
 		}
 
 		b, err = cmd.Flags().GetBool("rs")
 		if err == nil {
-			conf.Resource.ReplicaSet = b
+			conf.Resource.ReplicaSet.Watch = b
+			conf.Resource.ReplicaSet.Events.Create = b
+			conf.Resource.ReplicaSet.Events.Update = b
+			conf.Resource.ReplicaSet.Events.Delete = b
 		} else {
 			logrus.Fatal("rs", err)
 		}
 
 		b, err = cmd.Flags().GetBool("rc")
 		if err == nil {
-			conf.Resource.ReplicationController = b
+			conf.Resource.ReplicationController.Watch = b
+			conf.Resource.ReplicationController.Events.Create = b
+			conf.Resource.ReplicationController.Events.Update = b
+			conf.Resource.ReplicationController.Events.Delete = b
 		} else {
 			logrus.Fatal("rc", err)
 		}
 
 		b, err = cmd.Flags().GetBool("ns")
 		if err == nil {
-			conf.Resource.Namespace = b
+			conf.Resource.Namespace.Watch = b
+			conf.Resource.Namespace.Events.Create = b
+			conf.Resource.Namespace.Events.Update = b
+			conf.Resource.Namespace.Events.Delete = b
 		} else {
 			logrus.Fatal("ns", err)
 		}
 
 		b, err = cmd.Flags().GetBool("jobs")
 		if err == nil {
-			conf.Resource.Job = b
+			conf.Resource.Job.Watch = b
+			conf.Resource.Job.Events.Create = b
+			conf.Resource.Job.Events.Update = b
+			conf.Resource.Job.Events.Delete = b
 		} else {
 			logrus.Fatal("jobs", err)
 		}
 
 		b, err = cmd.Flags().GetBool("pv")
 		if err == nil {
-			conf.Resource.PersistentVolume = b
+			conf.Resource.PersistentVolume.Watch = b
+			conf.Resource.PersistentVolume.Events.Create = b
+			conf.Resource.PersistentVolume.Events.Update = b
+			conf.Resource.PersistentVolume.Events.Delete = b
 		} else {
 			logrus.Fatal("pv", err)
 		}
 
 		b, err = cmd.Flags().GetBool("ds")
 		if err == nil {
-			conf.Resource.DaemonSet = b
+			conf.Resource.DaemonSet.Watch = b
+			conf.Resource.DaemonSet.Events.Create = b
+			conf.Resource.DaemonSet.Events.Update = b
+			conf.Resource.DaemonSet.Events.Delete = b
 		} else {
 			logrus.Fatal("ds", err)
 		}
 
 		b, err = cmd.Flags().GetBool("secret")
 		if err == nil {
-			conf.Resource.Secret = b
+			conf.Resource.Secret.Watch = b
+			conf.Resource.Secret.Events.Create = b
+			conf.Resource.Secret.Events.Update = b
+			conf.Resource.Secret.Events.Delete = b
 		} else {
 			logrus.Fatal("secret", err)
 		}
 
 		b, err = cmd.Flags().GetBool("configmap")
 		if err == nil {
-			conf.Resource.ConfigMap = b
+			conf.Resource.ConfigMap.Watch = b
+			conf.Resource.ConfigMap.Events.Create = b
+			conf.Resource.ConfigMap.Events.Update = b
+			conf.Resource.ConfigMap.Events.Delete = b
 		} else {
 			logrus.Fatal("configmap", err)
 		}
 
 		b, err = cmd.Flags().GetBool("ing")
 		if err == nil {
-			conf.Resource.Ingress = b
+			conf.Resource.Ingress.Watch = b
+			conf.Resource.Ingress.Events.Create = b
+			conf.Resource.Ingress.Events.Update = b
+			conf.Resource.Ingress.Events.Delete = b
 		} else {
 			logrus.Fatal("ing", err)
 		}
