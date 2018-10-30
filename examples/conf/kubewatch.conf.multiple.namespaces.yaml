@@ -9,14 +9,15 @@ data:
       - namespaceTwo
     handler:
       slack:
-        token: <token>
-        channel: <channel>
+        token: xxx
+        channel: xxx
     resource:
+      namespace: false
       deployment: false
       replicationcontroller: false
       replicaset: false
       daemonset: false
-      services: true
+      services: false
       pod: true
       secret: false
       configmap: false
