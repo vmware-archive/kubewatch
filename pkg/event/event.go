@@ -65,6 +65,8 @@ func New(obj interface{}, action string) Event {
 		kind = "ingress"
 	case *api_v1.PersistentVolume:
 		kind = "persistent volume"
+	case *api_v1.PersistentVolumeClaim:
+		kind = "persistent volume claim"
 	case *api_v1.Pod:
 		kind = "pod"
 		host = object.Spec.NodeName

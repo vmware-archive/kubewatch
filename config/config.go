@@ -45,6 +45,7 @@ type Resource struct {
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
 	PersistentVolume      bool `json:"pv"`
+	PersistentVolumeClaim bool `json:"pvc"`
 	Namespace             bool `json:"ns"`
 	Secret                bool `json:"secret"`
 	ConfigMap             bool `json:"configmap"`
@@ -170,6 +171,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.PersistentVolume && os.Getenv("KW_PERSISTENT_VOLUME") == "true" {
 		c.Resource.PersistentVolume = true
+	}
+	if !c.Resource.PersistentVolumeClaim && os.Getenv("KW_PERSISTENT_VOLUME_CLAIM") == "true" {
+		c.Resource.PersistentVolumeClaim = true
 	}
 	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
 		c.Resource.Secret = true
