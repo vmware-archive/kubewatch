@@ -1,0 +1,21 @@
+{
+    "cards": [
+        {
+            "header": {
+                "title": "Kubewatch Notifications"
+            },
+            "sections": [
+                {
+                    "header": "Message",
+                    "widgets": [
+                        {
+                            "textParagraph": {
+                                "text": "some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message some message "
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
