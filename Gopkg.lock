@@ -200,6 +200,12 @@
   version = "v2.0.1"
 
 [[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [".","mem"]
   revision = "bb8f1927f2a9d3ab41c9340aa034f6b803f4359c"
@@ -273,6 +279,12 @@
 
 [[projects]]
   branch = "v2"
+  name = "gopkg.in/tucnak/telebot.v2"
+  packages = ["."]
+  revision = "b59ea4aec33eba0a5d2eeda2638efe000fa93f22"
+
+[[projects]]
+  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "d670f9405373e636a5a2765eea47fac0c9bc91a4"
@@ -301,6 +313,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6a262eb088f5665cba517b1096fd973db6bb53be9ca5bbeb2633deeb002cf680"
+  inputs-digest = "dd20fd0a6e568589dc93d298956d12e8b0f3904e7311c072972b9d5f1f419ef1"
   solver-name = "gps-cdcl"
   solver-version = 1

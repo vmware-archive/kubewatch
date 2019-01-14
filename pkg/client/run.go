@@ -20,12 +20,13 @@ import (
 	"log"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/telegram"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
 
@@ -35,6 +36,8 @@ func Run(conf *config.Config) {
 	switch {
 	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
 		eventHandler = new(slack.Slack)
+	case len(conf.Handler.Telegram.Channel) > 0 || len(conf.Handler.Telegram.Token) > 0:
+		eventHandler = new(telegram.Telegram)
 	case len(conf.Handler.Hipchat.Room) > 0 || len(conf.Handler.Hipchat.Token) > 0:
 		eventHandler = new(hipchat.Hipchat)
 	case len(conf.Handler.Mattermost.Channel) > 0 || len(conf.Handler.Mattermost.Url) > 0:

@@ -33,6 +33,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	Telegram   Telegram   `json:"telegram"`
 }
 
 // Resource contains resource configuration
@@ -89,6 +90,12 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	Url string `json:"url"`
+}
+
+// Telegram contains slack configuration
+type Telegram struct {
+	Token   string `json:"token"`
+	Channel string `json:"channel"`
 }
 
 // New creates new config object
@@ -185,6 +192,13 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
 		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
+	}
+
+	if (c.Handler.Telegram.Channel == "") && (os.Getenv("TELEGRAM_CHANNEL") != "") {
+		c.Handler.Telegram.Channel = os.Getenv("TELEGRAM_CHANNEL")
+	}
+	if (c.Handler.Telegram.Token == "") && (os.Getenv("TELEGRAM_TOKEN") != "") {
+		c.Handler.Telegram.Token = os.Getenv("TELEGRAM_TOKEN")
 	}
 }
 
