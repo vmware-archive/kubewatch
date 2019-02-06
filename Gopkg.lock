@@ -14,6 +14,12 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/RocketChat/Rocket.Chat.Go.SDK"
+  packages = ["models"]
+  revision = "cf0caa70276455b003778afa1763194acccba604"
+
+[[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
   revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
@@ -301,6 +307,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6a262eb088f5665cba517b1096fd973db6bb53be9ca5bbeb2633deeb002cf680"
+  inputs-digest = "b1f3fafdb78bb44bddd6b89f38e0e15ce2d0509117bcbf2ec64a5a101655f3c0"
   solver-name = "gps-cdcl"
   solver-version = 1

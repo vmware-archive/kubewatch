@@ -33,6 +33,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	Rocketchat Rocketchat `json:"rocketchat"`
 }
 
 // Resource contains resource configuration
@@ -89,6 +90,17 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	Url string `json:"url"`
+}
+
+// RocketChat contains RocketChat configuration
+type Rocketchat struct {
+	Scheme   string `json:"scheme"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Channel  string `json:"channel"`
 }
 
 // New creates new config object
@@ -212,15 +224,15 @@ func getConfigFile() string {
 }
 
 func configDir() string {
-    if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
-        return configDir
-    }
+	if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
+		return configDir
+	}
 
-    if runtime.GOOS == "windows" {
-        home := os.Getenv("USERPROFILE")
-        return home
-    }
-    return os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("USERPROFILE")
+		return home
+	}
+	return os.Getenv("HOME")
 	//path := "/etc/kubewatch"
 	//if _, err := os.Stat(path); os.IsNotExist(err) {
 	//	os.Mkdir(path, 755)
