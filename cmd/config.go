@@ -38,4 +38,5 @@ func init() {
 	configCmd.AddCommand(resourceConfigCmd)
 	configCmd.AddCommand(flockConfigCmd)
 	configCmd.AddCommand(webhookConfigCmd)
+	configCmd.AddCommand(rocketchatConfigCmd)
 }
