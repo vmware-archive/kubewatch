@@ -20,12 +20,14 @@ import (
 	"log"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/icq"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
 
@@ -43,6 +45,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(flock.Flock)
 	case len(conf.Handler.Webhook.Url) > 0:
 		eventHandler = new(webhook.Webhook)
+	case len(conf.Handler.Icq.Token) > 0 || len(conf.Handler.Icq.Uid) > 0:
+		eventHandler = new(icq.Icq)
 	default:
 		eventHandler = new(handlers.Default)
 	}
