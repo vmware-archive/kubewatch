@@ -26,14 +26,54 @@ You may also provide a values file instead:
 rbac:
   create: true
 resourcesToWatch:
-  daemonset: true
-  deployment: false
-  pod: true
-  replicaset: false
-  replicationcontroller: false
-  services: true
-  secret: false
-  configmap: false
+  daemonset:
+   watch: true
+   events:
+    create: true
+    update: true
+    delete: false
+  deployment:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
+  pod:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: true
+  replicaset:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
+  replicationcontroller:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
+  services:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
+  secret:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
+  configmap:
+   watch: true
+   events: 
+    create: true
+    update: true
+    delete: false
 slack:
   channel: '#YOUR_CHANNEL'
   token: 'xoxb-YOUR_TOKEN'
@@ -73,15 +113,60 @@ To modify what notifications you get, update the `kubewatch` ConfigMap and turn 
 
 ```
 resource:
-      deployment: false
-      replicationcontroller: false
-      replicaset: false
-      daemonset: false
-      services: true
-      pod: true
-      secret: false
-      configmap: false
-      ingress: false
+      deployment:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      replicationcontroller:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      replicaset:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: true
+      daemonset:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      services:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      pod:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      secret:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      configmap:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
+      ingress:
+       watch: true
+       events: 
+        create: true
+        update: true
+        delete: false
 ```
 
 ### Working with RBAC

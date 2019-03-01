@@ -34,6 +34,7 @@ type Event struct {
 	Reason    string
 	Status    string
 	Name      string
+	Msg       string
 }
 
 var m = map[string]string{
@@ -109,13 +110,17 @@ func (e *Event) Message() (msg string) {
 			e.Reason,
 		)
 	default:
-		msg = fmt.Sprintf(
-			"A `%s` in namespace `%s` has been `%s`:\n`%s`",
-			e.Kind,
-			e.Namespace,
-			e.Reason,
-			e.Name,
-		)
+		if e.Msg == "" {
+			msg = fmt.Sprintf(
+				"A `%s` in namespace `%s` has been `%s`:\n`%s`",
+				e.Kind,
+				e.Namespace,
+				e.Reason,
+				e.Name,
+			)
+		} else {
+			msg = e.Msg
+		}
 	}
 	return msg
 }

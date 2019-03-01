@@ -10,11 +10,39 @@ data:
         token: <token>
         channel: <channel>
     resource:
-      deployment: false
-      replicationcontroller: false
-      replicaset: false
-      daemonset: false
-      services: true
-      pod: true
-      secret: false
-      configmap: false
+      deployment:
+       watch: true
+       events:
+        create: true
+        update: false
+        delete: true
+      replicationcontroller:
+       watch: true
+       events:
+        create: true
+      replicaset:
+       watch: true
+       events:
+        create: true
+      daemonset:
+       watch: true
+       events:
+        create: true
+      services:
+       watch: true
+       events:
+        create: true
+        update: true
+        loadbalancercreate: true
+      pod:
+       watch: true
+       events:
+        create: true
+      secret:
+       watch: true
+       events:
+        create: true
+      configmap:
+       watch: true
+       events:
+        create: true

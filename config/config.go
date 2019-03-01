@@ -37,18 +37,30 @@ type Handler struct {
 
 // Resource contains resource configuration
 type Resource struct {
-	Deployment            bool `json:"deployment"`
-	ReplicationController bool `json:"rc"`
-	ReplicaSet            bool `json:"rs"`
-	DaemonSet             bool `json:"ds"`
-	Services              bool `json:"svc"`
-	Pod                   bool `json:"po"`
-	Job                   bool `json:"job"`
-	PersistentVolume      bool `json:"pv"`
-	Namespace             bool `json:"ns"`
-	Secret                bool `json:"secret"`
-	ConfigMap             bool `json:"configmap"`
-	Ingress               bool `json:"ing"`
+	Deployment            WatchType `json:"deployment"`
+	ReplicationController WatchType `json:"rc"`
+	ReplicaSet            WatchType `json:"rs"`
+	DaemonSet             WatchType `json:"ds"`
+	Services              WatchType `json:"svc"`
+	Pod                   WatchType `json:"po"`
+	Job                   WatchType `json:"job"`
+	PersistentVolume      WatchType `json:"pv"`
+	Namespace             WatchType `json:"ns"`
+	Secret                WatchType `json:"secret"`
+	ConfigMap             WatchType `json:"configmap"`
+	Ingress               WatchType `json:"ing"`
+}
+
+type WatchType struct {
+	Watch  bool      `json:"watch"`
+	Events EventType `json:"events"`
+}
+
+type EventType struct {
+	Create             bool `json:"create"`
+	Update             bool `json:"update"`
+	Delete             bool `json:"delete"`
+	LoadBalancerCreate bool `json:"loadbalancercreate"`
 }
 
 // Config struct contains kubewatch configuration
@@ -144,41 +156,77 @@ func (c *Config) Load() error {
 }
 
 func (c *Config) CheckMissingResourceEnvvars() {
-	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
-		c.Resource.DaemonSet = true
+	if !c.Resource.DaemonSet.Watch && os.Getenv("KW_DAEMONSET") == "true" {
+		c.Resource.DaemonSet.Watch = true
+		c.Resource.DaemonSet.Events.Create = true
+		c.Resource.DaemonSet.Events.Update = true
+		c.Resource.DaemonSet.Events.Delete = true
 	}
-	if !c.Resource.ReplicaSet && os.Getenv("KW_REPLICASET") == "true" {
-		c.Resource.ReplicaSet = true
+	if !c.Resource.ReplicaSet.Watch && os.Getenv("KW_REPLICASET") == "true" {
+		c.Resource.ReplicaSet.Watch = true
+		c.Resource.ReplicaSet.Events.Create = true
+		c.Resource.ReplicaSet.Events.Update = true
+		c.Resource.ReplicaSet.Events.Delete = true
 	}
-	if !c.Resource.Namespace && os.Getenv("KW_NAMESPACE") == "true" {
-		c.Resource.Namespace = true
+	if !c.Resource.Namespace.Watch && os.Getenv("KW_NAMESPACE") == "true" {
+		c.Resource.Namespace.Watch = true
+		c.Resource.Namespace.Events.Create = true
+		c.Resource.Namespace.Events.Update = true
+		c.Resource.Namespace.Events.Delete = true
 	}
-	if !c.Resource.Deployment && os.Getenv("KW_DEPLOYMENT") == "true" {
-		c.Resource.Deployment = true
+	if !c.Resource.Deployment.Watch && os.Getenv("KW_DEPLOYMENT") == "true" {
+		c.Resource.Deployment.Watch = true
+		c.Resource.Deployment.Events.Create = true
+		c.Resource.Deployment.Events.Update = true
+		c.Resource.Deployment.Events.Delete = true
 	}
-	if !c.Resource.Pod && os.Getenv("KW_POD") == "true" {
-		c.Resource.Pod = true
+	if !c.Resource.Pod.Watch && os.Getenv("KW_POD") == "true" {
+		c.Resource.Pod.Watch = true
+		c.Resource.Pod.Events.Create = true
+		c.Resource.Pod.Events.Update = true
+		c.Resource.Pod.Events.Delete = true
 	}
-	if !c.Resource.ReplicationController && os.Getenv("KW_REPLICATION_CONTROLLER") == "true" {
-		c.Resource.ReplicationController = true
+	if !c.Resource.ReplicationController.Watch && os.Getenv("KW_REPLICATION_CONTROLLER") == "true" {
+		c.Resource.ReplicationController.Watch = true
+		c.Resource.ReplicationController.Events.Create = true
+		c.Resource.ReplicationController.Events.Update = true
+		c.Resource.ReplicationController.Events.Delete = true
 	}
-	if !c.Resource.Services && os.Getenv("KW_SERVICE") == "true" {
-		c.Resource.Services = true
+	if !c.Resource.Services.Watch && os.Getenv("KW_SERVICE") == "true" {
+		c.Resource.Services.Watch = true
+		c.Resource.Services.Events.Create = true
+		c.Resource.Services.Events.Update = true
+		c.Resource.Services.Events.Delete = true
 	}
-	if !c.Resource.Job && os.Getenv("KW_JOB") == "true" {
-		c.Resource.Job = true
+	if !c.Resource.Job.Watch && os.Getenv("KW_JOB") == "true" {
+		c.Resource.Job.Watch = true
+		c.Resource.Job.Events.Create = true
+		c.Resource.Job.Events.Update = true
+		c.Resource.Job.Events.Delete = true
 	}
-	if !c.Resource.PersistentVolume && os.Getenv("KW_PERSISTENT_VOLUME") == "true" {
-		c.Resource.PersistentVolume = true
+	if !c.Resource.PersistentVolume.Watch && os.Getenv("KW_PERSISTENT_VOLUME") == "true" {
+		c.Resource.PersistentVolume.Watch = true
+		c.Resource.PersistentVolume.Events.Create = true
+		c.Resource.PersistentVolume.Events.Update = true
+		c.Resource.PersistentVolume.Events.Delete = true
 	}
-	if !c.Resource.Secret && os.Getenv("KW_SECRET") == "true" {
-		c.Resource.Secret = true
+	if !c.Resource.Secret.Watch && os.Getenv("KW_SECRET") == "true" {
+		c.Resource.Secret.Watch = true
+		c.Resource.Secret.Events.Create = true
+		c.Resource.Secret.Events.Update = true
+		c.Resource.Secret.Events.Delete = true
 	}
-	if !c.Resource.ConfigMap && os.Getenv("KW_CONFIGMAP") == "true" {
-		c.Resource.ConfigMap = true
+	if !c.Resource.ConfigMap.Watch && os.Getenv("KW_CONFIGMAP") == "true" {
+		c.Resource.ConfigMap.Watch = true
+		c.Resource.ConfigMap.Events.Create = true
+		c.Resource.ConfigMap.Events.Update = true
+		c.Resource.ConfigMap.Events.Delete = true
 	}
-	if !c.Resource.Ingress && os.Getenv("KW_INGRESS") == "true" {
-		c.Resource.Ingress = true
+	if !c.Resource.Ingress.Watch && os.Getenv("KW_INGRESS") == "true" {
+		c.Resource.Ingress.Watch = true
+		c.Resource.Ingress.Events.Create = true
+		c.Resource.Ingress.Events.Update = true
+		c.Resource.Ingress.Events.Delete = true
 	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
