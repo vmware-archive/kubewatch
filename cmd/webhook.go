@@ -24,7 +24,7 @@ import (
 
 // webhookConfigCmd represents the webhook subcommand
 var webhookConfigCmd = &cobra.Command{
-	Use:   "webhook FLAG",
+	Use:   "webhook",
 	Short: "specific webhook configuration",
 	Long: `specific webhook configuration`,
 	Run: func(cmd *cobra.Command, args []string){

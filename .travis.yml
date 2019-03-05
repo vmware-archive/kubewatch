@@ -3,8 +3,7 @@ language: go
 sudo: required
 
 go:
-  - 1.8
-  - tip
+  - 1.12.x
 
 branches:
   only:

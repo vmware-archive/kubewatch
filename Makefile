@@ -6,9 +6,9 @@ VERSION=
 BUILD=
 
 PKG            = github.com/bitnami-labs/kubewatch
-TRAVIS_COMMIT ?= `git rev-parse HEAD`
+TRAVIS_COMMIT ?= `git describe --tags`
 GOCMD          = go
-BUILD_DATE     = `date`
+BUILD_DATE     = `date +%FT%T%z`
 GOFLAGS       ?= $(GOFLAGS:)
 LDFLAGS       := "-X '$(PKG)/cmd.gitCommit=$(TRAVIS_COMMIT)' \
 		          -X '$(PKG)/cmd.buildDate=$(BUILD_DATE)'"
