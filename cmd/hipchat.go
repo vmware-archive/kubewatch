@@ -24,7 +24,7 @@ import (
 
 // hipchatConfigCmd represents the hipchat subcommand
 var hipchatConfigCmd = &cobra.Command{
-	Use:   "hipchat FLAG",
+	Use:   "hipchat",
 	Short: "specific hipchat configuration",
 	Long:  `specific hipchat configuration`,
 	Run: func(cmd *cobra.Command, args []string) {

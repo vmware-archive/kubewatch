@@ -24,7 +24,7 @@ import (
 
 // slackConfigCmd represents the slack subcommand
 var slackConfigCmd = &cobra.Command{
-	Use:   "slack FLAG",
+	Use:   "slack",
 	Short: "specific slack configuration",
 	Long: `specific slack configuration`,
 	Run: func(cmd *cobra.Command, args []string){

@@ -24,117 +24,153 @@ import (
 
 // resourceConfigCmd represents the resource subcommand
 var resourceConfigCmd = &cobra.Command{
-	Use:   "resource FLAG",
-	Short: "specific resources to be watched",
-	Long:  `specific resources to be watched`,
+	Use:   "resource",
+	Short: "manage resources to be watched",
+	Long: `
+manage resources to be watched`,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		// warn for too few arguments
+		if len(args) < 2 {
+			logrus.Warn("Too few arguments to Command \"resource\".\nMinimum 2 arguments required: subcommand, resource flags")
+		}
+		// display help
+		cmd.Help()
+	},
+}
+
+// resourceConfigAddCmd represents the resource add subcommand
+var resourceConfigAddCmd = &cobra.Command{
+	Use:   "add",
+	Short: "adds specific resources to be watched",
+	Long: `
+adds specific resources to be watched`,
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
 		}
 
-		var b bool
-		b, err = cmd.Flags().GetBool("svc")
-		if err == nil {
-			conf.Resource.Services = b
-		} else {
-			logrus.Fatal("svc", err)
-		}
-
-		b, err = cmd.Flags().GetBool("deployments")
-		if err == nil {
-			conf.Resource.Deployment = b
-		} else {
-			logrus.Fatal("deployments", err)
-		}
-
-		b, err = cmd.Flags().GetBool("po")
-		if err == nil {
-			conf.Resource.Pod = b
-		} else {
-			logrus.Fatal("po", err)
-		}
-
-		b, err = cmd.Flags().GetBool("rs")
-		if err == nil {
-			conf.Resource.ReplicaSet = b
-		} else {
-			logrus.Fatal("rs", err)
-		}
-
-		b, err = cmd.Flags().GetBool("rc")
-		if err == nil {
-			conf.Resource.ReplicationController = b
-		} else {
-			logrus.Fatal("rc", err)
-		}
-
-		b, err = cmd.Flags().GetBool("ns")
-		if err == nil {
-			conf.Resource.Namespace = b
-		} else {
-			logrus.Fatal("ns", err)
-		}
-
-		b, err = cmd.Flags().GetBool("jobs")
-		if err == nil {
-			conf.Resource.Job = b
-		} else {
-			logrus.Fatal("jobs", err)
-		}
-
-		b, err = cmd.Flags().GetBool("pv")
-		if err == nil {
-			conf.Resource.PersistentVolume = b
-		} else {
-			logrus.Fatal("pv", err)
-		}
-
-		b, err = cmd.Flags().GetBool("ds")
-		if err == nil {
-			conf.Resource.DaemonSet = b
-		} else {
-			logrus.Fatal("ds", err)
-		}
-
-		b, err = cmd.Flags().GetBool("secret")
-		if err == nil {
-			conf.Resource.Secret = b
-		} else {
-			logrus.Fatal("secret", err)
-		}
-
-		b, err = cmd.Flags().GetBool("configmap")
-		if err == nil {
-			conf.Resource.ConfigMap = b
-		} else {
-			logrus.Fatal("configmap", err)
-		}
-
-		b, err = cmd.Flags().GetBool("ing")
-		if err == nil {
-			conf.Resource.Ingress = b
-		} else {
-			logrus.Fatal("ing", err)
-		}
-
-		if err = conf.Write(); err != nil {
-			logrus.Fatal(err)
-		}
+		// add resource to config
+		configureResource("add", cmd, conf)
 	},
 }
 
+// resourceConfigRemoveCmd represents the resource remove subcommand
+var resourceConfigRemoveCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "remove specific resources being watched",
+	Long: `
+remove specific resources being watched`,
+	Run: func(cmd *cobra.Command, args []string) {
+		conf, err := config.New()
+		if err != nil {
+			logrus.Fatal(err)
+		}
+
+		// remove resource from config
+		configureResource("remove", cmd, conf)
+	},
+}
+
+// configures resource in config based on operation add/remove
+func configureResource(operation string, cmd *cobra.Command, conf *config.Config) {
+
+	// flags struct
+	flags := []struct {
+		resourceStr     string
+		resourceToWatch *bool
+	}{
+		{
+			"svc",
+			&conf.Resource.Services,
+		},
+		{
+			"deploy",
+			&conf.Resource.Deployment,
+		},
+		{
+			"po",
+			&conf.Resource.Pod,
+		},
+		{
+			"rs",
+			&conf.Resource.ReplicaSet,
+		},
+		{
+			"rc",
+			&conf.Resource.ReplicationController,
+		},
+		{
+			"ns",
+			&conf.Resource.Namespace,
+		},
+		{
+			"job",
+			&conf.Resource.Job,
+		},
+		{
+			"pv",
+			&conf.Resource.PersistentVolume,
+		},
+		{
+			"ds",
+			&conf.Resource.DaemonSet,
+		},
+		{
+			"secret",
+			&conf.Resource.Secret,
+		},
+		{
+			"cm",
+			&conf.Resource.ConfigMap,
+		},
+		{
+			"ing",
+			&conf.Resource.Ingress,
+		},
+	}
+
+	for _, flag := range flags {
+		b, err := cmd.Flags().GetBool(flag.resourceStr)
+		if err == nil {
+			if b {
+				switch operation {
+				case "add":
+					*flag.resourceToWatch = true
+					logrus.Infof("resource %s configured", flag.resourceStr)
+				case "remove":
+					*flag.resourceToWatch = false
+					logrus.Infof("resource %s removed", flag.resourceStr)
+				}
+			}
+		} else {
+			logrus.Fatal(flag.resourceStr, err)
+		}
+	}
+
+	if err := conf.Write(); err != nil {
+		logrus.Fatal(err)
+	}
+}
+
 func init() {
-	resourceConfigCmd.Flags().Bool("svc", false, "watch for services")
-	resourceConfigCmd.Flags().Bool("deployments", false, "watch for deployments")
-	resourceConfigCmd.Flags().Bool("po", false, "watch for pods")
-	resourceConfigCmd.Flags().Bool("rc", false, "watch for replication controllers")
-	resourceConfigCmd.Flags().Bool("rs", false, "watch for replicasets")
-	resourceConfigCmd.Flags().Bool("ns", false, "watch for namespaces")
-	resourceConfigCmd.Flags().Bool("pv", false, "watch for persistent volumes")
-	resourceConfigCmd.Flags().Bool("jobs", false, "watch for jobs")
-	resourceConfigCmd.Flags().Bool("ds", false, "watch for daemonsets")
-	resourceConfigCmd.Flags().Bool("secret", false, "watch for plain secrets")
-	resourceConfigCmd.Flags().Bool("configmap", false, "watch for plain configmap")
-	resourceConfigCmd.Flags().Bool("ing", false, "watch for ingresses")
+	RootCmd.AddCommand(resourceConfigCmd)
+	resourceConfigCmd.AddCommand(
+		resourceConfigAddCmd,
+		resourceConfigRemoveCmd,
+	)
+	// Add resource object flags as PersistentFlags to resourceConfigCmd
+	resourceConfigCmd.PersistentFlags().Bool("svc", false, "watch for services")
+	resourceConfigCmd.PersistentFlags().Bool("deploy", false, "watch for deployments")
+	resourceConfigCmd.PersistentFlags().Bool("po", false, "watch for pods")
+	resourceConfigCmd.PersistentFlags().Bool("rc", false, "watch for replication controllers")
+	resourceConfigCmd.PersistentFlags().Bool("rs", false, "watch for replicasets")
+	resourceConfigCmd.PersistentFlags().Bool("ns", false, "watch for namespaces")
+	resourceConfigCmd.PersistentFlags().Bool("pv", false, "watch for persistent volumes")
+	resourceConfigCmd.PersistentFlags().Bool("job", false, "watch for jobs")
+	resourceConfigCmd.PersistentFlags().Bool("ds", false, "watch for daemonsets")
+	resourceConfigCmd.PersistentFlags().Bool("secret", false, "watch for plain secrets")
+	resourceConfigCmd.PersistentFlags().Bool("cm", false, "watch for plain configmaps")
+	resourceConfigCmd.PersistentFlags().Bool("ing", false, "watch for ingresses")
 }
