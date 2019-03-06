@@ -18,9 +18,7 @@ package controller
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
+	"log"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -65,7 +63,11 @@ type Controller struct {
 	eventHandler handlers.Handler
 }
 
-func Start(conf *config.Config, eventHandler handlers.Handler) {
+func Start(conf *config.Config, eventHandler handlers.Handler, stopCh <-chan struct{}) {
+	if err := eventHandler.Init(conf); err != nil {
+		log.Fatal(err)
+	}
+
 	var kubeClient kubernetes.Interface
 	_, err := rest.InClusterConfig()
 	if err != nil {
@@ -89,9 +91,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "pod")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -111,9 +110,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "daemonset")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -133,9 +129,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "replicaset")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -155,9 +148,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "service")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -177,9 +167,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "deployment")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -199,9 +186,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "namespace")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -221,9 +205,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "replication controller")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -243,9 +224,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "job")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -265,9 +243,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "persistent volume")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -287,9 +262,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "secret")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -309,9 +281,6 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "configmap")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
@@ -331,16 +300,9 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "ingress")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
 		go c.Run(stopCh)
 	}
 
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGTERM)
-	signal.Notify(sigterm, syscall.SIGINT)
-	<-sigterm
 }
 
 func newResourceController(client kubernetes.Interface, eventHandler handlers.Handler, informer cache.SharedIndexInformer, resourceType string) *Controller {
