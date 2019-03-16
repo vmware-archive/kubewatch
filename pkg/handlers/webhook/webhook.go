@@ -48,6 +48,7 @@ type Webhook struct {
 	Url string
 }
 
+// WebhookMessage for messages
 type WebhookMessage struct {
 	Text string `json:"text"`
 }
@@ -65,14 +66,17 @@ func (m *Webhook) Init(c *config.Config) error {
 	return checkMissingWebhookVars(m)
 }
 
+// ObjectCreated calls notifyWebhook on event creation
 func (m *Webhook) ObjectCreated(obj interface{}) {
 	notifyWebhook(m, obj, "created")
 }
 
+// ObjectDeleted calls notifyWebhook on event creation
 func (m *Webhook) ObjectDeleted(obj interface{}) {
 	notifyWebhook(m, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyWebhook on event creation
 func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyWebhook(m, newObj, "updated")
 }

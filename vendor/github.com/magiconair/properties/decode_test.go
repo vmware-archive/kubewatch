@@ -269,9 +269,9 @@ func TestDecodeMap(t *testing.T) {
 	`
 	out := &X{
 		A: map[string]string{"foo": "bar", "bar": "bang"},
-		B: map[string][]string{"foo": []string{"a", "b", "c"}, "bar": []string{"1", "2", "3"}},
-		C: map[string]map[string]string{"foo": map[string]string{"one": "1", "two": "2"}, "bar": map[string]string{"three": "3", "four": "4"}},
-		D: map[string]S{"foo": S{"bar"}},
+		B: map[string][]string{"foo": {"a", "b", "c"}, "bar": {"1", "2", "3"}},
+		C: map[string]map[string]string{"foo": {"one": "1", "two": "2"}, "bar": {"three": "3", "four": "4"}},
+		D: map[string]S{"foo": {"bar"}},
 		E: map[string]int{},
 	}
 	testDecode(t, in, &X{}, out)

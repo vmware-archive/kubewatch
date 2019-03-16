@@ -30,7 +30,7 @@ func TestMattermostInit(t *testing.T) {
 
 	var Tests = []struct {
 		mattermost config.Mattermost
-		err   error
+		err        error
 	}{
 		{config.Mattermost{Url: "foo", Channel: "bar", Username: "username"}, nil},
 		{config.Mattermost{Url: "foo", Channel: "bar"}, expectedError},

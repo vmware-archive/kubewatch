@@ -34,7 +34,7 @@ func randomRunes() map[rune]uint8 {
 func Example_build() {
 	t := triegen.NewTrie("rand")
 
-	for r, _ := range randomRunes() {
+	for r := range randomRunes() {
 		t.Insert(r, 1)
 	}
 	sz, err := t.Gen(genWriter)

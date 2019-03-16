@@ -18,7 +18,7 @@ type tokenPair struct {
 }
 
 var tokenLists = map[string][]tokenPair{
-	"comment": []tokenPair{
+	"comment": {
 		{token.COMMENT, "//"},
 		{token.COMMENT, "////"},
 		{token.COMMENT, "// comment"},
@@ -39,7 +39,7 @@ var tokenLists = map[string][]tokenPair{
 		{token.COMMENT, "/*\n comment\n*/"},
 		{token.COMMENT, "/*" + f100 + "*/"},
 	},
-	"operator": []tokenPair{
+	"operator": {
 		{token.LBRACK, "["},
 		{token.LBRACE, "{"},
 		{token.COMMA, ","},
@@ -50,11 +50,11 @@ var tokenLists = map[string][]tokenPair{
 		{token.ADD, "+"},
 		{token.SUB, "-"},
 	},
-	"bool": []tokenPair{
+	"bool": {
 		{token.BOOL, "true"},
 		{token.BOOL, "false"},
 	},
-	"ident": []tokenPair{
+	"ident": {
 		{token.IDENT, "a"},
 		{token.IDENT, "a0"},
 		{token.IDENT, "foobar"},
@@ -73,11 +73,11 @@ var tokenLists = map[string][]tokenPair{
 		{token.IDENT, "foo६४"},
 		{token.IDENT, "bar９８７６"},
 	},
-	"heredoc": []tokenPair{
+	"heredoc": {
 		{token.HEREDOC, "<<EOF\nhello\nworld\nEOF"},
 		{token.HEREDOC, "<<EOF123\nhello\nworld\nEOF123"},
 	},
-	"string": []tokenPair{
+	"string": {
 		{token.STRING, `" "`},
 		{token.STRING, `"a"`},
 		{token.STRING, `"本"`},
@@ -101,7 +101,7 @@ var tokenLists = map[string][]tokenPair{
 		{token.STRING, `"\U0000ffAB"`},
 		{token.STRING, `"` + f100 + `"`},
 	},
-	"number": []tokenPair{
+	"number": {
 		{token.NUMBER, "0"},
 		{token.NUMBER, "1"},
 		{token.NUMBER, "9"},
@@ -148,7 +148,7 @@ var tokenLists = map[string][]tokenPair{
 		{token.NUMBER, "-0X123456789abcDEF"},
 		{token.NUMBER, "-0X" + f100},
 	},
-	"float": []tokenPair{
+	"float": {
 		{token.FLOAT, "0."},
 		{token.FLOAT, "1."},
 		{token.FLOAT, "42."},

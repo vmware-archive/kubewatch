@@ -207,13 +207,13 @@ func TestFilterPrefix(t *testing.T) {
 	}
 
 	for prefix, want := range map[string]map[string]string{
-		"a":    map[string]string{"all": "", "and": "", "at": "", "available": ""},
-		"al":   map[string]string{"all": ""},
-		"all":  map[string]string{"all": ""},
-		"alll": map[string]string{},
-		"c":    map[string]string{"components": "", "coreos": ""},
-		"co":   map[string]string{"components": "", "coreos": ""},
-		"com":  map[string]string{"components": ""},
+		"a":    {"all": "", "and": "", "at": "", "available": ""},
+		"al":   {"all": ""},
+		"all":  {"all": ""},
+		"alll": {},
+		"c":    {"components": "", "coreos": ""},
+		"co":   {"components": "", "coreos": ""},
+		"com":  {"components": ""},
 	} {
 		have := filterPrefix(input, prefix)
 		if !reflect.DeepEqual(want, have) {

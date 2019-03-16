@@ -73,14 +73,17 @@ func (s *Slack) Init(c *config.Config) error {
 	return checkMissingSlackVars(s)
 }
 
+// ObjectCreated calls notifySlack on event creation
 func (s *Slack) ObjectCreated(obj interface{}) {
 	notifySlack(s, obj, "created")
 }
 
+// ObjectDeleted calls notifySlack on event creation
 func (s *Slack) ObjectDeleted(obj interface{}) {
 	notifySlack(s, obj, "deleted")
 }
 
+// ObjectUpdated calls notifySlack on event creation
 func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
 	notifySlack(s, newObj, "updated")
 }
@@ -114,7 +117,7 @@ func prepareSlackAttachment(e event.Event) slack.Attachment {
 
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
-			slack.AttachmentField{
+			{
 				Title: "kubewatch",
 				Value: e.Message(),
 			},

@@ -70,11 +70,11 @@ func UTF32(e Endianness, b BOMPolicy) encoding.Encoding {
 // mibValue maps Endianness and BOMPolicy settings to MIB constants for UTF-32.
 // Note that some configurations map to the same MIB identifier.
 var mibValue = map[Endianness][numBOMValues]identifier.MIB{
-	BigEndian: [numBOMValues]identifier.MIB{
+	BigEndian: {
 		IgnoreBOM: identifier.UTF32BE,
 		UseBOM:    identifier.UTF32,
 	},
-	LittleEndian: [numBOMValues]identifier.MIB{
+	LittleEndian: {
 		IgnoreBOM: identifier.UTF32LE,
 		UseBOM:    identifier.UTF32,
 	},

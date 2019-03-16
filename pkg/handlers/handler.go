@@ -18,10 +18,10 @@ package handlers
 
 import (
 	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
-	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
 
@@ -36,12 +36,12 @@ type Handler interface {
 
 // Map maps each event handler function to a name for easily lookup
 var Map = map[string]interface{}{
-	"default": &Default{},
-	"slack":   &slack.Slack{},
-	"hipchat": &hipchat.Hipchat{},
+	"default":    &Default{},
+	"slack":      &slack.Slack{},
+	"hipchat":    &hipchat.Hipchat{},
 	"mattermost": &mattermost.Mattermost{},
-	"flock": &flock.Flock{},
-	"webhook": &webhook.Webhook{},
+	"flock":      &flock.Flock{},
+	"webhook":    &webhook.Webhook{},
 }
 
 // Default handler implements Handler interface,
@@ -55,14 +55,17 @@ func (d *Default) Init(c *config.Config) error {
 	return nil
 }
 
+// ObjectCreated sends events on object creation
 func (d *Default) ObjectCreated(obj interface{}) {
 
 }
 
+// ObjectDeleted sends events on object deletion
 func (d *Default) ObjectDeleted(obj interface{}) {
 
 }
 
+// ObjectUpdated sends events on object updation
 func (d *Default) ObjectUpdated(oldObj, newObj interface{}) {
 
 }

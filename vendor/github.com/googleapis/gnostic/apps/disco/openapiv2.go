@@ -18,8 +18,8 @@ import (
 	"log"
 	"net/url"
 
-	discovery "github.com/googleapis/gnostic/discovery"
 	openapi2 "github.com/googleapis/gnostic/OpenAPIv2"
+	discovery "github.com/googleapis/gnostic/discovery"
 )
 
 func addOpenAPI2SchemaForSchema(d *openapi2.Document, name string, schema *discovery.Schema) {
@@ -167,7 +167,7 @@ func buildOpenAPI2OperationForMethod(method *discovery.Method) *openapi2.Operati
 	}
 	responses := &openapi2.Responses{
 		ResponseCode: []*openapi2.NamedResponseValue{
-			&openapi2.NamedResponseValue{
+			{
 				Name: "default",
 				Value: &openapi2.ResponseValue{
 					Oneof: &openapi2.ResponseValue_Response{
@@ -246,7 +246,7 @@ func addOpenAPI2PathsForResource(d *openapi2.Document, name string, resource *di
 
 func removeTrailingSlash(path string) string {
 	if len(path) > 1 && path[len(path)-1] == '/' {
-		return path[0: len(path)-1]
+		return path[0 : len(path)-1]
 	}
 	return path
 }

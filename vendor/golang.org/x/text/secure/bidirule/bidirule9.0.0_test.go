@@ -14,7 +14,7 @@ import (
 var testCases = [][]ruleTest{
 	// Go-specific rules.
 	// Invalid UTF-8 is invalid.
-	0: []ruleTest{{
+	0: {{
 		in:  "",
 		dir: bidi.LeftToRight,
 	}, {
@@ -72,7 +72,7 @@ var testCases = [][]ruleTest{
 	// Rule 2.1: The first character must be a character with Bidi property L,
 	// R, or AL.  If it has the R or AL property, it is an RTL label; if it has
 	// the L property, it is an LTR label.
-	1: []ruleTest{{
+	1: {{
 		in:  strL,
 		dir: bidi.LeftToRight,
 	}, {
@@ -179,7 +179,7 @@ var testCases = [][]ruleTest{
 
 	// Rule 2.2: In an RTL label, only characters with the Bidi properties R,
 	// AL, AN, EN, ES, CS, ET, ON, BN, or NSM are allowed.
-	2: []ruleTest{{
+	2: {{
 		in:  strR + strR + strAL,
 		dir: bidi.RightToLeft,
 	}, {
@@ -284,7 +284,7 @@ var testCases = [][]ruleTest{
 	// Rule 2.3: In an RTL label, the end of the label must be a character with
 	// Bidi property R, AL, EN, or AN, followed by zero or more characters with
 	// Bidi property NSM.
-	3: []ruleTest{{
+	3: {{
 		in:  strR + strNSM,
 		dir: bidi.RightToLeft,
 	}, {
@@ -408,7 +408,7 @@ var testCases = [][]ruleTest{
 
 	// Rule 2.4: In an RTL label, if an EN is present, no AN may be present,
 	// and vice versa.
-	4: []ruleTest{{
+	4: {{
 		in:  strR + strEN + strAN,
 		dir: bidi.RightToLeft,
 		n:   len(strR + strEN),
@@ -432,7 +432,7 @@ var testCases = [][]ruleTest{
 
 	// Rule 2.5: In an LTR label, only characters with the Bidi properties L,
 	// EN, ES, CS, ET, ON, BN, or NSM are allowed.
-	5: []ruleTest{{
+	5: {{
 		in:  strL + strL + strL,
 		dir: bidi.LeftToRight,
 	}, {
@@ -506,7 +506,7 @@ var testCases = [][]ruleTest{
 	// Rule 2.6: In an LTR label, the end of the label must be a character with
 	// Bidi property L or EN, followed by zero or more characters with Bidi
 	// property NSM.
-	6: []ruleTest{{
+	6: {{
 		in:  strL,
 		dir: bidi.LeftToRight,
 	}, {
@@ -622,7 +622,7 @@ var testCases = [][]ruleTest{
 	}},
 
 	// Incremental processing.
-	9: []ruleTest{{
+	9: {{
 		in:  "e\u0301", // é
 		dir: bidi.LeftToRight,
 

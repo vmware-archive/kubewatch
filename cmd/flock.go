@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // flockConfigCmd represents the flock subcommand
 var flockConfigCmd = &cobra.Command{
 	Use:   "flock",
 	Short: "specific flock configuration",
-	Long: `specific flock configuration`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific flock configuration`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
