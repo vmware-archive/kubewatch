@@ -25,6 +25,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/msteam"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
@@ -43,6 +44,8 @@ func Run(conf *config.Config) {
 		eventHandler = new(flock.Flock)
 	case len(conf.Handler.Webhook.Url) > 0:
 		eventHandler = new(webhook.Webhook)
+	case len(conf.Handler.MSTeams.WebhookURL) > 0:
+		eventHandler = new(msteam.MSTeams)
 	default:
 		eventHandler = new(handlers.Default)
 	}

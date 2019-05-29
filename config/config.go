@@ -35,6 +35,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	MSTeams    MSTeams    `json:"msteams"`
 }
 
 // Resource contains resource configuration
@@ -91,6 +92,11 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	Url string `json:"url"`
+}
+
+// MSTeams contains MSTeams configuration
+type MSTeams struct {
+	WebhookURL string `json:"webhookurl"`
 }
 
 // New creates new config object

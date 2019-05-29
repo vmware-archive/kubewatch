@@ -71,5 +71,6 @@ func init() {
 		mattermostConfigCmd,
 		flockConfigCmd,
 		webhookConfigCmd,
+		msteamsConfigCmd,
 	)
 }
