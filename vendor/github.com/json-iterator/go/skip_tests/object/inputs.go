@@ -12,5 +12,5 @@ var inputs = []string{
 	`{"hello":{}}`,               // valid
 	`{"hello":{}}}`,              // invalid
 	`{"hello":  {  "hello": 1}}`, // valid
-	`{abc}`, // invalid
+	`{abc}`,                      // invalid
 }

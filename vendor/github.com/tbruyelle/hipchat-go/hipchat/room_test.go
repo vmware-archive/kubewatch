@@ -391,7 +391,7 @@ func TestRoomGlanceUpdate(t *testing.T) {
 
 	args := &GlanceUpdateRequest{
 		Glance: []*GlanceUpdate{
-			&GlanceUpdate{
+			{
 				Key: "abc",
 				Content: GlanceContent{
 					Status: GlanceStatus{Type: "lozenge", Value: AttributeValue{Type: "default", Label: "something"}},
@@ -532,7 +532,7 @@ func TestCardDescriptionJSONDecodeWithObject(t *testing.T) {
 func TestGlanceUpdateRequestJSONEncodeWithString(t *testing.T) {
 	gr := GlanceUpdateRequest{
 		Glance: []*GlanceUpdate{
-			&GlanceUpdate{
+			{
 				Key: "abc",
 				Content: GlanceContent{
 					Status: GlanceStatus{Type: "lozenge", Value: AttributeValue{Type: "default", Label: "something"}},

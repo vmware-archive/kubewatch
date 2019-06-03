@@ -25,8 +25,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ConfigFileName stores file of config
 var ConfigFileName = ".kubewatch.yaml"
 
+// Handler contains handler configuration
 type Handler struct {
 	Slack      Slack      `json:"slack"`
 	Hipchat    Hipchat    `json:"hipchat"`
@@ -149,6 +151,7 @@ func (c *Config) Load() error {
 	return nil
 }
 
+// CheckMissingResourceEnvvars will read the environment for equivalent config variables to set
 func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
 		c.Resource.DaemonSet = true
@@ -218,15 +221,15 @@ func getConfigFile() string {
 }
 
 func configDir() string {
-    if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
-        return configDir
-    }
+	if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
+		return configDir
+	}
 
-    if runtime.GOOS == "windows" {
-        home := os.Getenv("USERPROFILE")
-        return home
-    }
-    return os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("USERPROFILE")
+		return home
+	}
+	return os.Getenv("HOME")
 	//path := "/etc/kubewatch"
 	//if _, err := os.Stat(path); os.IsNotExist(err) {
 	//	os.Mkdir(path, 755)

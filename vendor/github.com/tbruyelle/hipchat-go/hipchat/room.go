@@ -319,8 +319,8 @@ func (gs *GlanceStatus) UnmarshalJSON(data []byte) error {
 	val := obj["value"].(map[string]interface{})
 
 	valueMap := map[string][]string{
-		"lozenge": []string{"type", "label"},
-		"icon":    []string{"url", "url@2x"},
+		"lozenge": {"type", "label"},
+		"icon":    {"url", "url@2x"},
 	}
 
 	if valueMap[gs.Type] == nil {

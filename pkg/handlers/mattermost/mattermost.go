@@ -58,6 +58,7 @@ type Mattermost struct {
 	Username string
 }
 
+// MattermostMessage struct for messages
 type MattermostMessage struct {
 	Channel      string                         `json:"channel"`
 	Username     string                         `json:"username"`
@@ -66,6 +67,7 @@ type MattermostMessage struct {
 	Attachements []MattermostMessageAttachement `json:"attachments"`
 }
 
+// MattermostMessageAttachement for message attachments
 type MattermostMessageAttachement struct {
 	Title string `json:"title"`
 	Color string `json:"color"`
@@ -96,14 +98,17 @@ func (m *Mattermost) Init(c *config.Config) error {
 	return checkMissingMattermostVars(m)
 }
 
+// ObjectCreated calls notifyMattermost on event creation
 func (m *Mattermost) ObjectCreated(obj interface{}) {
 	notifyMattermost(m, obj, "created")
 }
 
+// ObjectDeleted calls notifyMattermost on event creation
 func (m *Mattermost) ObjectDeleted(obj interface{}) {
 	notifyMattermost(m, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyMattermost on event creation
 func (m *Mattermost) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyMattermost(m, newObj, "updated")
 }

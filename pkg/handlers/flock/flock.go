@@ -54,18 +54,21 @@ type Flock struct {
 	Url string
 }
 
+// FlockMessage struct
 type FlockMessage struct {
 	Notification string                    `json:"notification"`
 	Text         string                    `json:"text"`
 	Attachements []FlockMessageAttachement `json:"attachments"`
 }
 
+// FlockMessageAttachement struct
 type FlockMessageAttachement struct {
 	Title string                       `json:"title"`
 	Color string                       `json:"color"`
 	Views FlockMessageAttachementViews `json:"views"`
 }
 
+// FlockMessageAttachementViews struct
 type FlockMessageAttachementViews struct {
 	Flockml string `json:"flockml"`
 }
@@ -83,14 +86,17 @@ func (f *Flock) Init(c *config.Config) error {
 	return checkMissingFlockVars(f)
 }
 
+// ObjectCreated calls notifyFlock on event creation
 func (f *Flock) ObjectCreated(obj interface{}) {
 	notifyFlock(f, obj, "created")
 }
 
+// ObjectDeleted calls notifyFlock on event creation
 func (f *Flock) ObjectDeleted(obj interface{}) {
 	notifyFlock(f, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyFlock on event creation
 func (f *Flock) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyFlock(f, newObj, "updated")
 }

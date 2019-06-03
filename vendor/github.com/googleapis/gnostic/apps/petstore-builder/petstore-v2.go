@@ -41,7 +41,7 @@ func buildDocumentV2() *v2.Document {
 					OperationId: "listPets",
 					Tags:        []string{"pets"},
 					Parameters: []*v2.ParametersItem{
-						&v2.ParametersItem{
+						{
 							Oneof: &v2.ParametersItem_Parameter{
 								Parameter: &v2.Parameter{
 									Oneof: &v2.Parameter_NonBodyParameter{
@@ -64,7 +64,7 @@ func buildDocumentV2() *v2.Document {
 					},
 					Responses: &v2.Responses{
 						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
+							{
 								Name: "200",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -79,7 +79,7 @@ func buildDocumentV2() *v2.Document {
 											},
 											Headers: &v2.Headers{
 												AdditionalProperties: []*v2.NamedHeader{
-													&v2.NamedHeader{
+													{
 														Name: "x-next",
 														Value: &v2.Header{
 															Type:        "string",
@@ -92,7 +92,7 @@ func buildDocumentV2() *v2.Document {
 									},
 								},
 							},
-							&v2.NamedResponseValue{
+							{
 								Name: "default",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -119,7 +119,7 @@ func buildDocumentV2() *v2.Document {
 					Parameters:  []*v2.ParametersItem{},
 					Responses: &v2.Responses{
 						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
+							{
 								Name: "201",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -129,7 +129,7 @@ func buildDocumentV2() *v2.Document {
 									},
 								},
 							},
-							&v2.NamedResponseValue{
+							{
 								Name: "default",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -159,7 +159,7 @@ func buildDocumentV2() *v2.Document {
 					OperationId: "showPetById",
 					Tags:        []string{"pets"},
 					Parameters: []*v2.ParametersItem{
-						&v2.ParametersItem{
+						{
 							Oneof: &v2.ParametersItem_Parameter{
 								Parameter: &v2.Parameter{
 									Oneof: &v2.Parameter_NonBodyParameter{
@@ -181,7 +181,7 @@ func buildDocumentV2() *v2.Document {
 					},
 					Responses: &v2.Responses{
 						ResponseCode: []*v2.NamedResponseValue{
-							&v2.NamedResponseValue{
+							{
 								Name: "200",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -198,7 +198,7 @@ func buildDocumentV2() *v2.Document {
 									},
 								},
 							},
-							&v2.NamedResponseValue{
+							{
 								Name: "default",
 								Value: &v2.ResponseValue{
 									Oneof: &v2.ResponseValue_Response{
@@ -227,11 +227,11 @@ func buildDocumentV2() *v2.Document {
 				Required: []string{"id", "name"},
 				Properties: &v2.Properties{
 					AdditionalProperties: []*v2.NamedSchema{
-						&v2.NamedSchema{Name: "id", Value: &v2.Schema{
+						{Name: "id", Value: &v2.Schema{
 							Type:   &v2.TypeItem{[]string{"integer"}},
 							Format: "int64"}},
-						&v2.NamedSchema{Name: "name", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
-						&v2.NamedSchema{Name: "tag", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
+						{Name: "name", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
+						{Name: "tag", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
 					},
 				},
 			}})
@@ -240,7 +240,7 @@ func buildDocumentV2() *v2.Document {
 			Name: "Pets",
 			Value: &v2.Schema{
 				Type:  &v2.TypeItem{[]string{"array"}},
-				Items: &v2.ItemsItem{[]*v2.Schema{&v2.Schema{XRef: "#/definitions/Pet"}}},
+				Items: &v2.ItemsItem{[]*v2.Schema{{XRef: "#/definitions/Pet"}}},
 			}})
 	d.Definitions.AdditionalProperties = append(d.Definitions.AdditionalProperties,
 		&v2.NamedSchema{
@@ -249,10 +249,10 @@ func buildDocumentV2() *v2.Document {
 				Required: []string{"code", "message"},
 				Properties: &v2.Properties{
 					AdditionalProperties: []*v2.NamedSchema{
-						&v2.NamedSchema{Name: "code", Value: &v2.Schema{
+						{Name: "code", Value: &v2.Schema{
 							Type:   &v2.TypeItem{[]string{"integer"}},
 							Format: "int32"}},
-						&v2.NamedSchema{Name: "message", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
+						{Name: "message", Value: &v2.Schema{Type: &v2.TypeItem{[]string{"string"}}}},
 					},
 				},
 			}})

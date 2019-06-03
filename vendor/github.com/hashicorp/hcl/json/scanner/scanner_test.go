@@ -16,7 +16,7 @@ type tokenPair struct {
 }
 
 var tokenLists = map[string][]tokenPair{
-	"operator": []tokenPair{
+	"operator": {
 		{token.LBRACK, "["},
 		{token.LBRACE, "{"},
 		{token.COMMA, ","},
@@ -24,11 +24,11 @@ var tokenLists = map[string][]tokenPair{
 		{token.RBRACK, "]"},
 		{token.RBRACE, "}"},
 	},
-	"bool": []tokenPair{
+	"bool": {
 		{token.BOOL, "true"},
 		{token.BOOL, "false"},
 	},
-	"string": []tokenPair{
+	"string": {
 		{token.STRING, `" "`},
 		{token.STRING, `"a"`},
 		{token.STRING, `"本"`},
@@ -51,7 +51,7 @@ var tokenLists = map[string][]tokenPair{
 		{token.STRING, `"\U0000ffAB"`},
 		{token.STRING, `"` + f100 + `"`},
 	},
-	"number": []tokenPair{
+	"number": {
 		{token.NUMBER, "0"},
 		{token.NUMBER, "1"},
 		{token.NUMBER, "9"},
@@ -63,7 +63,7 @@ var tokenLists = map[string][]tokenPair{
 		{token.NUMBER, "-42"},
 		{token.NUMBER, "-1234567890"},
 	},
-	"float": []tokenPair{
+	"float": {
 		{token.FLOAT, "0."},
 		{token.FLOAT, "1."},
 		{token.FLOAT, "42."},

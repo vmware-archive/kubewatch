@@ -17,16 +17,16 @@ func TestObjectListFilter(t *testing.T) {
 		{
 			[]string{"foo"},
 			[]*ObjectItem{
-				&ObjectItem{
+				{
 					Keys: []*ObjectKey{
-						&ObjectKey{
+						{
 							Token: token.Token{Type: token.STRING, Text: `"foo"`},
 						},
 					},
 				},
 			},
 			[]*ObjectItem{
-				&ObjectItem{
+				{
 					Keys: []*ObjectKey{},
 				},
 			},
@@ -35,22 +35,22 @@ func TestObjectListFilter(t *testing.T) {
 		{
 			[]string{"foo"},
 			[]*ObjectItem{
-				&ObjectItem{
+				{
 					Keys: []*ObjectKey{
-						&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
-						&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
+						{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
+						{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
 					},
 				},
-				&ObjectItem{
+				{
 					Keys: []*ObjectKey{
-						&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
+						{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
 					},
 				},
 			},
 			[]*ObjectItem{
-				&ObjectItem{
+				{
 					Keys: []*ObjectKey{
-						&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
+						{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
 					},
 				},
 			},
@@ -68,16 +68,16 @@ func TestObjectListFilter(t *testing.T) {
 
 func TestWalk(t *testing.T) {
 	items := []*ObjectItem{
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
 			},
 			Val: &LiteralType{Token: token.Token{Type: token.STRING, Text: `"example"`}},
 		},
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
 			},
 		},
 	}
@@ -111,14 +111,14 @@ func TestWalk(t *testing.T) {
 
 func TestWalkEquality(t *testing.T) {
 	items := []*ObjectItem{
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
 			},
 		},
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
 			},
 		},
 	}
@@ -162,15 +162,15 @@ func TestWalkEquality(t *testing.T) {
 
 func TestWalkRewrite(t *testing.T) {
 	items := []*ObjectItem{
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"foo"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"bar"`}},
 			},
 		},
-		&ObjectItem{
+		{
 			Keys: []*ObjectKey{
-				&ObjectKey{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
+				{Token: token.Token{Type: token.STRING, Text: `"baz"`}},
 			},
 		},
 	}

@@ -34,7 +34,7 @@ var exceptions = runes.Predicate(func(r rune) bool {
 // Ensure that certain properties were generated correctly.
 func TestTable(t *testing.T) {
 	tests := []tableTest{
-		tableTest{
+		{
 			rangetable.Merge(
 				unicode.Lt, unicode.Nl, unicode.No, // Other letter digits
 				unicode.Me,             // Modifiers
@@ -44,7 +44,7 @@ func TestTable(t *testing.T) {
 			),
 			idDisOrFreePVal,
 		},
-		tableTest{
+		{
 			rangetable.New(0x30000, 0x30101, 0xDFFFF),
 			unassigned,
 		},

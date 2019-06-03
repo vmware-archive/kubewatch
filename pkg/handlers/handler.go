@@ -57,14 +57,17 @@ func (d *Default) Init(c *config.Config) error {
 	return nil
 }
 
+// ObjectCreated sends events on object creation
 func (d *Default) ObjectCreated(obj interface{}) {
 
 }
 
+// ObjectDeleted sends events on object deletion
 func (d *Default) ObjectDeleted(obj interface{}) {
 
 }
 
+// ObjectUpdated sends events on object updation
 func (d *Default) ObjectUpdated(oldObj, newObj interface{}) {
 
 }

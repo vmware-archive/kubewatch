@@ -9,7 +9,7 @@ import (
 )
 
 func normalizePath(path string) string {
-	// use lower case, as Windows file systems will almost always be case insensitive 
+	// use lower case, as Windows file systems will almost always be case insensitive
 	return strings.ToLower(strings.Replace(path, "\\", "/", -1))
 }
 

@@ -18,10 +18,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
-
-	"github.com/spf13/cobra"
 )
 
 // configCmd represents the config command

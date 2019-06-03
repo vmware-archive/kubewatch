@@ -18,8 +18,8 @@ import (
 	"net/url"
 	"strings"
 
-	discovery "github.com/googleapis/gnostic/discovery"
 	openapi3 "github.com/googleapis/gnostic/OpenAPIv3"
+	discovery "github.com/googleapis/gnostic/discovery"
 )
 
 func pathForMethod(path string) string {
@@ -114,7 +114,7 @@ func buildOpenAPI3RequestBodyForRequest(request *discovery.Request) *openapi3.Re
 	return &openapi3.RequestBody{
 		Content: &openapi3.MediaTypes{
 			AdditionalProperties: []*openapi3.NamedMediaType{
-				&openapi3.NamedMediaType{
+				{
 					Name: "application/json",
 					Value: &openapi3.MediaType{
 						Schema: &openapi3.SchemaOrReference{
@@ -145,7 +145,7 @@ func buildOpenAPI3ResponseForResponse(response *discovery.Response, hasDataWrapp
 			Description: "Successful operation",
 			Content: &openapi3.MediaTypes{
 				AdditionalProperties: []*openapi3.NamedMediaType{
-					&openapi3.NamedMediaType{
+					{
 						Name: "application/json",
 						Value: &openapi3.MediaType{
 							Schema: &openapi3.SchemaOrReference{
@@ -179,7 +179,7 @@ func buildOpenAPI3OperationForMethod(method *discovery.Method, hasDataWrapper bo
 	}
 	responses := &openapi3.Responses{
 		ResponseOrReference: []*openapi3.NamedResponseOrReference{
-			&openapi3.NamedResponseOrReference{
+			{
 				Name: "default",
 				Value: &openapi3.ResponseOrReference{
 					Oneof: &openapi3.ResponseOrReference_Response{

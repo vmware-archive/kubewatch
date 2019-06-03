@@ -2688,5 +2688,3 @@ func (m *Simple) ToRawInfo() interface{} {
 func (m *StringArray) ToRawInfo() interface{} {
 	return m.Value
 }
-
-var ()

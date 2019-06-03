@@ -83,14 +83,17 @@ func (s *Hipchat) Init(c *config.Config) error {
 	return checkMissingHipchatVars(s)
 }
 
+// ObjectCreated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectCreated(obj interface{}) {
 	notifyHipchat(s, obj, "created")
 }
 
+// ObjectDeleted calls notifyHipchat on event creation
 func (s *Hipchat) ObjectDeleted(obj interface{}) {
 	notifyHipchat(s, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyHipchat(s, newObj, "updated")
 }

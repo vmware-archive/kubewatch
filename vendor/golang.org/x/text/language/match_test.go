@@ -417,29 +417,29 @@ var benchHave = []Tag{
 }
 
 var benchWant = [][]Tag{
-	[]Tag{
+	{
 		mk("en"),
 	},
-	[]Tag{
+	{
 		mk("en-AU"),
 		mk("de-HK"),
 		mk("nl"),
 		mk("fy"),
 		mk("lv"),
 	},
-	[]Tag{
+	{
 		mk("en-AU"),
 		mk("de-HK"),
 		mk("nl"),
 		mk("fy"),
 	},
-	[]Tag{
+	{
 		mk("ja-Hant"),
 		mk("da-HK"),
 		mk("nl"),
 		mk("zh-TW"),
 	},
-	[]Tag{
+	{
 		mk("ja-Hant"),
 		mk("da-HK"),
 		mk("nl"),
