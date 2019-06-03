@@ -180,6 +180,7 @@ Usage:
 
 Available Commands:
   add         add webhook config to .kubewatch.yaml
+  test        test handler config present in .kubewatch.yaml
   view        view .kubewatch.yaml
 
 Flags:
@@ -222,6 +223,30 @@ Use "kubewatch config [command] --help" for more information about a command.
   ```console
   $ export KW_FLOCK_URL='https://api.flock.com/hooks/sendMessage/XXXXXXXX'
   ```
+
+## Testing Config
+
+To test the handler config by send test messages use the following command.
+```
+$ kubewatch config test -h
+
+Tests handler configs present in .kubewatch.yaml by sending test messages
+
+Usage:
+  kubewatch config test [flags]
+
+Flags:
+  -h, --help   help for test
+```
+
+#### Example:
+
+```
+$ kubewatch config test
+
+Testing Handler configs from .kubewatch.yaml
+2019/06/03 12:29:23 Message successfully sent to channel ABCD at 1559545162.000100
+```
 
 ## Viewing config
 To view the entire config file `$HOME/.kubewatch.yaml` use the following command.
