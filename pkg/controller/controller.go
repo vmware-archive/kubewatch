@@ -65,7 +65,7 @@ type Controller struct {
 	eventHandler handlers.Handler
 }
 
-// Start kubewatch server
+// Start prepares watchers and run their controllers, then waits for process termination signals
 func Start(conf *config.Config, eventHandler handlers.Handler) {
 	var kubeClient kubernetes.Interface
 	_, err := rest.InClusterConfig()

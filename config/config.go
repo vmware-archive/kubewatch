@@ -151,7 +151,7 @@ func (c *Config) Load() error {
 	return nil
 }
 
-// CheckMissingResourceEnvvars checks the missing environment variables
+// CheckMissingResourceEnvvars will read the environment for equivalent config variables to set
 func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
 		c.Resource.DaemonSet = true
