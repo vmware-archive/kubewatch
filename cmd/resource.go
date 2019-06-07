@@ -83,7 +83,7 @@ func configureResource(operation string, cmd *cobra.Command, conf *config.Config
 	}{
 		{
 			"svc",
-			&conf.Resource.Services,
+			&conf.Resource.Service,
 		},
 		{
 			"deploy",
@@ -173,7 +173,7 @@ func init() {
 		resourceConfigRemoveCmd,
 	)
 	// Add resource object flags as PersistentFlags to resourceConfigCmd
-	resourceConfigCmd.PersistentFlags().Bool("svc", false, "watch for services")
+	resourceConfigCmd.PersistentFlags().Bool("svc", false, "watch for Service")
 	resourceConfigCmd.PersistentFlags().Bool("deploy", false, "watch for deployments")
 	resourceConfigCmd.PersistentFlags().Bool("po", false, "watch for pods")
 	resourceConfigCmd.PersistentFlags().Bool("rc", false, "watch for replication controllers")

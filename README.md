@@ -317,6 +317,8 @@ handler:
     url: ""
   webhook:
     url: ""
+
+// Resource Config Section for generic alerting
 resource:
   deployment: false
   replicationcontroller: false
@@ -333,6 +335,19 @@ resource:
   secret: false
   configmap: false
   ingress: false
+
+// Events Config Section for granular alerting
+event:
+    global:
+     - pod
+     - deployment
+    create:
+     - service
+    update:
+
+    delete:
+     - job
+     - service
 namespace: ""
 
 ```
@@ -416,6 +431,31 @@ $ kubewatch resource add --rc --po --svc
 
 # rc, po and svc will be stopped from being watched
 $ kubewatch resource remove --rc --po --svc
+```
+
+## Events
+
+Event config section in `.kubewatch.yaml` file can be used for granular alerting.
+
+```
+handler:
+  slack:
+    token: xoxb-xxxxx-yyyyyyy
+    channel: kube-watch-test
+
+event:
+    global:                       // global alerts for all events
+     - pod
+     - deployment
+    create:                       // create alerts for resource object creation
+     - service
+    update:                       // update alerts for resource object updation
+     - 
+    delete:                       // delete alerts for resource object deletion
+     - job
+     - service
+
+namespace: ""
 ```
 
 # Build
