@@ -376,4 +376,4 @@ kubewatch           latest              919896d3cd90        3 minutes ago       
 
 # Contribution
 
-Refer the [contribution guidelines](docs/CONTRIBUTION.md) to get started.
+Refer to the [contribution guidelines](docs/CONTRIBUTION.md) to get started.
