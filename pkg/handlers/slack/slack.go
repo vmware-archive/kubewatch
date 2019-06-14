@@ -85,17 +85,17 @@ func (s *Slack) Init(c *config.Config) error {
 
 // ObjectCreated calls notifySlack on event creation
 func (s *Slack) ObjectCreated(obj interface{}) {
-	notifySlack(s, obj, "created")
+	notifySlack(s, obj)
 }
 
 // ObjectDeleted calls notifySlack on event creation
 func (s *Slack) ObjectDeleted(obj interface{}) {
-	notifySlack(s, obj, "deleted")
+	notifySlack(s, obj)
 }
 
 // ObjectUpdated calls notifySlack on event creation
 func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
-	notifySlack(s, newObj, "updated")
+	notifySlack(s, newObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.
@@ -120,8 +120,8 @@ func (s *Slack) TestHandler() {
 	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
 }
 
-func notifySlack(s *Slack, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
+func notifySlack(s *Slack, obj interface{}) {
+	e,_ := obj.(kbEvent.Event)
 	api := slack.New(s.Token)
 	attachment := prepareSlackAttachment(e, s)
 

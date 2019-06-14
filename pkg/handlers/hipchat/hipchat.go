@@ -85,17 +85,17 @@ func (s *Hipchat) Init(c *config.Config) error {
 
 // ObjectCreated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectCreated(obj interface{}) {
-	notifyHipchat(s, obj, "created")
+	notifyHipchat(s, obj)
 }
 
 // ObjectDeleted calls notifyHipchat on event creation
 func (s *Hipchat) ObjectDeleted(obj interface{}) {
-	notifyHipchat(s, obj, "deleted")
+	notifyHipchat(s, obj)
 }
 
 // ObjectUpdated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyHipchat(s, newObj, "updated")
+	notifyHipchat(s, newObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.
@@ -125,8 +125,8 @@ func (s *Hipchat) TestHandler() {
 	log.Printf("Message successfully sent to room %s", s.Room)
 }
 
-func notifyHipchat(s *Hipchat, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
+func notifyHipchat(s *Hipchat, obj interface{}) {
+	e,_ := obj.(kbEvent.Event)
 
 	client := hipchat.NewClient(s.Token)
 	if s.Url != "" {

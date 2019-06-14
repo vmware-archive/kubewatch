@@ -127,6 +127,28 @@ func (e *Event) Message() (msg string) {
 			e.Name,
 			e.Reason,
 		)
+	case "NodeReady":
+		msg = fmt.Sprintf(
+			"Node `%s` is Ready : \nNodeReady",
+			e.Name,
+		)
+	case "NodeNotReady":
+		msg = fmt.Sprintf(
+			"Node `%s` is Not Ready : \nNodeNotReady",
+			e.Name,
+		)
+	case "NodeRebooted":
+		msg = fmt.Sprintf(
+			"Node `%s` Rebooted : \nNodeRebooted",
+			e.Name,
+		)
+	case "Backoff":
+		msg = fmt.Sprintf(
+			"Pod `%s` in `%s` Crashed : \nCrashLoopBackOff %s",
+			e.Name,
+			e.Namespace,
+			e.Reason,
+		)
 	default:
 		msg = fmt.Sprintf(
 			"A `%s` in namespace `%s` has been `%s`:\n`%s`",

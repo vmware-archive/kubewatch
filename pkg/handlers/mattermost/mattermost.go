@@ -100,17 +100,17 @@ func (m *Mattermost) Init(c *config.Config) error {
 
 // ObjectCreated calls notifyMattermost on event creation
 func (m *Mattermost) ObjectCreated(obj interface{}) {
-	notifyMattermost(m, obj, "created")
+	notifyMattermost(m, obj)
 }
 
 // ObjectDeleted calls notifyMattermost on event creation
 func (m *Mattermost) ObjectDeleted(obj interface{}) {
-	notifyMattermost(m, obj, "deleted")
+	notifyMattermost(m, obj)
 }
 
 // ObjectUpdated calls notifyMattermost on event creation
 func (m *Mattermost) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyMattermost(m, newObj, "updated")
+	notifyMattermost(m, newObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.
@@ -135,8 +135,8 @@ func (m *Mattermost) TestHandler() {
 	log.Printf("Message successfully sent to channel %s at %s", m.Channel, time.Now())
 }
 
-func notifyMattermost(m *Mattermost, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
+func notifyMattermost(m *Mattermost, obj interface{}) {
+	e,_ := obj.(kbEvent.Event)
 
 	mattermostMessage := prepareMattermostMessage(e, m)
 

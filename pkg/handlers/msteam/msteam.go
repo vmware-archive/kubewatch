@@ -112,7 +112,7 @@ func sendCard(ms *MSTeams, card *TeamsMessageCard) (*http.Response, error) {
 }
 
 // notifyMSTeams creates the TeamsMessageCard and send to webhook URL
-func notifyMSTeams(ms *MSTeams, obj interface{}, action string) {
+func notifyMSTeams(ms *MSTeams, obj interface{}) {
 	card := &TeamsMessageCard{
 		Type:    messageType,
 		Context: context,
@@ -121,7 +121,7 @@ func notifyMSTeams(ms *MSTeams, obj interface{}, action string) {
 		Summary: "kubewatch notification received",
 	}
 
-	e := event.New(obj, action)
+	e,_ := obj.(event.Event)
 	card.ThemeColor = msTeamsColors[e.Status]
 
 	var s TeamsMessageCardSection
@@ -155,17 +155,17 @@ func (ms *MSTeams) Init(c *config.Config) error {
 
 // Notify on object creation
 func (ms *MSTeams) ObjectCreated(obj interface{}) {
-	notifyMSTeams(ms, obj, "created")
+	notifyMSTeams(ms, obj)
 }
 
 // Notify on object deletion
 func (ms *MSTeams) ObjectDeleted(obj interface{}) {
-	notifyMSTeams(ms, obj, "deleted")
+	notifyMSTeams(ms, obj)
 }
 
 // Notify on object update
 func (ms *MSTeams) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyMSTeams(ms, oldObj, "updated")
+	notifyMSTeams(ms, oldObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.

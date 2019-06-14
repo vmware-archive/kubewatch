@@ -9,8 +9,7 @@ import (
 	"testing"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 // Tests the Init() function
@@ -46,7 +45,7 @@ func TestObjectCreated(t *testing.T) {
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
 			{
-				ActivityTitle: "A `pod` in namespace `new` has been `created`:\n`foo`",
+				ActivityTitle: "A `pod` in namespace `new` has been `Created`:\n`foo`",
 				Markdown:      true,
 			},
 		},
@@ -68,17 +67,14 @@ func TestObjectCreated(t *testing.T) {
 	}))
 
 	ms := &MSTeams{TeamsWebhookURL: ts.URL}
-	p := &v1.Pod{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			UID:       "12345678",
-			Name:      "foo",
-			Namespace: "new",
-		},
+	p := event.Event{
+		Name:      "foo",
+		Kind:      "pod",
+		Namespace: "new",
+		Reason:    "Created",
+		Status:    "Normal",
 	}
+
 	ms.ObjectCreated(p)
 }
 
@@ -93,7 +89,7 @@ func TestObjectDeleted(t *testing.T) {
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
 			{
-				ActivityTitle: "A `pod` in namespace `new` has been `deleted`:\n`foo`",
+				ActivityTitle: "A `pod` in namespace `new` has been `Deleted`:\n`foo`",
 				Markdown:      true,
 			},
 		},
@@ -115,17 +111,15 @@ func TestObjectDeleted(t *testing.T) {
 	}))
 
 	ms := &MSTeams{TeamsWebhookURL: ts.URL}
-	p := &v1.Pod{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			UID:       "12345678",
-			Name:      "foo",
-			Namespace: "new",
-		},
+
+	p := event.Event{
+		Name:      "foo",
+		Namespace: "new",
+		Kind:      "pod",
+		Reason:    "Deleted",
+		Status:    "Danger",
 	}
+
 	ms.ObjectDeleted(p)
 }
 
@@ -140,7 +134,7 @@ func TestObjectUpdated(t *testing.T) {
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
 			{
-				ActivityTitle: "A `pod` in namespace `new` has been `updated`:\n`foo`",
+				ActivityTitle: "A `pod` in namespace `new` has been `Updated`:\n`foo`",
 				Markdown:      true,
 			},
 		},
@@ -163,28 +157,20 @@ func TestObjectUpdated(t *testing.T) {
 
 	ms := &MSTeams{TeamsWebhookURL: ts.URL}
 
-	oldP := &v1.Pod{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			UID:       "12345678",
-			Name:      "foo",
-			Namespace: "new",
-		},
+	oldP := event.Event{
+		Name:      "foo",
+		Namespace: "new",
+		Kind:      "pod",
+		Reason:    "Updated",
+		Status:    "Warning",
 	}
 
-	newP := &v1.Pod{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			UID:       "12345678",
-			Name:      "foo-new",
-			Namespace: "new",
-		},
+	newP := event.Event{
+		Name:      "foo-new",
+		Namespace: "new",
+		Kind:      "pod",
+		Reason:    "Updated",
+		Status:    "Warning",
 	}
 
 	ms.ObjectUpdated(oldP, newP)
