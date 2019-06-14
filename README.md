@@ -8,7 +8,7 @@
 ```
 $ kubewatch -h
 
-Kubewath: A watcher for Kubernetes
+Kubewatch: A watcher for Kubernetes
 
 kubewatch is a Kubernetes watcher that could publishes notification 
 to Slack/hipchat/mattermost/flock channels. It watches the culster 
