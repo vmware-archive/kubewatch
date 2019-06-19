@@ -32,6 +32,14 @@ import (
 
 // Run runs the event loop processing with given handler
 func Run(conf *config.Config) {
+
+	var eventHandler = ParseEventHandler(conf)
+	controller.Start(conf, eventHandler)
+}
+
+// ParseEventHandler returns the respective handler object specified in the config file.
+func ParseEventHandler(conf *config.Config) handlers.Handler {
+
 	var eventHandler handlers.Handler
 	switch {
 	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
@@ -49,9 +57,8 @@ func Run(conf *config.Config) {
 	default:
 		eventHandler = new(handlers.Default)
 	}
-
 	if err := eventHandler.Init(conf); err != nil {
 		log.Fatal(err)
 	}
-	controller.Start(conf, eventHandler)
+	return eventHandler
 }

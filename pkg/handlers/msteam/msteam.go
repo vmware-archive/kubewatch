@@ -167,3 +167,26 @@ func (ms *MSTeams) ObjectDeleted(obj interface{}) {
 func (ms *MSTeams) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyMSTeams(ms, oldObj, "updated")
 }
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (ms *MSTeams) TestHandler() {
+	card := &TeamsMessageCard{
+		Type:    messageType,
+		Context: context,
+		Title:   fmt.Sprintf("kubewatch"),
+		// Set a default Summary, this is required for Microsoft Teams
+		Summary: "kubewatch notification received",
+	}
+
+	var s TeamsMessageCardSection
+	s.ActivityTitle = "Testing Handler Configuration. This is a Test message."
+	s.Markdown = true
+	card.Sections = append(card.Sections, s)
+
+	if _, err := sendCard(ms, card); err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to MS Teams")
+}

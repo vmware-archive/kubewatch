@@ -101,6 +101,28 @@ func (f *Flock) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyFlock(f, newObj, "updated")
 }
 
+// TestHandler tests the handler configurarion by sending test messages.
+func (f *Flock) TestHandler() {
+
+	flockMessage := &FlockMessage{
+		Text:         "Kubewatch Alert",
+		Notification: "Kubewatch Alert",
+		Attachements: []FlockMessageAttachement{
+			{
+				Title: "Testing Handler Configuration. This is a Test message.",
+			},
+		},
+	}
+
+	err := postMessage(f.Url, flockMessage)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to channel %s at %s", f.Url, time.Now())
+}
+
 func notifyFlock(f *Flock, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 

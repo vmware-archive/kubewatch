@@ -81,6 +81,22 @@ func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyWebhook(m, newObj, "updated")
 }
 
+// TestHandler tests the handler configurarion by sending test messages.
+func (m *Webhook) TestHandler() {
+
+	webhookMessage := &WebhookMessage{
+		"Testing Handler Configuration. This is a Test message.",
+	}
+
+	err := postMessage(m.Url, webhookMessage)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
+}
+
 func notifyWebhook(m *Webhook, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 
