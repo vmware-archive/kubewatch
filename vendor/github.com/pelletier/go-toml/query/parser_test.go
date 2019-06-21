@@ -407,7 +407,7 @@ func TestQueryFilterFn(t *testing.T) {
 	assertQueryPositions(t, string(buff),
 		"$..[?(float)]",
 		[]interface{}{
-		// no float values in document
+			// no float values in document
 		})
 
 	tv, _ := time.Parse(time.RFC3339, "1979-05-27T07:32:00Z")

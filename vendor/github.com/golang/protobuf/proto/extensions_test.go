@@ -100,7 +100,7 @@ func TestExtensionDescsWithMissingExtensions(t *testing.T) {
 		t.Fatalf("proto.ExtensionDescs: got error %v", err)
 	}
 	sortExtDescs(descs)
-	wantDescs := []*proto.ExtensionDesc{extdesc1, &proto.ExtensionDesc{Field: extdesc2.Field}}
+	wantDescs := []*proto.ExtensionDesc{extdesc1, {Field: extdesc2.Field}}
 	if !reflect.DeepEqual(descs, wantDescs) {
 		t.Errorf("proto.ExtensionDescs(msg) sorted extension ids: got %+v, want %+v", descs, wantDescs)
 	}

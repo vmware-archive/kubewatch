@@ -901,7 +901,7 @@ func (domain *Domain) generateToRawInfoMethodForType(code *printer.Code, typeNam
 func (domain *Domain) generateConstantVariables(code *printer.Code, regexPatterns *patternNames) {
 	names := regexPatterns.Names()
 	var sortedNames []string
-	for name, _ := range names {
+	for name := range names {
 		sortedNames = append(sortedNames, name)
 	}
 	sort.Strings(sortedNames)

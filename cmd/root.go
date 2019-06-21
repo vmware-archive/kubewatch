@@ -20,12 +20,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/bitnami-labs/kubewatch/config"
+	c "github.com/bitnami-labs/kubewatch/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	c "github.com/bitnami-labs/kubewatch/pkg/client"
-	"github.com/bitnami-labs/kubewatch/config"
-	"github.com/Sirupsen/logrus"
 )
 
 var cfgFile string
@@ -34,7 +33,20 @@ var cfgFile string
 var RootCmd = &cobra.Command{
 	Use:   "kubewatch",
 	Short: "A watcher for Kubernetes",
-	Long: `A watcher for Kubernetes`,
+	Long: `
+Kubewath: A watcher for Kubernetes
+
+kubewatch is a Kubernetes watcher that could publishes notification 
+to Slack/hipchat/mattermost/flock channels. It watches the culster 
+for resource changes and notifies them through webhooks.
+
+supported webhooks:
+ - slack
+ - hipchat
+ - mattermost
+ - flock
+ - webhook
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		config := &config.Config{}
@@ -58,6 +70,11 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	// Disable Help subcommand
+	RootCmd.SetHelpCommand(&cobra.Command{
+		Use:    "no-help",
+		Hidden: true,
+	})
 	//RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kubewatch.yaml)")
 }
 
@@ -68,8 +85,8 @@ func initConfig() {
 	}
 
 	viper.SetConfigName(".kubewatch.yaml") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	viper.AutomaticEnv()          // read in environment variables that match
+	viper.AddConfigPath("$HOME")           // adding home directory as first search path
+	viper.AutomaticEnv()                   // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

@@ -48,7 +48,7 @@ func scCE(s int, ccc uint8) []rawCE {
 }
 
 func mkCE(w []int, ccc uint8) []rawCE {
-	return []rawCE{rawCE{w, ccc}}
+	return []rawCE{{w, ccc}}
 }
 
 // ducetElem is used to define test data that is used to generate a table.

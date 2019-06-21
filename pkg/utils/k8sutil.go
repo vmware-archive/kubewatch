@@ -7,7 +7,7 @@ import (
 	apps_v1 "k8s.io/api/apps/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
-        ext_v1beta1 "k8s.io/api/extensions/v1beta1"
+	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -45,6 +45,9 @@ func GetClientOutOfCluster() kubernetes.Interface {
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		logrus.Fatalf("Can not get kubernetes config: %v", err)
+	}
 
 	return clientset
 }

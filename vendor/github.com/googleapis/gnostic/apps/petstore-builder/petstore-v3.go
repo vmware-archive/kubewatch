@@ -40,7 +40,7 @@ func buildDocumentV3() *v3.Document {
 					OperationId: "listPets",
 					Tags:        []string{"pets"},
 					Parameters: []*v3.ParameterOrReference{
-						&v3.ParameterOrReference{
+						{
 							Oneof: &v3.ParameterOrReference_Parameter{
 								Parameter: &v3.Parameter{
 									Name:        "limit",
@@ -66,7 +66,7 @@ func buildDocumentV3() *v3.Document {
 									Description: "unexpected error",
 									Content: &v3.MediaTypes{
 										AdditionalProperties: []*v3.NamedMediaType{
-											&v3.NamedMediaType{
+											{
 												Name: "application/json",
 												Value: &v3.MediaType{
 													Schema: &v3.SchemaOrReference{
@@ -84,7 +84,7 @@ func buildDocumentV3() *v3.Document {
 							},
 						},
 						ResponseOrReference: []*v3.NamedResponseOrReference{
-							&v3.NamedResponseOrReference{
+							{
 								Name: "200",
 								Value: &v3.ResponseOrReference{
 									Oneof: &v3.ResponseOrReference_Response{
@@ -92,7 +92,7 @@ func buildDocumentV3() *v3.Document {
 											Description: "An paged array of pets", // [sic] match other examples
 											Content: &v3.MediaTypes{
 												AdditionalProperties: []*v3.NamedMediaType{
-													&v3.NamedMediaType{
+													{
 														Name: "application/json",
 														Value: &v3.MediaType{
 															Schema: &v3.SchemaOrReference{
@@ -108,7 +108,7 @@ func buildDocumentV3() *v3.Document {
 											},
 											Headers: &v3.HeadersOrReferences{
 												AdditionalProperties: []*v3.NamedHeaderOrReference{
-													&v3.NamedHeaderOrReference{
+													{
 														Name: "x-next",
 														Value: &v3.HeaderOrReference{
 															Oneof: &v3.HeaderOrReference_Header{
@@ -145,7 +145,7 @@ func buildDocumentV3() *v3.Document {
 									Description: "unexpected error",
 									Content: &v3.MediaTypes{
 										AdditionalProperties: []*v3.NamedMediaType{
-											&v3.NamedMediaType{
+											{
 												Name: "application/json",
 												Value: &v3.MediaType{
 													Schema: &v3.SchemaOrReference{
@@ -163,7 +163,7 @@ func buildDocumentV3() *v3.Document {
 							},
 						},
 						ResponseOrReference: []*v3.NamedResponseOrReference{
-							&v3.NamedResponseOrReference{
+							{
 								Name: "201",
 								Value: &v3.ResponseOrReference{
 									Oneof: &v3.ResponseOrReference_Response{
@@ -185,7 +185,7 @@ func buildDocumentV3() *v3.Document {
 					OperationId: "showPetById",
 					Tags:        []string{"pets"},
 					Parameters: []*v3.ParameterOrReference{
-						&v3.ParameterOrReference{
+						{
 							Oneof: &v3.ParameterOrReference_Parameter{
 								Parameter: &v3.Parameter{
 									Name:        "petId",
@@ -210,7 +210,7 @@ func buildDocumentV3() *v3.Document {
 									Description: "unexpected error",
 									Content: &v3.MediaTypes{
 										AdditionalProperties: []*v3.NamedMediaType{
-											&v3.NamedMediaType{
+											{
 												Name: "application/json",
 												Value: &v3.MediaType{
 													Schema: &v3.SchemaOrReference{
@@ -228,7 +228,7 @@ func buildDocumentV3() *v3.Document {
 							},
 						},
 						ResponseOrReference: []*v3.NamedResponseOrReference{
-							&v3.NamedResponseOrReference{
+							{
 								Name: "200",
 								Value: &v3.ResponseOrReference{
 									Oneof: &v3.ResponseOrReference_Response{
@@ -236,7 +236,7 @@ func buildDocumentV3() *v3.Document {
 											Description: "Expected response to a valid request",
 											Content: &v3.MediaTypes{
 												AdditionalProperties: []*v3.NamedMediaType{
-													&v3.NamedMediaType{
+													{
 														Name: "application/json",
 														Value: &v3.MediaType{
 															Schema: &v3.SchemaOrReference{
@@ -261,7 +261,7 @@ func buildDocumentV3() *v3.Document {
 	d.Components = &v3.Components{
 		Schemas: &v3.SchemasOrReferences{
 			AdditionalProperties: []*v3.NamedSchemaOrReference{
-				&v3.NamedSchemaOrReference{
+				{
 					Name: "Pet",
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
@@ -269,7 +269,7 @@ func buildDocumentV3() *v3.Document {
 								Required: []string{"id", "name"},
 								Properties: &v3.Properties{
 									AdditionalProperties: []*v3.NamedSchemaOrReference{
-										&v3.NamedSchemaOrReference{
+										{
 											Name: "id",
 											Value: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Schema{
@@ -280,7 +280,7 @@ func buildDocumentV3() *v3.Document {
 												},
 											},
 										},
-										&v3.NamedSchemaOrReference{
+										{
 											Name: "name",
 											Value: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Schema{
@@ -290,7 +290,7 @@ func buildDocumentV3() *v3.Document {
 												},
 											},
 										},
-										&v3.NamedSchemaOrReference{
+										{
 											Name: "tag",
 											Value: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Schema{
@@ -306,7 +306,7 @@ func buildDocumentV3() *v3.Document {
 						},
 					},
 				},
-				&v3.NamedSchemaOrReference{
+				{
 					Name: "Pets",
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
@@ -314,7 +314,7 @@ func buildDocumentV3() *v3.Document {
 								Type: "array",
 								Items: &v3.ItemsItem{
 									SchemaOrReference: []*v3.SchemaOrReference{
-										&v3.SchemaOrReference{
+										{
 											Oneof: &v3.SchemaOrReference_Reference{
 												Reference: &v3.Reference{
 													XRef: "#/components/schemas/Pet",
@@ -327,7 +327,7 @@ func buildDocumentV3() *v3.Document {
 						},
 					},
 				},
-				&v3.NamedSchemaOrReference{
+				{
 					Name: "Error",
 					Value: &v3.SchemaOrReference{
 						Oneof: &v3.SchemaOrReference_Schema{
@@ -335,7 +335,7 @@ func buildDocumentV3() *v3.Document {
 								Required: []string{"code", "message"},
 								Properties: &v3.Properties{
 									AdditionalProperties: []*v3.NamedSchemaOrReference{
-										&v3.NamedSchemaOrReference{
+										{
 											Name: "code",
 											Value: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Schema{
@@ -346,7 +346,7 @@ func buildDocumentV3() *v3.Document {
 												},
 											},
 										},
-										&v3.NamedSchemaOrReference{
+										{
 											Name: "message",
 											Value: &v3.SchemaOrReference{
 												Oneof: &v3.SchemaOrReference_Schema{

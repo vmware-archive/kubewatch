@@ -71,7 +71,7 @@ func (api *Client) AuthTest() (response *AuthTestResponse, error error) {
 func (api *Client) SetDebug(debug bool) {
 	api.debug = debug
 	if debug && logger == nil {
-		logger = log.New(os.Stdout, "nlopes/slack", log.LstdFlags | log.Lshortfile)
+		logger = log.New(os.Stdout, "nlopes/slack", log.LstdFlags|log.Lshortfile)
 	}
 }
 

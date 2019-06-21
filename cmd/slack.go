@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // slackConfigCmd represents the slack subcommand
 var slackConfigCmd = &cobra.Command{
-	Use:   "slack FLAG",
+	Use:   "slack",
 	Short: "specific slack configuration",
-	Long: `specific slack configuration`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific slack configuration`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)

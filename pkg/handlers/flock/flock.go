@@ -54,18 +54,21 @@ type Flock struct {
 	Url string
 }
 
+// FlockMessage struct
 type FlockMessage struct {
 	Notification string                    `json:"notification"`
 	Text         string                    `json:"text"`
 	Attachements []FlockMessageAttachement `json:"attachments"`
 }
 
+// FlockMessageAttachement struct
 type FlockMessageAttachement struct {
 	Title string                       `json:"title"`
 	Color string                       `json:"color"`
 	Views FlockMessageAttachementViews `json:"views"`
 }
 
+// FlockMessageAttachementViews struct
 type FlockMessageAttachementViews struct {
 	Flockml string `json:"flockml"`
 }
@@ -83,16 +86,41 @@ func (f *Flock) Init(c *config.Config) error {
 	return checkMissingFlockVars(f)
 }
 
+// ObjectCreated calls notifyFlock on event creation
 func (f *Flock) ObjectCreated(obj interface{}) {
 	notifyFlock(f, obj, "created")
 }
 
+// ObjectDeleted calls notifyFlock on event creation
 func (f *Flock) ObjectDeleted(obj interface{}) {
 	notifyFlock(f, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyFlock on event creation
 func (f *Flock) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyFlock(f, newObj, "updated")
+}
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (f *Flock) TestHandler() {
+
+	flockMessage := &FlockMessage{
+		Text:         "Kubewatch Alert",
+		Notification: "Kubewatch Alert",
+		Attachements: []FlockMessageAttachement{
+			{
+				Title: "Testing Handler Configuration. This is a Test message.",
+			},
+		},
+	}
+
+	err := postMessage(f.Url, flockMessage)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to channel %s at %s", f.Url, time.Now())
 }
 
 func notifyFlock(f *Flock, obj interface{}, action string) {

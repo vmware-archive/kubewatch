@@ -26,12 +26,21 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/msteam"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
 
 // Run runs the event loop processing with given handler
 func Run(conf *config.Config) {
+
+	var eventHandler = ParseEventHandler(conf)
+	controller.Start(conf, eventHandler)
+}
+
+// ParseEventHandler returns the respective handler object specified in the config file.
+func ParseEventHandler(conf *config.Config) handlers.Handler {
+
 	var eventHandler handlers.Handler
 	switch {
 	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
@@ -46,12 +55,13 @@ func Run(conf *config.Config) {
 		eventHandler = new(webhook.Webhook)
 	case len(conf.Handler.Exec.Cmd) > 0:
 		eventHandler = new(exec.Exec)
+	case len(conf.Handler.MSTeams.WebhookURL) > 0:
+		eventHandler = new(msteam.MSTeams)
 	default:
 		eventHandler = new(handlers.Default)
 	}
-
 	if err := eventHandler.Init(conf); err != nil {
 		log.Fatal(err)
 	}
-	controller.Start(conf, eventHandler)
+	return eventHandler
 }

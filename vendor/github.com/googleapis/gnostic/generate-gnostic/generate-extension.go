@@ -32,7 +32,7 @@ import (
 )
 
 var protoOptionsForExtensions = []ProtoOption{
-	ProtoOption{
+	{
 		Name:  "java_multiple_files",
 		Value: "true",
 		Comment: "// This option lets the proto compiler generate Java code inside the package\n" +
@@ -41,7 +41,7 @@ var protoOptionsForExtensions = []ProtoOption{
 			"// consistent with most programming languages that don't support outer classes.",
 	},
 
-	ProtoOption{
+	{
 		Name:  "java_outer_classname",
 		Value: "VendorExtensionProto",
 		Comment: "// The Java outer classname should be the filename in UpperCamelCase. This\n" +
@@ -132,10 +132,10 @@ type primitiveTypeInfo struct {
 }
 
 var supportedPrimitiveTypeInfos = map[string]primitiveTypeInfo{
-	"string":  primitiveTypeInfo{goTypeName: "string", wrapperProtoName: "StringValue"},
-	"number":  primitiveTypeInfo{goTypeName: "float64", wrapperProtoName: "DoubleValue"},
-	"integer": primitiveTypeInfo{goTypeName: "int64", wrapperProtoName: "Int64Value"},
-	"boolean": primitiveTypeInfo{goTypeName: "bool", wrapperProtoName: "BoolValue"},
+	"string":  {goTypeName: "string", wrapperProtoName: "StringValue"},
+	"number":  {goTypeName: "float64", wrapperProtoName: "DoubleValue"},
+	"integer": {goTypeName: "int64", wrapperProtoName: "Int64Value"},
+	"boolean": {goTypeName: "bool", wrapperProtoName: "BoolValue"},
 	// TODO: Investigate how to support arrays. For now users will not be allowed to
 	// create extension handlers for arrays and they will have to use the
 	// plane yaml string as is.

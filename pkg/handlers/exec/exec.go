@@ -56,6 +56,11 @@ func (s *Exec) ObjectUpdated(oldObj, newObj interface{}) {
 	handleEvent(s, newObj, "updated")
 }
 
+// TestHandler tests the handler configurarion by sending test messages.
+func (s *Exec) TestHandler() {
+	return
+}
+
 func handleEvent(s *Exec, obj interface{}, action string) {
 	e := event.New(obj, action)
 

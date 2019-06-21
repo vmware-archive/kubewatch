@@ -17,17 +17,17 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/Sirupsen/logrus"
+	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/spf13/cobra"
 )
 
 // mattermostConfigCmd represents the mattermost subcommand
 var mattermostConfigCmd = &cobra.Command{
-	Use:   "mattermost FLAG",
+	Use:   "mattermost",
 	Short: "specific mattermost configuration",
-	Long: `specific mattermost configuration`,
-	Run: func(cmd *cobra.Command, args []string){
+	Long:  `specific mattermost configuration`,
+	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := config.New()
 		if err != nil {
 			logrus.Fatal(err)
@@ -59,7 +59,6 @@ var mattermostConfigCmd = &cobra.Command{
 		} else {
 			logrus.Fatal(err)
 		}
-
 
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)

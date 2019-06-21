@@ -73,16 +73,42 @@ func (s *Slack) Init(c *config.Config) error {
 	return checkMissingSlackVars(s)
 }
 
+// ObjectCreated calls notifySlack on event creation
 func (s *Slack) ObjectCreated(obj interface{}) {
 	notifySlack(s, obj, "created")
 }
 
+// ObjectDeleted calls notifySlack on event creation
 func (s *Slack) ObjectDeleted(obj interface{}) {
 	notifySlack(s, obj, "deleted")
 }
 
+// ObjectUpdated calls notifySlack on event creation
 func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
 	notifySlack(s, newObj, "updated")
+}
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (s *Slack) TestHandler() {
+	api := slack.New(s.Token)
+	params := slack.PostMessageParameters{}
+	attachment := slack.Attachment{
+		Fields: []slack.AttachmentField{
+			{
+				Title: "kubewatch",
+				Value: "Testing Handler Configuration. This is a Test message.",
+			},
+		},
+	}
+	params.Attachments = []slack.Attachment{attachment}
+	params.AsUser = true
+	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
 }
 
 func notifySlack(s *Slack, obj interface{}, action string) {
@@ -114,7 +140,7 @@ func prepareSlackAttachment(e event.Event) slack.Attachment {
 
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
-			slack.AttachmentField{
+			{
 				Title: "kubewatch",
 				Value: e.Message(),
 			},

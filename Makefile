@@ -5,14 +5,18 @@ BINARY = kubewatch
 VERSION=
 BUILD=
 
-GOCMD = go
-GOFLAGS ?= $(GOFLAGS:)
-LDFLAGS =
+PKG            = github.com/bitnami-labs/kubewatch
+TRAVIS_COMMIT ?= `git describe --tags`
+GOCMD          = go
+BUILD_DATE     = `date +%FT%T%z`
+GOFLAGS       ?= $(GOFLAGS:)
+LDFLAGS       := "-X '$(PKG)/cmd.gitCommit=$(TRAVIS_COMMIT)' \
+		          -X '$(PKG)/cmd.buildDate=$(BUILD_DATE)'"
 
 default: build test
 
 build:
-	"$(GOCMD)" build ${GOFLAGS} ${LDFLAGS} -o "${BINARY}"
+	"$(GOCMD)" build ${GOFLAGS} -ldflags ${LDFLAGS} -o "${BINARY}"
 
 docker-image:
 	@docker build -t "${BINARY}" .
