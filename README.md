@@ -8,7 +8,7 @@
 ```
 $ kubewatch -h
 
-Kubewath: A watcher for Kubernetes
+Kubewatch: A watcher for Kubernetes
 
 kubewatch is a Kubernetes watcher that could publishes notification 
 to Slack/hipchat/mattermost/flock channels. It watches the culster 
@@ -54,14 +54,21 @@ You may also provide a values file instead:
 rbac:
   create: true
 resourcesToWatch:
-  daemonset: true
   deployment: false
-  pod: true
-  replicaset: false
   replicationcontroller: false
+  replicaset: false
+  daemonset: false
   services: true
+  pod: true
+  job: false
+  node: false
+  clusterrole: true
+  serviceaccount: true
+  persistentvolume: false
+  namespace: false
   secret: false
   configmap: false
+  ingress: false
 slack:
   channel: '#YOUR_CHANNEL'
   token: 'xoxb-YOUR_TOKEN'
@@ -101,15 +108,21 @@ To modify what notifications you get, update the `kubewatch` ConfigMap and turn 
 
 ```
 resource:
-      deployment: false
-      replicationcontroller: false
-      replicaset: false
-      daemonset: false
-      services: true
-      pod: true
-      secret: false
-      configmap: false
-      ingress: false
+  deployment: false
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: true
+  pod: true
+  job: false
+  node: false
+  clusterrole: false
+  serviceaccount: false
+  persistentvolume: false
+  namespace: false
+  secret: false
+  configmap: false
+  ingress: false
 ```
 
 #### Working with RBAC
@@ -278,6 +291,9 @@ resource:
   services: false
   pod: true
   job: false
+  node: false
+  clusterrole: false
+  serviceaccount: false
   persistentvolume: false
   namespace: false
   secret: false
@@ -306,19 +322,22 @@ Available Commands:
   remove      remove specific resources being watched
 
 Flags:
-      --cm       watch for plain configmap
-      --deploy   watch for deployments
-      --ds       watch for daemonsets
-  -h, --help     help for resource
-      --ing      watch for ingresses
-      --job      watch for job
-      --ns       watch for namespaces
-      --po       watch for pods
-      --pv       watch for persistent volumes
-      --rc       watch for replication controllers
-      --rs       watch for replicasets
-      --secret   watch for plain secrets
-      --svc      watch for services
+      --clusterrole   watch for cluster roles
+      --cm            watch for plain configmaps
+      --deploy        watch for deployments
+      --ds            watch for daemonsets
+  -h, --help          help for resource
+      --ing           watch for ingresses
+      --job           watch for jobs
+      --node          watch for Nodes
+      --ns            watch for namespaces
+      --po            watch for pods
+      --pv            watch for persistent volumes
+      --rc            watch for replication controllers
+      --rs            watch for replicasets
+      --sa            watch for service accounts
+      --secret        watch for plain secrets
+      --svc           watch for services
 
 Use "kubewatch resource [command] --help" for more information about a command.
 
@@ -337,18 +356,21 @@ Flags:
   -h, --help   help for add
 
 Global Flags:
-      --cm       watch for plain configmaps
-      --deploy   watch for deployments
-      --ds       watch for daemonsets
-      --ing      watch for ingresses
-      --job      watch for jobs
-      --ns       watch for namespaces
-      --po       watch for pods
-      --pv       watch for persistent volumes
-      --rc       watch for replication controllers
-      --rs       watch for replicasets
-      --secret   watch for plain secrets
-      --svc      watch for services
+      --clusterrole   watch for cluster roles
+      --cm            watch for plain configmaps
+      --deploy        watch for deployments
+      --ds            watch for daemonsets
+      --ing           watch for ingresses
+      --job           watch for jobs
+      --node          watch for Nodes
+      --ns            watch for namespaces
+      --po            watch for pods
+      --pv            watch for persistent volumes
+      --rc            watch for replication controllers
+      --rs            watch for replicasets
+      --sa            watch for service accounts
+      --secret        watch for plain secrets
+      --svc           watch for services
 
 ```
 

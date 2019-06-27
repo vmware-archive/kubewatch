@@ -21,6 +21,7 @@ import (
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
+	rbac_v1beta1 "k8s.io/api/rbac/v1beta1"
 )
 
 // Event represent an event got from k8s api server
@@ -79,6 +80,12 @@ func New(obj interface{}, action string) Event {
 		kind = "secret"
 	case *api_v1.ConfigMap:
 		kind = "configmap"
+	case *api_v1.Node:
+		kind = "node"
+	case *rbac_v1beta1.ClusterRole:
+		kind = "cluster role"
+	case *api_v1.ServiceAccount:
+		kind = "service account"
 	case Event:
 		name = object.Name
 		kind = object.Kind
@@ -105,6 +112,18 @@ func (e *Event) Message() (msg string) {
 	case "namespace":
 		msg = fmt.Sprintf(
 			"A namespace `%s` has been `%s`",
+			e.Name,
+			e.Reason,
+		)
+	case "node":
+		msg = fmt.Sprintf(
+			"A node `%s` has been `%s`",
+			e.Name,
+			e.Reason,
+		)
+	case "cluster role":
+		msg = fmt.Sprintf(
+			"A cluster role `%s` has been `%s`",
 			e.Name,
 			e.Reason,
 		)

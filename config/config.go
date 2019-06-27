@@ -47,6 +47,9 @@ type Resource struct {
 	Services              bool `json:"svc"`
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
+	Node                  bool `json:"node"`
+	ClusterRole           bool `json:"clusterrole"`
+	ServiceAccount        bool `json:"sa"`
 	PersistentVolume      bool `json:"pv"`
 	Namespace             bool `json:"ns"`
 	Secret                bool `json:"secret"`
@@ -188,6 +191,15 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Ingress && os.Getenv("KW_INGRESS") == "true" {
 		c.Resource.Ingress = true
+	}
+	if !c.Resource.Node && os.Getenv("KW_NODE") == "true" {
+		c.Resource.Node = true
+	}
+	if !c.Resource.ServiceAccount && os.Getenv("KW_SERVICE_ACCOUNT") == "true" {
+		c.Resource.ServiceAccount = true
+	}
+	if !c.Resource.ClusterRole && os.Getenv("KW_CLUSTER_ROLE") == "true" {
+		c.Resource.ClusterRole = true
 	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")
