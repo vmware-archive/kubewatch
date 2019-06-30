@@ -1,6 +1,9 @@
-# Kubewatch
+<p align="center">
+  <img src="./docs/kubewatch-logo.jpeg">
+</p>
 
-[![Build Status](https://travis-ci.org/bitnami-labs/kubewatch.svg?branch=master)](https://travis-ci.org/bitnami-labs/kubewatch) [![Go Report Card](https://goreportcard.com/badge/github.com/bitnami-labs/kubewatch)](https://goreportcard.com/report/github.com/bitnami-labs/kubewatch) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/bitnami-labs/kubewatch/blob/master/LICENSE)
+
+[![Build Status](https://travis-ci.org/bitnami-labs/kubewatch.svg?branch=master)](https://travis-ci.org/bitnami-labs/kubewatch) [![Go Report Card](https://goreportcard.com/badge/github.com/bitnami-labs/kubewatch)](https://goreportcard.com/report/github.com/bitnami-labs/kubewatch) [![GoDoc](https://godoc.org/github.com/bitnami-labs/kubewatch?status.svg)](https://godoc.org/github.com/bitnami-labs/kubewatch) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/bitnami-labs/kubewatch/blob/master/LICENSE)
 
 **kubewatch** is a Kubernetes watcher that currently publishes notification to available collaboration hubs/notification channels. Run it in your k8s cluster, and you will get event notifications through webhooks.
 
@@ -163,6 +166,36 @@ INFO[0000] Processing add to pod: kube-system/tiller-deploy-69ffbf64bc-h8zxm  pk
 INFO[0000] Kubewatch controller synced and ready         pkg=kubewatch-service
 INFO[0000] Kubewatch controller synced and ready         pkg=kubewatch-pod
 
+```
+#### Using Docker:
+
+To Run Kubewatch Container interactively, place the config file in `$HOME/.kubewatch.yaml` location and use the following command. 
+
+```
+docker run --rm -it --network host -v $HOME/.kubewatch.yaml:/root/.kubewatch.yaml -v $HOME/.kube/config:/opt/bitnami/kubewatch/.kube/config --name <container-name> bitnami/kubewatch
+```
+
+Example:
+
+```
+$ docker run --rm -it --network host -v $HOME/.kubewatch.yaml:/root/.kubewatch.yaml -v $HOME/.kube/config:/opt/bitnami/kubewatch/.kube/config --name kubewatch-app bitnami/kubewatch
+
+==> Writing config file...
+INFO[0000] Starting kubewatch controller                 pkg=kubewatch-service
+INFO[0000] Starting kubewatch controller                 pkg=kubewatch-pod
+INFO[0000] Starting kubewatch controller                 pkg=kubewatch-deployment
+INFO[0000] Starting kubewatch controller                 pkg=kubewatch-namespace
+INFO[0000] Processing add to namespace: kube-node-lease  pkg=kubewatch-namespace
+INFO[0000] Processing add to namespace: kube-public      pkg=kubewatch-namespace
+INFO[0000] Processing add to namespace: kube-system      pkg=kubewatch-namespace
+INFO[0000] Processing add to namespace: default          pkg=kubewatch-namespace
+....
+```
+
+To Demonise Kubewatch container use
+
+```
+$ docker run --rm -d --network host -v $HOME/.kubewatch.yaml:/root/.kubewatch.yaml -v $HOME/.kube/config:/opt/bitnami/kubewatch/.kube/config --name kubewatch-app bitnami/kubewatch
 ```
 
 # Configure
