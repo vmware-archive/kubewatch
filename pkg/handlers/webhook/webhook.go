@@ -50,7 +50,17 @@ type Webhook struct {
 
 // WebhookMessage for messages
 type WebhookMessage struct {
-	Text string `json:"text"`
+	EventMeta EventMeta `json:"eventmeta"`
+	Message   string    `json:"message"`
+	Time      time.Time `json:"time"`
+}
+
+// EventMeta containes the meta data about the event occurred
+type EventMeta struct {
+	Kind      string `json:"kind"`
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Reason    string `json:"reason"`
 }
 
 // Init prepares Webhook configuration
@@ -85,7 +95,14 @@ func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
 func (m *Webhook) TestHandler() {
 
 	webhookMessage := &WebhookMessage{
-		"Testing Handler Configuration. This is a Test message.",
+		EventMeta: EventMeta{
+			Kind:      "object",
+			Name:      "Test",
+			Namespace: "default",
+			Reason:    "Tested",
+		},
+		Message: "Testing Handler Configuration. This is a Test message.",
+		Time:    time.Now(),
 	}
 
 	err := postMessage(m.Url, webhookMessage)
@@ -121,9 +138,15 @@ func checkMissingWebhookVars(s *Webhook) error {
 
 func prepareWebhookMessage(e kbEvent.Event, m *Webhook) *WebhookMessage {
 	return &WebhookMessage{
-		e.Message(),
+		EventMeta: EventMeta{
+			Kind:      e.Kind,
+			Name:      e.Name,
+			Namespace: e.Namespace,
+			Reason:    e.Reason,
+		},
+		Message: e.Message(),
+		Time:    time.Now(),
 	}
-
 }
 
 func postMessage(url string, webhookMessage *WebhookMessage) error {
