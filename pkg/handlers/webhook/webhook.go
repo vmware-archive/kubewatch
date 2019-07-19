@@ -51,7 +51,7 @@ type Webhook struct {
 // WebhookMessage for messages
 type WebhookMessage struct {
 	EventMeta EventMeta `json:"eventmeta"`
-	Message   string    `json:"message"`
+	Text      string    `json:"text"`
 	Time      time.Time `json:"time"`
 }
 
@@ -101,8 +101,8 @@ func (m *Webhook) TestHandler() {
 			Namespace: "default",
 			Reason:    "Tested",
 		},
-		Message: "Testing Handler Configuration. This is a Test message.",
-		Time:    time.Now(),
+		Text: "Testing Handler Configuration. This is a Test message.",
+		Time: time.Now(),
 	}
 
 	err := postMessage(m.Url, webhookMessage)
@@ -144,8 +144,8 @@ func prepareWebhookMessage(e kbEvent.Event, m *Webhook) *WebhookMessage {
 			Namespace: e.Namespace,
 			Reason:    e.Reason,
 		},
-		Message: e.Message(),
-		Time:    time.Now(),
+		Text: e.Message(),
+		Time: time.Now(),
 	}
 }
 
