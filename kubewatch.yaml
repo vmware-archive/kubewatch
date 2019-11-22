@@ -11,13 +11,6 @@ spec:
     volumeMounts:
     - name: config-volume
       mountPath: /root
-  - image: gcr.io/skippbox/kubectl:v1.3.0
-    args:
-      - proxy
-      - "-p"
-      - "8080"
-    name: proxy
-    imagePullPolicy: Always
   restartPolicy: Always
   volumes:
   - name: config-volume
