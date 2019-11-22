@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: bitnami/kubewatch
+  - image: bitnami/kubewatch #using this image, its more stable and active
     imagePullPolicy: Always
     name: kubewatch
     volumeMounts:
