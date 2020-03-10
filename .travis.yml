@@ -12,11 +12,7 @@ cache:
     - $GOPATH/bin
 
 go:
-  - 1.12.x
-
-install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
+  - 1.14.x
 
 language: go
 
