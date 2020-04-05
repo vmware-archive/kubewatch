@@ -74,114 +74,130 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 	} else {
 		kubeClient = utils.GetClient()
 	}
+
+	if len(conf.Namespace) == 0 {
+		conf.Namespace = append(conf.Namespace, "")
+	}
+
 	if conf.Resource.Pod {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().Pods(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			fmt.Println(ns)
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.CoreV1().Pods(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.CoreV1().Pods(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().Pods(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.Pod{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&api_v1.Pod{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "pod")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "pod")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.DaemonSet {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.ExtensionsV1beta1().DaemonSets(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.ExtensionsV1beta1().DaemonSets(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.ExtensionsV1beta1().DaemonSets(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.ExtensionsV1beta1().DaemonSets(conf.Namespace).Watch(options)
-				},
-			},
-			&ext_v1beta1.DaemonSet{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&ext_v1beta1.DaemonSet{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "daemonset")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "daemonset")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.ReplicaSet {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.ExtensionsV1beta1().ReplicaSets(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.ExtensionsV1beta1().ReplicaSets(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.ExtensionsV1beta1().ReplicaSets(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.ExtensionsV1beta1().ReplicaSets(conf.Namespace).Watch(options)
-				},
-			},
-			&ext_v1beta1.ReplicaSet{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&ext_v1beta1.ReplicaSet{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "replicaset")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "replicaset")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.Services {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().Services(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.CoreV1().Services(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.CoreV1().Services(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().Services(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.Service{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&api_v1.Service{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "service")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "service")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.Deployment {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.AppsV1beta1().Deployments(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.AppsV1beta1().Deployments(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.AppsV1beta1().Deployments(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.AppsV1beta1().Deployments(conf.Namespace).Watch(options)
-				},
-			},
-			&apps_v1beta1.Deployment{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&apps_v1beta1.Deployment{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "deployment")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "deployment")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.Namespace {
@@ -207,47 +223,51 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 	}
 
 	if conf.Resource.ReplicationController {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().ReplicationControllers(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.CoreV1().ReplicationControllers(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.CoreV1().ReplicationControllers(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().ReplicationControllers(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.ReplicationController{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&api_v1.ReplicationController{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "replication controller")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "replication controller")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.Job {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.BatchV1().Jobs(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.BatchV1().Jobs(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.BatchV1().Jobs(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.BatchV1().Jobs(conf.Namespace).Watch(options)
-				},
-			},
-			&batch_v1.Job{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&batch_v1.Job{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "job")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "job")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.PersistentVolume {
@@ -273,69 +293,75 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 	}
 
 	if conf.Resource.Secret {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().Secrets(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.CoreV1().Secrets(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.CoreV1().Secrets(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().Secrets(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.Secret{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&api_v1.Secret{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "secret")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "secret")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.ConfigMap {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().ConfigMaps(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.CoreV1().ConfigMaps(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.CoreV1().ConfigMaps(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().ConfigMaps(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.ConfigMap{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&api_v1.ConfigMap{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "configmap")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "configmap")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	if conf.Resource.Ingress {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.ExtensionsV1beta1().Ingresses(conf.Namespace).List(options)
+		for _, ns := range conf.Namespace {
+			informer := cache.NewSharedIndexInformer(
+				&cache.ListWatch{
+					ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+						return kubeClient.ExtensionsV1beta1().Ingresses(ns).List(options)
+					},
+					WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+						return kubeClient.ExtensionsV1beta1().Ingresses(ns).Watch(options)
+					},
 				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.ExtensionsV1beta1().Ingresses(conf.Namespace).Watch(options)
-				},
-			},
-			&ext_v1beta1.Ingress{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
+				&ext_v1beta1.Ingress{},
+				0, //Skip resync
+				cache.Indexers{},
+			)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "ingress")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
+			c := newResourceController(kubeClient, eventHandler, informer, "ingress")
+			stopCh := make(chan struct{})
+			defer close(stopCh)
 
-		go c.Run(stopCh)
+			go c.Run(stopCh)
+		}
 	}
 
 	sigterm := make(chan os.Signal, 1)

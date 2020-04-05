@@ -61,7 +61,7 @@ type Config struct {
 	Resource Resource `json:"resource"`
 	// for watching specific namespace, leave it empty for watching all.
 	// this config is ignored when watching namespaces
-	Namespace string `json:"namespace,omitempty"`
+	Namespace []string `json:"namespace,omitempty"`
 }
 
 // Slack contains slack configuration
