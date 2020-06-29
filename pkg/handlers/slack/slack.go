@@ -88,6 +88,29 @@ func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
 	notifySlack(s, newObj, "updated")
 }
 
+// TestHandler tests the handler configurarion by sending test messages.
+func (s *Slack) TestHandler() {
+	api := slack.New(s.Token)
+	params := slack.PostMessageParameters{}
+	attachment := slack.Attachment{
+		Fields: []slack.AttachmentField{
+			{
+				Title: "kubewatch",
+				Value: "Testing Handler Configuration. This is a Test message.",
+			},
+		},
+	}
+	params.Attachments = []slack.Attachment{attachment}
+	params.AsUser = true
+	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
+}
+
 func notifySlack(s *Slack, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 	api := slack.New(s.Token)

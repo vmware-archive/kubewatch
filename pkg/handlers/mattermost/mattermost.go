@@ -113,6 +113,28 @@ func (m *Mattermost) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyMattermost(m, newObj, "updated")
 }
 
+// TestHandler tests the handler configurarion by sending test messages.
+func (m *Mattermost) TestHandler() {
+	mattermostMessage := &MattermostMessage{
+		Channel:  m.Channel,
+		Username: m.Username,
+		IconUrl:  "https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo_with_border.png",
+		Attachements: []MattermostMessageAttachement{
+			{
+				Title: "Testing Handler Configuration. This is a Test message.",
+			},
+		},
+	}
+
+	err := postMessage(m.Url, mattermostMessage)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to channel %s at %s", m.Channel, time.Now())
+}
+
 func notifyMattermost(m *Mattermost, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 

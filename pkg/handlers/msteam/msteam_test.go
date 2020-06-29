@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -45,7 +45,7 @@ func TestObjectCreated(t *testing.T) {
 		Title:      "kubewatch",
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
-			TeamsMessageCardSection{
+			{
 				ActivityTitle: "A `pod` in namespace `new` has been `created`:\n`foo`",
 				Markdown:      true,
 			},
@@ -92,7 +92,7 @@ func TestObjectDeleted(t *testing.T) {
 		Title:      "kubewatch",
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
-			TeamsMessageCardSection{
+			{
 				ActivityTitle: "A `pod` in namespace `new` has been `deleted`:\n`foo`",
 				Markdown:      true,
 			},
@@ -139,7 +139,7 @@ func TestObjectUpdated(t *testing.T) {
 		Title:      "kubewatch",
 		Text:       "",
 		Sections: []TeamsMessageCardSection{
-			TeamsMessageCardSection{
+			{
 				ActivityTitle: "A `pod` in namespace `new` has been `updated`:\n`foo`",
 				Markdown:      true,
 			},

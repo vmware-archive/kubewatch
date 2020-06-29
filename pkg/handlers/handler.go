@@ -33,6 +33,7 @@ type Handler interface {
 	ObjectCreated(obj interface{})
 	ObjectDeleted(obj interface{})
 	ObjectUpdated(oldObj, newObj interface{})
+	TestHandler()
 }
 
 // Map maps each event handler function to a name for easily lookup
@@ -69,5 +70,10 @@ func (d *Default) ObjectDeleted(obj interface{}) {
 
 // ObjectUpdated sends events on object updation
 func (d *Default) ObjectUpdated(oldObj, newObj interface{}) {
+
+}
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (d *Default) TestHandler() {
 
 }
