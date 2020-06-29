@@ -23,13 +23,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
+	"github.com/sirupsen/logrus"
 
-	apps_v1beta1 "k8s.io/api/apps/v1beta1"
+	apps_v1 "k8s.io/api/apps/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -100,13 +100,13 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.ExtensionsV1beta1().DaemonSets(conf.Namespace).List(options)
+					return kubeClient.AppsV1().DaemonSets(conf.Namespace).List(options)
 				},
 				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.ExtensionsV1beta1().DaemonSets(conf.Namespace).Watch(options)
+					return kubeClient.AppsV1().DaemonSets(conf.Namespace).Watch(options)
 				},
 			},
-			&ext_v1beta1.DaemonSet{},
+			&apps_v1.DaemonSet{},
 			0, //Skip resync
 			cache.Indexers{},
 		)
@@ -122,13 +122,13 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.ExtensionsV1beta1().ReplicaSets(conf.Namespace).List(options)
+					return kubeClient.AppsV1().ReplicaSets(conf.Namespace).List(options)
 				},
 				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.ExtensionsV1beta1().ReplicaSets(conf.Namespace).Watch(options)
+					return kubeClient.AppsV1().ReplicaSets(conf.Namespace).Watch(options)
 				},
 			},
-			&ext_v1beta1.ReplicaSet{},
+			&apps_v1.ReplicaSet{},
 			0, //Skip resync
 			cache.Indexers{},
 		)
@@ -166,13 +166,13 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.AppsV1beta1().Deployments(conf.Namespace).List(options)
+					return kubeClient.AppsV1().Deployments(conf.Namespace).List(options)
 				},
 				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.AppsV1beta1().Deployments(conf.Namespace).Watch(options)
+					return kubeClient.AppsV1().Deployments(conf.Namespace).Watch(options)
 				},
 			},
-			&apps_v1beta1.Deployment{},
+			&apps_v1.Deployment{},
 			0, //Skip resync
 			cache.Indexers{},
 		)

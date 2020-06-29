@@ -17,7 +17,7 @@ import (
 	"fmt"
 
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
-	apps_v1beta1 "k8s.io/api/apps/v1beta1"
+	apps_v1 "k8s.io/api/apps/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -55,7 +55,7 @@ func New(obj interface{}, action string) Event {
 	switch object := obj.(type) {
 	case *ext_v1beta1.DaemonSet:
 		kind = "daemon set"
-	case *apps_v1beta1.Deployment:
+	case *apps_v1.Deployment:
 		kind = "deployment"
 	case *batch_v1.Job:
 		kind = "job"
