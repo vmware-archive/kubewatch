@@ -1,3 +1,5 @@
+# github.com/BurntSushi/toml v0.3.1
+## explicit
 # github.com/PuerkitoBio/purell v1.1.0
 ## explicit
 github.com/PuerkitoBio/purell
@@ -7,15 +9,13 @@ github.com/PuerkitoBio/urlesc
 # github.com/Sirupsen/logrus v1.0.4
 ## explicit
 github.com/Sirupsen/logrus
-# github.com/davecgh/go-spew v1.1.0
-## explicit
+# github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/emicklei/go-restful v2.5.0+incompatible
 ## explicit
 github.com/emicklei/go-restful
 github.com/emicklei/go-restful/log
-# github.com/fsnotify/fsnotify v1.4.7
-## explicit
+# github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
 # github.com/ghodss/yaml v1.0.0
 ## explicit
@@ -39,8 +39,9 @@ github.com/gogo/protobuf/sortkeys
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 ## explicit
 github.com/golang/glog
-# github.com/golang/protobuf v0.0.0-20171113180720-1e59b77b52bf
+# github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 ## explicit
+# github.com/golang/protobuf v1.4.2
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/any
@@ -105,17 +106,21 @@ github.com/mailru/easyjson/jwriter
 # github.com/mitchellh/mapstructure v0.0.0-20180111000720-b4575eea38cc
 ## explicit
 github.com/mitchellh/mapstructure
+# github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e
+## explicit
 # github.com/nlopes/slack v0.1.0
 ## explicit
 github.com/nlopes/slack
+# github.com/onsi/ginkgo v1.13.0
+## explicit
 # github.com/pelletier/go-toml v1.0.1
 ## explicit
 github.com/pelletier/go-toml
-# github.com/petar/GoLLRB v0.0.0-20130427215148-53be0d36a84c
-## explicit
 # github.com/peterbourgon/diskv v2.0.1+incompatible
 ## explicit
 github.com/peterbourgon/diskv
+# github.com/sirupsen/logrus v1.6.0
+## explicit
 # github.com/spf13/afero v1.0.2
 ## explicit
 github.com/spf13/afero
@@ -135,35 +140,71 @@ github.com/spf13/pflag
 # github.com/spf13/viper v1.0.0
 ## explicit
 github.com/spf13/viper
+# github.com/stretchr/testify v1.6.1
+## explicit
 # github.com/tbruyelle/hipchat-go v0.0.0-20160921153256-749fb9e14beb
 ## explicit
 github.com/tbruyelle/hipchat-go/hipchat
-# golang.org/x/crypto v0.0.0-20180112200814-13931e22f9e7
-## explicit
+# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20180112015858-5ccada7d0a7b
-## explicit
+# golang.org/x/net v0.0.0-20200520004742-59133d7f0dd7
 golang.org/x/net/context
+golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-golang.org/x/net/lex/httplex
 golang.org/x/net/websocket
-# golang.org/x/sys v0.0.0-20180115085844-fff93fa7cd27
-## explicit
+# golang.org/x/sys v0.0.0-20200519105757-fe76b779f299
+golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.3.1-0.20171227012246-e19ae1496984
-## explicit
+# golang.org/x/text v0.3.2
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
+# google.golang.org/protobuf v1.23.0
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/fieldnum
+google.golang.org/protobuf/internal/fieldsort
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genname
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/mapsort
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/known/anypb
+google.golang.org/protobuf/types/known/durationpb
+google.golang.org/protobuf/types/known/timestamppb
+# gopkg.in/airbrake/gobrake.v2 v2.0.9
+## explicit
+# gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f
+## explicit
+# gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2
+## explicit
 # gopkg.in/inf.v0 v0.9.0
 ## explicit
 gopkg.in/inf.v0
-# gopkg.in/yaml.v2 v2.0.0
+# gopkg.in/yaml.v2 v2.3.0
 ## explicit
 gopkg.in/yaml.v2
 # k8s.io/api v0.0.0-20171207041203-11147472b7c9
