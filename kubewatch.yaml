@@ -5,19 +5,12 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: tuna/kubewatch:v0.0.1
+  - image: bitnami/kubewatch #using this image, its more stable and active
     imagePullPolicy: Always
     name: kubewatch
     volumeMounts:
     - name: config-volume
       mountPath: /root
-  - image: gcr.io/skippbox/kubectl:v1.3.0
-    args:
-      - proxy
-      - "-p"
-      - "8080"
-    name: proxy
-    imagePullPolicy: Always
   restartPolicy: Always
   volumes:
   - name: config-volume
