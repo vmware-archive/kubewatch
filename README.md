@@ -196,7 +196,7 @@ Use "kubewatch config [command] --help" for more information about a command.
 
 - Edit the Bot to customize its name, icon and retrieve the API token (it starts with `xoxb-`).
 
-- Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Slack message area.
+- Invite the Bot into your channel by typing: `/invite @name_of_your_bot` in the Slack message area.
 
 - Add Api token to kubewatch config using the following steps
 
