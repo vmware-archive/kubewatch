@@ -22,7 +22,7 @@ docker-image:
 	@docker build -t "${BINARY}" .
 
 test:
-	"$(GOCMD)" test -race -v $(shell go list ./... | grep -v '/vendor/')
+	"$(GOCMD)" test -race -v ./...
 
 stop:
 	@docker stop "${BINARY}"
