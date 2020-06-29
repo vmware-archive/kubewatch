@@ -68,8 +68,8 @@ type Controller struct {
 // Start prepares watchers and run their controllers, then waits for process termination signals
 func Start(conf *config.Config, eventHandler handlers.Handler) {
 	var kubeClient kubernetes.Interface
-	_, err := rest.InClusterConfig()
-	if err != nil {
+
+	if _, err := rest.InClusterConfig(); err != nil {
 		kubeClient = utils.GetClientOutOfCluster()
 	} else {
 		kubeClient = utils.GetClient()
