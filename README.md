@@ -10,8 +10,8 @@ $ kubewatch -h
 
 Kubewatch: A watcher for Kubernetes
 
-kubewatch is a Kubernetes watcher that could publishes notification
-to Slack/hipchat/mattermost/flock channels. It watches the cluster
+kubewatch is a Kubernetes watcher that publishes notifications 
+to Slack/hipchat/mattermost/flock channels. It watches the cluster 
 for resource changes and notifies them through webhooks.
 
 supported webhooks:
@@ -120,7 +120,7 @@ Kubernetes Engine clusters running versions 1.6 or higher introduced Role-Based 
 $ kubectl create -f kubewatch-service-account.yaml
 ```
 
-If you do not have permission to create it, you need to become a admin first. For example, in GKE you would run:
+If you do not have permission to create it, you need to become an admin first. For example, in GKE you would run:
 
 ```
 $ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=REPLACE_EMAIL_HERE
@@ -358,7 +358,7 @@ Global Flags:
 # rc, po and svc will be watched
 $ kubewatch resource add --rc --po --svc
 
-# rc, po and svc will be stoped from being watched
+# rc, po and svc will be stopped from being watched
 $ kubewatch resource remove --rc --po --svc
 ```
 
@@ -401,4 +401,4 @@ kubewatch           latest              919896d3cd90        3 minutes ago       
 
 # Contribution
 
-Refer the [contribution guidlines](docs/CONTRIBUTION.md) to get started.
+Refer to the [contribution guidelines](docs/CONTRIBUTION.md) to get started.
