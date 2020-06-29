@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
@@ -27,12 +28,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const kubewatchConfigFile = ".kubewatch.yaml"
+
 // configCmd represents the config command
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "modify kubewatch configuration",
 	Long: `
-config command allows configuration of .kubewatch.yaml for running kubewatch`,
+config command allows configuration of ~/.kubewatch.yaml for running kubewatch`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
@@ -40,9 +43,9 @@ config command allows configuration of .kubewatch.yaml for running kubewatch`,
 
 var configAddCmd = &cobra.Command{
 	Use:   "add",
-	Short: "add webhook config to .kubewatch.yaml",
+	Short: "add webhook config to ~/.kubewatch.yaml",
 	Long: `
-Adds webhook config to .kubewatch.yaml`,
+Adds webhook config to ~/.kubewatch.yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
@@ -50,9 +53,9 @@ Adds webhook config to .kubewatch.yaml`,
 
 var configTestCmd = &cobra.Command{
 	Use:   "test",
-	Short: "test handler config present in .kubewatch.yaml",
+	Short: "test handler config present in ~/.kubewatch.yaml",
 	Long: `
-Tests handler configs present in .kubewatch.yaml by sending test messages`,
+Tests handler configs present in ~/.kubewatch.yaml by sending test messages`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Testing Handler configs from .kubewatch.yaml")
 		conf, err := config.New()
@@ -66,16 +69,17 @@ Tests handler configs present in .kubewatch.yaml by sending test messages`,
 
 var configViewCmd = &cobra.Command{
 	Use:   "view",
-	Short: "view .kubewatch.yaml",
+	Short: "view ~/.kubewatch.yaml",
 	Long: `
-Display the contents of the contents of .kubewatch.yaml`,
+Display the contents of the contents of ~/.kubewatch.yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Contents of .kubewatch.yaml")
-		configFile, err := ioutil.ReadFile(os.Getenv("HOME") + "/" + ".kubewatch.yaml")
+		fmt.Fprintln(os.Stderr, "Contents of ~/.kubewatch.yaml")
+		configFile, err := ioutil.ReadFile(filepath.Join(os.Getenv("HOME"), kubewatchConfigFile))
 		if err != nil {
-			fmt.Printf("yamlFile.Get err   #%v ", err)
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
 		}
-		fmt.Println(string(configFile))
+		fmt.Print(string(configFile))
 	},
 }
 

@@ -36,8 +36,8 @@ var RootCmd = &cobra.Command{
 	Long: `
 Kubewath: A watcher for Kubernetes
 
-kubewatch is a Kubernetes watcher that could publishes notification 
-to Slack/hipchat/mattermost/flock channels. It watches the cluster 
+kubewatch is a Kubernetes watcher that could publishes notification
+to Slack/hipchat/mattermost/flock channels. It watches the cluster
 for resource changes and notifies them through webhooks.
 
 supported webhooks:
@@ -84,9 +84,9 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".kubewatch.yaml") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")           // adding home directory as first search path
-	viper.AutomaticEnv()                   // read in environment variables that match
+	viper.SetConfigName(kubewatchConfigFile) // name of config file (without extension)
+	viper.AddConfigPath("$HOME")             // adding home directory as first search path
+	viper.AutomaticEnv()                     // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
