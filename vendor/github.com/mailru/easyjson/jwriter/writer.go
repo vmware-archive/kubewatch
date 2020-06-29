@@ -340,10 +340,11 @@ func (w *Writer) base64(in []byte) {
 		return
 	}
 
-	w.Buffer.EnsureSpace(((len(in)-1)/3 + 1) * 4)
+	w.Buffer.EnsureSpace(((len(in) - 1) / 3 + 1) * 4)
 
 	si := 0
 	n := (len(in) / 3) * 3
+
 
 	for si < n {
 		// Convert 3x 8bit source bytes into 4 bytes
