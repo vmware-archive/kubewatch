@@ -27,6 +27,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/msteam"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/smtp"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
 
@@ -54,6 +55,8 @@ func ParseEventHandler(conf *config.Config) handlers.Handler {
 		eventHandler = new(webhook.Webhook)
 	case len(conf.Handler.MSTeams.WebhookURL) > 0:
 		eventHandler = new(msteam.MSTeams)
+	case len(conf.Handler.SMTP.Smarthost) > 0 || len(conf.Handler.SMTP.To) > 0:
+		eventHandler = new(smtp.SMTP)
 	default:
 		eventHandler = new(handlers.Default)
 	}

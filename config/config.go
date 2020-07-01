@@ -36,6 +36,7 @@ type Handler struct {
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
 	MSTeams    MSTeams    `json:"msteams"`
+	SMTP       SMTP       `json:"smtp"`
 }
 
 // Resource contains resource configuration
@@ -98,6 +99,25 @@ type Webhook struct {
 // MSTeams contains MSTeams configuration
 type MSTeams struct {
 	WebhookURL string `json:"webhookurl"`
+}
+
+// SMTP contains SMTP configuration.
+type SMTP struct {
+	To         string            `json:"to" yaml:"to,omitempty"`
+	From       string            `json:"from" yaml:"from,omitempty"`
+	Hello      string            `json:"hello" yaml:"hello,omitempty"`
+	Smarthost  string            `json:"smarthost" yaml:"smarthost,omitempty"`
+	Subject    string            `json:"subject" yaml:"subject,omitempty"`
+	Headers    map[string]string `json:"headers" yaml:"headers,omitempty"`
+	Auth       SMTPAuth          `json:"auth" yaml:"auth,omitempty"`
+	RequireTLS bool              `json:"requireTLS" yaml:"requireTLS"`
+}
+
+type SMTPAuth struct {
+	Username string `json:"username" yaml:"username,omitempty"`
+	Password string `json:"password" yaml:"password,omitempty"`
+	Secret   string `json:"secret" yaml:"secret,omitempty"`
+	Identity string `json:"identity" yaml:"identity,omitempty"`
 }
 
 // New creates new config object

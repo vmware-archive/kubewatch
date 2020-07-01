@@ -22,9 +22,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/client"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -98,5 +98,6 @@ func init() {
 		flockConfigCmd,
 		webhookConfigCmd,
 		msteamsConfigCmd,
+		smtpConfigCmd,
 	)
 }

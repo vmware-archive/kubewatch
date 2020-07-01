@@ -12,6 +12,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/magiconair/properties v1.7.4 // indirect
 	github.com/mitchellh/mapstructure v0.0.0-20180111000720-b4575eea38cc // indirect
+	github.com/mkmik/multierror v0.3.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pelletier/go-toml v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.6.0

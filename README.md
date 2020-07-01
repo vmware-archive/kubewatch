@@ -13,8 +13,8 @@ $ kubewatch -h
 
 Kubewatch: A watcher for Kubernetes
 
-kubewatch is a Kubernetes watcher that publishes notifications 
-to Slack/hipchat/mattermost/flock channels. It watches the cluster 
+kubewatch is a Kubernetes watcher that publishes notifications
+to Slack/hipchat/mattermost/flock channels. It watches the cluster
 for resource changes and notifies them through webhooks.
 
 supported webhooks:
@@ -23,6 +23,7 @@ supported webhooks:
  - mattermost
  - flock
  - webhook
+ - smtp
 
 Usage:
   kubewatch [flags]

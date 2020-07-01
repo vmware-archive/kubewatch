@@ -27,6 +27,7 @@ With each event get from k8s and matched filtering from configuration, it is pas
  - `Hipchat`: which send notification to Hipchat room based on information from config
  - `Mattermost`: which send notification to Mattermost channel based on information from config
  - `Flock`: which send notification to Flock channel based on information from config
+ - 'Smtp': which sends notifications to email recipients using a SMTP server obtained from config
 
 More handlers will be added in future.
 
