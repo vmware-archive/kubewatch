@@ -11,10 +11,10 @@
 ```
 $ kubewatch -h
 
-Kubewath: A watcher for Kubernetes
+Kubewatch: A watcher for Kubernetes
 
-kubewatch is a Kubernetes watcher that could publishes notification 
-to Slack/hipchat/mattermost/flock channels. It watches the culster 
+kubewatch is a Kubernetes watcher that publishes notifications 
+to Slack/hipchat/mattermost/flock channels. It watches the cluster 
 for resource changes and notifies them through webhooks.
 
 supported webhooks:
@@ -48,7 +48,7 @@ Use "kubewatch [command] --help" for more information about a command.
 When you have helm installed in your cluster, use the following setup:
 
 ```console
-helm install --name kubewatch stable/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
+helm install --name kubewatch bitnami/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
 ```
 
 You may also provide a values file instead:
@@ -73,7 +73,7 @@ slack:
 And use that:
 
 ```console
-$ helm upgrade --install kubewatch stable/kubewatch --values=values-file.yml
+$ helm upgrade --install kubewatch bitnami/kubewatch --values=values-file.yml
 ```
 
 #### Using kubectl:
@@ -123,7 +123,7 @@ Kubernetes Engine clusters running versions 1.6 or higher introduced Role-Based 
 $ kubectl create -f kubewatch-service-account.yaml
 ```
 
-If you do not have permission to create it, you need to become a admin first. For example, in GKE you would run:
+If you do not have permission to create it, you need to become an admin first. For example, in GKE you would run:
 
 ```
 $ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=REPLACE_EMAIL_HERE
@@ -148,13 +148,13 @@ $ kubectl create -f kubewatch.yaml
 # Download and install kubewatch
 $ go get -u github.com/bitnami-labs/kubewatch
 
-# Configure the notification channel 
+# Configure the notification channel
 $ kubewatch config add slack --channel <slack_channel> --token <slack_token>
 
 # Add resources to be watched
 $ kubewatch resource add --po --svc
-INFO[0000] resource svc configured                      
-INFO[0000] resource po configured 
+INFO[0000] resource svc configured
+INFO[0000] resource po configured
 
 # start kubewatch server
 $ kubewatch
@@ -229,7 +229,7 @@ Use "kubewatch config [command] --help" for more information about a command.
 
 - Edit the Bot to customize its name, icon and retrieve the API token (it starts with `xoxb-`).
 
-- Invite the Bot into your channel by typing: `/join @name_of_your_bot` in the Slack message area.
+- Invite the Bot into your channel by typing: `/invite @name_of_your_bot` in the Slack message area.
 
 - Add Api token to kubewatch config using the following steps
 
@@ -391,7 +391,7 @@ Global Flags:
 # rc, po and svc will be watched
 $ kubewatch resource add --rc --po --svc
 
-# rc, po and svc will be stoped from being watched
+# rc, po and svc will be stopped from being watched
 $ kubewatch resource remove --rc --po --svc
 ```
 
@@ -407,7 +407,7 @@ $ git clone https://github.com/bitnami-labs/kubewatch.git
 $ cd kubewatch
 $ go build -o kubewatch main.go
 ```
-or 
+or
 
 You can also use the Makefile directly:
 
@@ -434,4 +434,4 @@ kubewatch           latest              919896d3cd90        3 minutes ago       
 
 # Contribution
 
-Refer the [contribution guidlines](docs/CONTRIBUTION.md) to get started.
+Refer to the [contribution guidelines](docs/CONTRIBUTION.md) to get started.
