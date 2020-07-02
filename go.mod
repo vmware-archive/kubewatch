@@ -13,9 +13,9 @@ require (
 	github.com/magiconair/properties v1.7.4 // indirect
 	github.com/mitchellh/mapstructure v0.0.0-20180111000720-b4575eea38cc // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/nlopes/slack v0.1.0
 	github.com/pelletier/go-toml v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.6.0
+	github.com/slack-go/slack v0.6.5
 	github.com/spf13/cast v1.1.0 // indirect
 	github.com/spf13/cobra v0.0.1
 	github.com/spf13/jwalterweatherman v0.0.0-20180109140146-7c0cea34c8ec // indirect
