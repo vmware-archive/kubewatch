@@ -52,12 +52,14 @@ Command line flags will override environment variables
 type Slack struct {
 	Token   string
 	Channel string
+	Title string
 }
 
 // Init prepares slack configuration
 func (s *Slack) Init(c *config.Config) error {
 	token := c.Handler.Slack.Token
 	channel := c.Handler.Slack.Channel
+	title := c.Handler.Slack.Title
 
 	if token == "" {
 		token = os.Getenv("KW_SLACK_TOKEN")
@@ -67,8 +69,16 @@ func (s *Slack) Init(c *config.Config) error {
 		channel = os.Getenv("KW_SLACK_CHANNEL")
 	}
 
+	if title == "" {
+		title = os.Getenv("KW_SLACK_TITLE")
+		if title == "" {
+			title = "kubewatch"
+		}
+	}
+
 	s.Token = token
 	s.Channel = channel
+	s.Title = title
 
 	return checkMissingSlackVars(s)
 }
@@ -113,7 +123,7 @@ func (s *Slack) TestHandler() {
 func notifySlack(s *Slack, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 	api := slack.New(s.Token)
-	attachment := prepareSlackAttachment(e)
+	attachment := prepareSlackAttachment(e, s)
 
 	channelID, timestamp, err := api.PostMessage(s.Channel,
 		slack.MsgOptionAttachments(attachment),
@@ -134,12 +144,12 @@ func checkMissingSlackVars(s *Slack) error {
 	return nil
 }
 
-func prepareSlackAttachment(e event.Event) slack.Attachment {
+func prepareSlackAttachment(e event.Event, s *Slack) slack.Attachment {
 
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
 			{
-				Title: "kubewatch",
+				Title: s.Title,
 				Value: e.Message(),
 			},
 		},

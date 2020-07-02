@@ -49,6 +49,12 @@ var slackConfigCmd = &cobra.Command{
 		} else {
 			logrus.Fatal(err)
 		}
+		title, err := cmd.Flags().GetString("title")
+		if err == nil {
+			if len(title) > 0 {
+				conf.Handler.Slack.Title = title
+			}
+		}
 
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)
@@ -59,4 +65,5 @@ var slackConfigCmd = &cobra.Command{
 func init() {
 	slackConfigCmd.Flags().StringP("channel", "c", "", "Specify slack channel")
 	slackConfigCmd.Flags().StringP("token", "t", "", "Specify slack token")
+	slackConfigCmd.Flags().StringP("title", "", "", "Specify slack msg title")
 }
