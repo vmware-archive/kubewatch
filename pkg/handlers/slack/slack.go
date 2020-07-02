@@ -21,7 +21,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
@@ -91,7 +91,6 @@ func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
 // TestHandler tests the handler configurarion by sending test messages.
 func (s *Slack) TestHandler() {
 	api := slack.New(s.Token)
-	params := slack.PostMessageParameters{}
 	attachment := slack.Attachment{
 		Fields: []slack.AttachmentField{
 			{
@@ -100,9 +99,9 @@ func (s *Slack) TestHandler() {
 			},
 		},
 	}
-	params.Attachments = []slack.Attachment{attachment}
-	params.AsUser = true
-	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	channelID, timestamp, err := api.PostMessage(s.Channel,
+		slack.MsgOptionAttachments(attachment),
+		slack.MsgOptionAsUser(true))
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
@@ -114,12 +113,11 @@ func (s *Slack) TestHandler() {
 func notifySlack(s *Slack, obj interface{}, action string) {
 	e := kbEvent.New(obj, action)
 	api := slack.New(s.Token)
-	params := slack.PostMessageParameters{}
 	attachment := prepareSlackAttachment(e)
 
-	params.Attachments = []slack.Attachment{attachment}
-	params.AsUser = true
-	channelID, timestamp, err := api.PostMessage(s.Channel, "", params)
+	channelID, timestamp, err := api.PostMessage(s.Channel,
+		slack.MsgOptionAttachments(attachment),
+		slack.MsgOptionAsUser(true))
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
