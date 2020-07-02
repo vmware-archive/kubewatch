@@ -17,7 +17,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/spf13/cobra"
 )
