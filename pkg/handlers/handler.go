@@ -18,6 +18,7 @@ package handlers
 
 import (
 	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/exec"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
@@ -44,6 +45,7 @@ var Map = map[string]interface{}{
 	"mattermost": &mattermost.Mattermost{},
 	"flock":      &flock.Flock{},
 	"webhook":    &webhook.Webhook{},
+	"exec":       &exec.Exec{},
 	"ms-teams":   &msteam.MSTeams{},
 }
 

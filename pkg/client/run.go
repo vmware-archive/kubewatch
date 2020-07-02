@@ -22,6 +22,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/exec"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
@@ -52,6 +53,8 @@ func ParseEventHandler(conf *config.Config) handlers.Handler {
 		eventHandler = new(flock.Flock)
 	case len(conf.Handler.Webhook.Url) > 0:
 		eventHandler = new(webhook.Webhook)
+	case len(conf.Handler.Exec.Cmd) > 0:
+		eventHandler = new(exec.Exec)
 	case len(conf.Handler.MSTeams.WebhookURL) > 0:
 		eventHandler = new(msteam.MSTeams)
 	default:

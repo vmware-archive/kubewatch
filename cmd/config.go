@@ -98,5 +98,6 @@ func init() {
 		flockConfigCmd,
 		webhookConfigCmd,
 		msteamsConfigCmd,
+		execConfigCmd,
 	)
 }

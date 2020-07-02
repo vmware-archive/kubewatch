@@ -1,0 +1,14 @@
+handler:
+  exec:
+    cmd: "echo {reason} {name}"
+resource:
+  deployment: false
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: false
+  pod: false
+  job: false
+  persistentvolume: false
+  configmap: true
+  ingress: false
