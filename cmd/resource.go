@@ -129,6 +129,18 @@ func configureResource(operation string, cmd *cobra.Command, conf *config.Config
 			"ing",
 			&conf.Resource.Ingress,
 		},
+		{
+			"node",
+			&conf.Resource.Node,
+		},
+		{
+			"clusterrole",
+			&conf.Resource.ClusterRole,
+		},
+		{
+			"sa",
+			&conf.Resource.ServiceAccount,
+		},
 	}
 
 	for _, flag := range flags {
@@ -173,4 +185,7 @@ func init() {
 	resourceConfigCmd.PersistentFlags().Bool("secret", false, "watch for plain secrets")
 	resourceConfigCmd.PersistentFlags().Bool("cm", false, "watch for plain configmaps")
 	resourceConfigCmd.PersistentFlags().Bool("ing", false, "watch for ingresses")
+	resourceConfigCmd.PersistentFlags().Bool("node", false, "watch for Nodes")
+	resourceConfigCmd.PersistentFlags().Bool("clusterrole", false, "watch for cluster roles")
+	resourceConfigCmd.PersistentFlags().Bool("sa", false, "watch for service accounts")
 }
