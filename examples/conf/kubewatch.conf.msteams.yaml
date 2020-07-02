@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubewatch
+data:
+  .kubewatch.yaml: |
+    namespace:
+    handler:
+      msteams:
+        webhookurl: https://outlook.office.com/webhook/...
+    resource:
+      namespace: false
+      deployment: false
+      replicationcontroller: false
+      replicaset: false
+      daemonset: false
+      services: false
+      pod: true
+      secret: false
+      configmap: false

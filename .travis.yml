@@ -1,14 +1,27 @@
-language: go
-
-sudo: required
-
-go:
-  - 1.12.x
-
+---
 branches:
   only:
     - master
+    - /^v\d+\.\d+\.\d+.*/
+    - staging
+    - trying
 
-install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
+cache:
+  directories:
+    - $GOPATH/pkg
+    - $GOPATH/bin
+
+go:
+  - 1.14.x
+
+language: go
+
+notifications:
+  email:
+    on_success: never
+
+os:
+  - linux
+  - osx
+
+sudo: required

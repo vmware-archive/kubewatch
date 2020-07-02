@@ -48,8 +48,19 @@ type Webhook struct {
 	Url string
 }
 
+// WebhookMessage for messages
 type WebhookMessage struct {
-	Text string `json:"text"`
+	EventMeta EventMeta `json:"eventmeta"`
+	Text      string    `json:"text"`
+	Time      time.Time `json:"time"`
+}
+
+// EventMeta containes the meta data about the event occurred
+type EventMeta struct {
+	Kind      string `json:"kind"`
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Reason    string `json:"reason"`
 }
 
 // Init prepares Webhook configuration
@@ -65,16 +76,42 @@ func (m *Webhook) Init(c *config.Config) error {
 	return checkMissingWebhookVars(m)
 }
 
+// ObjectCreated calls notifyWebhook on event creation
 func (m *Webhook) ObjectCreated(obj interface{}) {
 	notifyWebhook(m, obj, "created")
 }
 
+// ObjectDeleted calls notifyWebhook on event creation
 func (m *Webhook) ObjectDeleted(obj interface{}) {
 	notifyWebhook(m, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyWebhook on event creation
 func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyWebhook(m, newObj, "updated")
+}
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (m *Webhook) TestHandler() {
+
+	webhookMessage := &WebhookMessage{
+		EventMeta: EventMeta{
+			Kind:      "object",
+			Name:      "Test",
+			Namespace: "default",
+			Reason:    "Tested",
+		},
+		Text: "Testing Handler Configuration. This is a Test message.",
+		Time: time.Now(),
+	}
+
+	err := postMessage(m.Url, webhookMessage)
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
 }
 
 func notifyWebhook(m *Webhook, obj interface{}, action string) {
@@ -101,9 +138,15 @@ func checkMissingWebhookVars(s *Webhook) error {
 
 func prepareWebhookMessage(e kbEvent.Event, m *Webhook) *WebhookMessage {
 	return &WebhookMessage{
-		e.Message(),
+		EventMeta: EventMeta{
+			Kind:      e.Kind,
+			Name:      e.Name,
+			Namespace: e.Namespace,
+			Reason:    e.Reason,
+		},
+		Text: e.Message(),
+		Time: time.Now(),
 	}
-
 }
 
 func postMessage(url string, webhookMessage *WebhookMessage) error {

@@ -83,16 +83,46 @@ func (s *Hipchat) Init(c *config.Config) error {
 	return checkMissingHipchatVars(s)
 }
 
+// ObjectCreated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectCreated(obj interface{}) {
 	notifyHipchat(s, obj, "created")
 }
 
+// ObjectDeleted calls notifyHipchat on event creation
 func (s *Hipchat) ObjectDeleted(obj interface{}) {
 	notifyHipchat(s, obj, "deleted")
 }
 
+// ObjectUpdated calls notifyHipchat on event creation
 func (s *Hipchat) ObjectUpdated(oldObj, newObj interface{}) {
 	notifyHipchat(s, newObj, "updated")
+}
+
+// TestHandler tests the handler configurarion by sending test messages.
+func (s *Hipchat) TestHandler() {
+
+	client := hipchat.NewClient(s.Token)
+	if s.Url != "" {
+		baseUrl, err := url.Parse(s.Url)
+		if err != nil {
+			panic(err)
+		}
+		client.BaseURL = baseUrl
+	}
+
+	notificationRequest := hipchat.NotificationRequest{
+		Message: "Testing Handler Configuration. This is a Test message.",
+		Notify:  true,
+		From:    "kubewatch",
+	}
+	_, err := client.Room.Notification(s.Room, &notificationRequest)
+
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+
+	log.Printf("Message successfully sent to room %s", s.Room)
 }
 
 func notifyHipchat(s *Hipchat, obj interface{}, action string) {

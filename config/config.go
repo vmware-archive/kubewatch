@@ -25,14 +25,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ConfigFileName stores file of config
 var ConfigFileName = ".kubewatch.yaml"
 
+// Handler contains handler configuration
 type Handler struct {
 	Slack      Slack      `json:"slack"`
 	Hipchat    Hipchat    `json:"hipchat"`
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	MSTeams    MSTeams    `json:"msteams"`
 }
 
 // Resource contains resource configuration
@@ -92,6 +95,11 @@ type Webhook struct {
 	Url string `json:"url"`
 }
 
+// MSTeams contains MSTeams configuration
+type MSTeams struct {
+	WebhookURL string `json:"webhookurl"`
+}
+
 // New creates new config object
 func New() (*Config, error) {
 	c := &Config{}
@@ -144,6 +152,7 @@ func (c *Config) Load() error {
 	return nil
 }
 
+// CheckMissingResourceEnvvars will read the environment for equivalent config variables to set
 func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
 		c.Resource.DaemonSet = true
@@ -213,15 +222,15 @@ func getConfigFile() string {
 }
 
 func configDir() string {
-    if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
-        return configDir
-    }
+	if configDir := os.Getenv("KW_CONFIG"); configDir != "" {
+		return configDir
+	}
 
-    if runtime.GOOS == "windows" {
-        home := os.Getenv("USERPROFILE")
-        return home
-    }
-    return os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("USERPROFILE")
+		return home
+	}
+	return os.Getenv("HOME")
 	//path := "/etc/kubewatch"
 	//if _, err := os.Stat(path); os.IsNotExist(err) {
 	//	os.Mkdir(path, 755)
