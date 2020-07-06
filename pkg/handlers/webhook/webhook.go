@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 var webhookErrMsg = `
@@ -76,47 +76,8 @@ func (m *Webhook) Init(c *config.Config) error {
 	return checkMissingWebhookVars(m)
 }
 
-// ObjectCreated calls notifyWebhook on event creation
-func (m *Webhook) ObjectCreated(obj interface{}) {
-	notifyWebhook(m, obj)
-}
-
-// ObjectDeleted calls notifyWebhook on event creation
-func (m *Webhook) ObjectDeleted(obj interface{}) {
-	notifyWebhook(m, obj)
-}
-
-// ObjectUpdated calls notifyWebhook on event creation
-func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyWebhook(m, newObj)
-}
-
-// TestHandler tests the handler configurarion by sending test messages.
-func (m *Webhook) TestHandler() {
-
-	webhookMessage := &WebhookMessage{
-		EventMeta: EventMeta{
-			Kind:      "object",
-			Name:      "Test",
-			Namespace: "default",
-			Reason:    "Tested",
-		},
-		Text: "Testing Handler Configuration. This is a Test message.",
-		Time: time.Now(),
-	}
-
-	err := postMessage(m.Url, webhookMessage)
-	if err != nil {
-		log.Printf("%s\n", err)
-		return
-	}
-
-	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
-}
-
-func notifyWebhook(m *Webhook, obj interface{}) {
-	e, _ := obj.(kbEvent.Event)
-
+// Handle handles an event.
+func (m *Webhook) Handle(e event.Event) {
 	webhookMessage := prepareWebhookMessage(e, m)
 
 	err := postMessage(m.Url, webhookMessage)
@@ -136,7 +97,7 @@ func checkMissingWebhookVars(s *Webhook) error {
 	return nil
 }
 
-func prepareWebhookMessage(e kbEvent.Event, m *Webhook) *WebhookMessage {
+func prepareWebhookMessage(e event.Event, m *Webhook) *WebhookMessage {
 	return &WebhookMessage{
 		EventMeta: EventMeta{
 			Kind:      e.Kind,

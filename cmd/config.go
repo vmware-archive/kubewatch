@@ -24,6 +24,7 @@ import (
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/client"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -63,7 +64,16 @@ Tests handler configs present in ~/.kubewatch.yaml by sending test messages`,
 			logrus.Fatal(err)
 		}
 		eventHandler := client.ParseEventHandler(conf)
-		eventHandler.TestHandler()
+		e := event.Event{
+			Namespace: "testNamespace",
+			Name:      "testResource",
+			Kind:      "testKind",
+			Component: "testComponent",
+			Host:      "testHost",
+			Reason:    "Tested",
+			Status:    "Normal",
+		}
+		eventHandler.Handle(e)
 	},
 }
 

@@ -75,7 +75,7 @@ func TestObjectCreated(t *testing.T) {
 		Status:    "Normal",
 	}
 
-	ms.ObjectCreated(p)
+	ms.Handle(p)
 }
 
 // Tests ObjectDeleted() by passing v1.Pod
@@ -120,7 +120,7 @@ func TestObjectDeleted(t *testing.T) {
 		Status:    "Danger",
 	}
 
-	ms.ObjectDeleted(p)
+	ms.Handle(p)
 }
 
 // Tests ObjectUpdated() by passing v1.Pod
@@ -172,6 +172,7 @@ func TestObjectUpdated(t *testing.T) {
 		Reason:    "Updated",
 		Status:    "Warning",
 	}
+	_ = newP
 
-	ms.ObjectUpdated(oldP, newP)
+	ms.Handle(oldP)
 }

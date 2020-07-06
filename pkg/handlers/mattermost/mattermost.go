@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 var mattermostColors = map[string]string{
@@ -98,46 +98,8 @@ func (m *Mattermost) Init(c *config.Config) error {
 	return checkMissingMattermostVars(m)
 }
 
-// ObjectCreated calls notifyMattermost on event creation
-func (m *Mattermost) ObjectCreated(obj interface{}) {
-	notifyMattermost(m, obj)
-}
-
-// ObjectDeleted calls notifyMattermost on event creation
-func (m *Mattermost) ObjectDeleted(obj interface{}) {
-	notifyMattermost(m, obj)
-}
-
-// ObjectUpdated calls notifyMattermost on event creation
-func (m *Mattermost) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyMattermost(m, newObj)
-}
-
-// TestHandler tests the handler configurarion by sending test messages.
-func (m *Mattermost) TestHandler() {
-	mattermostMessage := &MattermostMessage{
-		Channel:  m.Channel,
-		Username: m.Username,
-		IconUrl:  "https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo_with_border.png",
-		Attachements: []MattermostMessageAttachement{
-			{
-				Title: "Testing Handler Configuration. This is a Test message.",
-			},
-		},
-	}
-
-	err := postMessage(m.Url, mattermostMessage)
-	if err != nil {
-		log.Printf("%s\n", err)
-		return
-	}
-
-	log.Printf("Message successfully sent to channel %s at %s", m.Channel, time.Now())
-}
-
-func notifyMattermost(m *Mattermost, obj interface{}) {
-	e,_ := obj.(kbEvent.Event)
-
+// Handle handles an event.
+func (m *Mattermost) Handle(e event.Event) {
 	mattermostMessage := prepareMattermostMessage(e, m)
 
 	err := postMessage(m.Url, mattermostMessage)
@@ -157,8 +119,7 @@ func checkMissingMattermostVars(s *Mattermost) error {
 	return nil
 }
 
-func prepareMattermostMessage(e kbEvent.Event, m *Mattermost) *MattermostMessage {
-
+func prepareMattermostMessage(e event.Event, m *Mattermost) *MattermostMessage {
 	return &MattermostMessage{
 		Channel:  m.Channel,
 		Username: m.Username,

@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
-	"strings"
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
@@ -147,8 +147,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 
 	go nodeRebootedController.Run(stopNodeRebootedCh)
 
-
-	// User Configured Events  
+	// User Configured Events
 	if conf.Resource.Pod {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -626,7 +625,7 @@ func (c *Controller) processItem(newEvent Event) error {
 	}
 	// get object's metedata
 	objectMeta := utils.GetObjectMetaData(obj)
-	
+
 	// hold status type for default critical alerts
 	var status string
 
@@ -656,13 +655,13 @@ func (c *Controller) processItem(newEvent Event) error {
 				status = "Normal"
 			}
 			kbEvent := event.Event{
-				Name: objectMeta.Name,
+				Name:      objectMeta.Name,
 				Namespace: newEvent.namespace,
-				Kind: newEvent.resourceType,
-				Status: status,
-				Reason: "Created",
+				Kind:      newEvent.resourceType,
+				Status:    status,
+				Reason:    "Created",
 			}
-			c.eventHandler.ObjectCreated(kbEvent)
+			c.eventHandler.Handle(kbEvent)
 			return nil
 		}
 	case "update":
@@ -676,23 +675,23 @@ func (c *Controller) processItem(newEvent Event) error {
 			status = "Warning"
 		}
 		kbEvent := event.Event{
-			Name: newEvent.key,
+			Name:      newEvent.key,
 			Namespace: newEvent.namespace,
-			Kind: newEvent.resourceType,
-			Status: status,
-			Reason: "Updated",
+			Kind:      newEvent.resourceType,
+			Status:    status,
+			Reason:    "Updated",
 		}
-		c.eventHandler.ObjectUpdated(obj, kbEvent)
+		c.eventHandler.Handle(kbEvent)
 		return nil
 	case "delete":
 		kbEvent := event.Event{
 			Name:      newEvent.key,
 			Namespace: newEvent.namespace,
 			Kind:      newEvent.resourceType,
-			Status: "Danger",
-			Reason: "Deleted",
+			Status:    "Danger",
+			Reason:    "Deleted",
 		}
-		c.eventHandler.ObjectDeleted(kbEvent)
+		c.eventHandler.Handle(kbEvent)
 		return nil
 	}
 	return nil
