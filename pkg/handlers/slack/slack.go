@@ -25,7 +25,6 @@ import (
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
 )
 
 var slackColors = map[string]string{
@@ -52,7 +51,7 @@ Command line flags will override environment variables
 type Slack struct {
 	Token   string
 	Channel string
-	Title string
+	Title   string
 }
 
 // Init prepares slack configuration
@@ -83,45 +82,8 @@ func (s *Slack) Init(c *config.Config) error {
 	return checkMissingSlackVars(s)
 }
 
-// ObjectCreated calls notifySlack on event creation
-func (s *Slack) ObjectCreated(obj interface{}) {
-	notifySlack(s, obj)
-}
-
-// ObjectDeleted calls notifySlack on event creation
-func (s *Slack) ObjectDeleted(obj interface{}) {
-	notifySlack(s, obj)
-}
-
-// ObjectUpdated calls notifySlack on event creation
-func (s *Slack) ObjectUpdated(oldObj, newObj interface{}) {
-	notifySlack(s, newObj)
-}
-
-// TestHandler tests the handler configurarion by sending test messages.
-func (s *Slack) TestHandler() {
-	api := slack.New(s.Token)
-	attachment := slack.Attachment{
-		Fields: []slack.AttachmentField{
-			{
-				Title: "kubewatch",
-				Value: "Testing Handler Configuration. This is a Test message.",
-			},
-		},
-	}
-	channelID, timestamp, err := api.PostMessage(s.Channel,
-		slack.MsgOptionAttachments(attachment),
-		slack.MsgOptionAsUser(true))
-	if err != nil {
-		log.Printf("%s\n", err)
-		return
-	}
-
-	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
-}
-
-func notifySlack(s *Slack, obj interface{}) {
-	e,_ := obj.(kbEvent.Event)
+// Handle handles the notification.
+func (s *Slack) Handle(e event.Event) {
 	api := slack.New(s.Token)
 	attachment := prepareSlackAttachment(e, s)
 

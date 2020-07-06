@@ -18,6 +18,7 @@ package handlers
 
 import (
 	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
@@ -31,10 +32,7 @@ import (
 // The Handle method is used to process event
 type Handler interface {
 	Init(c *config.Config) error
-	ObjectCreated(obj interface{})
-	ObjectDeleted(obj interface{})
-	ObjectUpdated(oldObj, newObj interface{})
-	TestHandler()
+	Handle(e event.Event)
 }
 
 // Map maps each event handler function to a name for easily lookup
@@ -60,22 +58,6 @@ func (d *Default) Init(c *config.Config) error {
 	return nil
 }
 
-// ObjectCreated sends events on object creation
-func (d *Default) ObjectCreated(obj interface{}) {
-
-}
-
-// ObjectDeleted sends events on object deletion
-func (d *Default) ObjectDeleted(obj interface{}) {
-
-}
-
-// ObjectUpdated sends events on object updation
-func (d *Default) ObjectUpdated(oldObj, newObj interface{}) {
-
-}
-
-// TestHandler tests the handler configurarion by sending test messages.
-func (d *Default) TestHandler() {
-
+// Handle handles an event.
+func (d *Default) Handle(e event.Event) {
 }

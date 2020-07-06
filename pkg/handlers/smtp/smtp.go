@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/bitnami-labs/kubewatch/config"
-	kbEvent "github.com/bitnami-labs/kubewatch/pkg/event"
+	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/sirupsen/logrus"
 )
 
@@ -70,38 +70,13 @@ func (s *SMTP) Init(c *config.Config) error {
 	return nil
 }
 
-// ObjectCreated calls notifyWebhook on event creation
-func (s *SMTP) ObjectCreated(obj interface{}) {
-	notify(s, obj, "created")
-}
-
-// ObjectDeleted calls notifyWebhook on event creation
-func (s *SMTP) ObjectDeleted(obj interface{}) {
-	notify(s, obj, "deleted")
-}
-
-// ObjectUpdated calls notifyWebhook on event creation
-func (s *SMTP) ObjectUpdated(oldObj, newObj interface{}) {
-	notify(s, newObj, "updated")
-}
-
-// TestHandler tests the handler configurarion by sending test messages.
-func (s *SMTP) TestHandler() {
-	send(s.cfg, "test")
-}
-
-func notify(s *SMTP, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
-	msg, err := formatEmail(e, action)
-	if err != nil {
-		logrus.Error(err)
-		return
-	}
-	send(s.cfg, msg)
+// Handle handles the notification.
+func (s *SMTP) Handle(e event.Event) {
+	send(s.cfg, e.Message())
 	log.Printf("Message successfully sent to %s at %s ", s.cfg.To, time.Now())
 }
 
-func formatEmail(e kbEvent.Event, action string) (string, error) {
+func formatEmail(e event.Event) (string, error) {
 	return e.Message(), nil
 }
 
