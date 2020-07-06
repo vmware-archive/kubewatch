@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // ConfigFileName stores file of config
@@ -231,17 +231,15 @@ func (c *Config) CheckMissingResourceEnvvars() {
 }
 
 func (c *Config) Write() error {
-	b, err := yaml.Marshal(c)
+	f, err := os.OpenFile(getConfigFile(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	err = ioutil.WriteFile(getConfigFile(), b, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	enc := yaml.NewEncoder(f)
+	enc.SetIndent(2) // compat with old versions of kubewatch
+	return enc.Encode(c)
 }
 
 func getConfigFile() string {
