@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+//go:generate bash -c "go install ../tools/yannotated && yannotated -o sample.go -format go -package config -type Config"
+
 package config
 
 import (
@@ -25,8 +27,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ConfigFileName stores file of config
-var ConfigFileName = ".kubewatch.yaml"
+var (
+	// ConfigFileName stores file of config
+	ConfigFileName = ".kubewatch.yaml"
+
+	// ConfigSample is a sample configuration file.
+	ConfigSample = yannotated
+)
 
 // Handler contains handler configuration
 type Handler struct {
@@ -60,26 +67,37 @@ type Resource struct {
 
 // Config struct contains kubewatch configuration
 type Config struct {
+	// Handlers know how to send notifications to specific services.
 	Handler Handler `json:"handler"`
+
 	//Reason   []string `json:"reason"`
+
+	// Resources to watch.
 	Resource Resource `json:"resource"`
-	// for watching specific namespace, leave it empty for watching all.
+
+	// For watching specific namespace, leave it empty for watching all.
 	// this config is ignored when watching namespaces
 	Namespace string `json:"namespace,omitempty"`
 }
 
 // Slack contains slack configuration
 type Slack struct {
-	Token   string `json:"token"`
+	// Slack "legacy" API token.
+	Token string `json:"token"`
+	// Slack channel.
 	Channel string `json:"channel"`
-	Title   string `json:"title"`
+	// Title of the message.
+	Title string `json:"title"`
 }
 
 // Hipchat contains hipchat configuration
 type Hipchat struct {
+	// Hipchat token.
 	Token string `json:"token"`
-	Room  string `json:"room"`
-	Url   string `json:"url"`
+	// Room name.
+	Room string `json:"room"`
+	// URL of the hipchat server.
+	Url string `json:"url"`
 }
 
 // Mattermost contains mattermost configuration
@@ -91,36 +109,51 @@ type Mattermost struct {
 
 // Flock contains flock configuration
 type Flock struct {
+	// URL of the flock API.
 	Url string `json:"url"`
 }
 
 // Webhook contains webhook configuration
 type Webhook struct {
+	// Webhook URL.
 	Url string `json:"url"`
 }
 
 // MSTeams contains MSTeams configuration
 type MSTeams struct {
+	// MSTeams API Webhook URL.
 	WebhookURL string `json:"webhookurl"`
 }
 
 // SMTP contains SMTP configuration.
 type SMTP struct {
-	To         string            `json:"to" yaml:"to,omitempty"`
-	From       string            `json:"from" yaml:"from,omitempty"`
-	Hello      string            `json:"hello" yaml:"hello,omitempty"`
-	Smarthost  string            `json:"smarthost" yaml:"smarthost,omitempty"`
-	Subject    string            `json:"subject" yaml:"subject,omitempty"`
-	Headers    map[string]string `json:"headers" yaml:"headers,omitempty"`
-	Auth       SMTPAuth          `json:"auth" yaml:"auth,omitempty"`
-	RequireTLS bool              `json:"requireTLS" yaml:"requireTLS"`
+	// Destination e-mail address.
+	To string `json:"to" yaml:"to,omitempty"`
+	// Sender e-mail address .
+	From string `json:"from" yaml:"from,omitempty"`
+	// Smarthost, aka "SMTP server"; address of server used to send email.
+	Smarthost string `json:"smarthost" yaml:"smarthost,omitempty"`
+	// Subject of the outgoing emails.
+	Subject string `json:"subject" yaml:"subject,omitempty"`
+	// Extra e-mail headers to be added to all outgoing messages.
+	Headers map[string]string `json:"headers" yaml:"headers,omitempty"`
+	// Authentication parameters.
+	Auth SMTPAuth `json:"auth" yaml:"auth,omitempty"`
+	// If "true" forces secure SMTP protocol (AKA StartTLS).
+	RequireTLS bool `json:"requireTLS" yaml:"requireTLS"`
+	// SMTP hello field (optional)
+	Hello string `json:"hello" yaml:"hello,omitempty"`
 }
 
 type SMTPAuth struct {
+	// Username for PLAN and LOGIN auth mechanisms.
 	Username string `json:"username" yaml:"username,omitempty"`
+	// Password for PLAIN and LOGIN auth mechanisms.
 	Password string `json:"password" yaml:"password,omitempty"`
-	Secret   string `json:"secret" yaml:"secret,omitempty"`
+	// Identity for PLAIN auth mechanism
 	Identity string `json:"identity" yaml:"identity,omitempty"`
+	// Secret for CRAM-MD5 auth mechanism
+	Secret string `json:"secret" yaml:"secret,omitempty"`
 }
 
 // New creates new config object

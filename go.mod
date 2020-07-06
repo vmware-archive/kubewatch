@@ -3,6 +3,7 @@ module github.com/bitnami-labs/kubewatch
 go 1.14
 
 require (
+	github.com/fatih/structtag v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -15,6 +16,7 @@ require (
 	github.com/mkmik/multierror v0.3.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pelletier/go-toml v1.0.1 // indirect
+	github.com/segmentio/textio v1.2.0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/slack-go/slack v0.6.5
 	github.com/spf13/cast v1.1.0 // indirect

@@ -77,6 +77,16 @@ Tests handler configs present in ~/.kubewatch.yaml by sending test messages`,
 	},
 }
 
+var configSampleCmd = &cobra.Command{
+	Use:   "sample",
+	Short: "Show a sample config file",
+	Long: `
+Print a sample config file which can be put in ~/.kubewatch.yaml`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Print(config.ConfigSample)
+	},
+}
+
 var configViewCmd = &cobra.Command{
 	Use:   "view",
 	Short: "view ~/.kubewatch.yaml",
@@ -98,6 +108,7 @@ func init() {
 	configCmd.AddCommand(
 		configAddCmd,
 		configTestCmd,
+		configSampleCmd,
 		configViewCmd,
 	)
 
