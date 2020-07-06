@@ -22,6 +22,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"strings"
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
@@ -75,6 +76,79 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 	} else {
 		kubeClient = utils.GetClient()
 	}
+
+	// Adding Default Critical Alerts
+	// For Capturing Critical Event NodeNotReady in Nodes
+	nodeNotReadyInformer := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeNotReady"
+				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
+			},
+			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeNotReady"
+				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
+			},
+		},
+		&api_v1.Event{},
+		0, //Skip resync
+		cache.Indexers{},
+	)
+
+	nodeNotReadyController := newResourceController(kubeClient, eventHandler, nodeNotReadyInformer, "NodeNotReady")
+	stopNodeNotReadyCh := make(chan struct{})
+	defer close(stopNodeNotReadyCh)
+
+	go nodeNotReadyController.Run(stopNodeNotReadyCh)
+
+	// For Capturing Critical Event NodeReady in Nodes
+	nodeReadyInformer := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeReady"
+				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
+			},
+			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeReady"
+				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
+			},
+		},
+		&api_v1.Event{},
+		0, //Skip resync
+		cache.Indexers{},
+	)
+
+	nodeReadyController := newResourceController(kubeClient, eventHandler, nodeReadyInformer, "NodeReady")
+	stopNodeReadyCh := make(chan struct{})
+	defer close(stopNodeReadyCh)
+
+	go nodeReadyController.Run(stopNodeReadyCh)
+
+	// For Capturing Critical Event NodeRebooted in Nodes
+	nodeRebootedInformer := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Warning,reason=Rebooted"
+				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
+			},
+			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+				options.FieldSelector = "involvedObject.kind=Node,type=Warning,reason=Rebooted"
+				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
+			},
+		},
+		&api_v1.Event{},
+		0, //Skip resync
+		cache.Indexers{},
+	)
+
+	nodeRebootedController := newResourceController(kubeClient, eventHandler, nodeRebootedInformer, "NodeRebooted")
+	stopNodeRebootedCh := make(chan struct{})
+	defer close(stopNodeRebootedCh)
+
+	go nodeRebootedController.Run(stopNodeRebootedCh)
+
+
+	// User Configured Events  
 	if conf.Resource.Pod {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
@@ -95,6 +169,30 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		defer close(stopCh)
 
 		go c.Run(stopCh)
+
+		// For Capturing CrashLoopBackOff Events in pods
+		backoffInformer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					options.FieldSelector = "involvedObject.kind=Pod,type=Warning,reason=BackOff"
+					return kubeClient.CoreV1().Events(conf.Namespace).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					options.FieldSelector = "involvedObject.kind=Pod,type=Warning,reason=BackOff"
+					return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
+				},
+			},
+			&api_v1.Event{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		backoffcontroller := newResourceController(kubeClient, eventHandler, backoffInformer, "Backoff")
+		stopBackoffCh := make(chan struct{})
+		defer close(stopBackoffCh)
+
+		go backoffcontroller.Run(stopBackoffCh)
+
 	}
 
 	if conf.Resource.DaemonSet {
@@ -528,6 +626,16 @@ func (c *Controller) processItem(newEvent Event) error {
 	}
 	// get object's metedata
 	objectMeta := utils.GetObjectMetaData(obj)
+	
+	// hold status type for default critical alerts
+	var status string
+
+	// namespace retrived from event key incase namespace value is empty
+	if newEvent.namespace == "" && strings.Contains(newEvent.key, "/") {
+		substring := strings.Split(newEvent.key, "/")
+		newEvent.namespace = substring[0]
+		newEvent.key = substring[1]
+	}
 
 	// process events based on its type
 	switch newEvent.eventType {
@@ -535,24 +643,54 @@ func (c *Controller) processItem(newEvent Event) error {
 		// compare CreationTimestamp and serverStartTime and alert only on latest events
 		// Could be Replaced by using Delta or DeltaFIFO
 		if objectMeta.CreationTimestamp.Sub(serverStartTime).Seconds() > 0 {
-			c.eventHandler.ObjectCreated(obj)
+			switch newEvent.resourceType {
+			case "NodeNotReady":
+				status = "Danger"
+			case "NodeReady":
+				status = "Normal"
+			case "NodeRebooted":
+				status = "Danger"
+			case "Backoff":
+				status = "Danger"
+			default:
+				status = "Normal"
+			}
+			kbEvent := event.Event{
+				Name: objectMeta.Name,
+				Namespace: newEvent.namespace,
+				Kind: newEvent.resourceType,
+				Status: status,
+				Reason: "Created",
+			}
+			c.eventHandler.ObjectCreated(kbEvent)
 			return nil
 		}
 	case "update":
 		/* TODOs
 		- enahace update event processing in such a way that, it send alerts about what got changed.
 		*/
+		switch newEvent.resourceType {
+		case "Backoff":
+			status = "Danger"
+		default:
+			status = "Warning"
+		}
 		kbEvent := event.Event{
-			Kind: newEvent.resourceType,
 			Name: newEvent.key,
+			Namespace: newEvent.namespace,
+			Kind: newEvent.resourceType,
+			Status: status,
+			Reason: "Updated",
 		}
 		c.eventHandler.ObjectUpdated(obj, kbEvent)
 		return nil
 	case "delete":
 		kbEvent := event.Event{
-			Kind:      newEvent.resourceType,
 			Name:      newEvent.key,
 			Namespace: newEvent.namespace,
+			Kind:      newEvent.resourceType,
+			Status: "Danger",
+			Reason: "Deleted",
 		}
 		c.eventHandler.ObjectDeleted(kbEvent)
 		return nil

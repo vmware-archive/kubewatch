@@ -78,17 +78,17 @@ func (m *Webhook) Init(c *config.Config) error {
 
 // ObjectCreated calls notifyWebhook on event creation
 func (m *Webhook) ObjectCreated(obj interface{}) {
-	notifyWebhook(m, obj, "created")
+	notifyWebhook(m, obj)
 }
 
 // ObjectDeleted calls notifyWebhook on event creation
 func (m *Webhook) ObjectDeleted(obj interface{}) {
-	notifyWebhook(m, obj, "deleted")
+	notifyWebhook(m, obj)
 }
 
 // ObjectUpdated calls notifyWebhook on event creation
 func (m *Webhook) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyWebhook(m, newObj, "updated")
+	notifyWebhook(m, newObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.
@@ -114,8 +114,8 @@ func (m *Webhook) TestHandler() {
 	log.Printf("Message successfully sent to %s at %s ", m.Url, time.Now())
 }
 
-func notifyWebhook(m *Webhook, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
+func notifyWebhook(m *Webhook, obj interface{}) {
+	e, _ := obj.(kbEvent.Event)
 
 	webhookMessage := prepareWebhookMessage(e, m)
 

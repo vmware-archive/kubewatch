@@ -88,17 +88,17 @@ func (f *Flock) Init(c *config.Config) error {
 
 // ObjectCreated calls notifyFlock on event creation
 func (f *Flock) ObjectCreated(obj interface{}) {
-	notifyFlock(f, obj, "created")
+	notifyFlock(f, obj)
 }
 
 // ObjectDeleted calls notifyFlock on event creation
 func (f *Flock) ObjectDeleted(obj interface{}) {
-	notifyFlock(f, obj, "deleted")
+	notifyFlock(f, obj)
 }
 
 // ObjectUpdated calls notifyFlock on event creation
 func (f *Flock) ObjectUpdated(oldObj, newObj interface{}) {
-	notifyFlock(f, newObj, "updated")
+	notifyFlock(f, newObj)
 }
 
 // TestHandler tests the handler configurarion by sending test messages.
@@ -123,9 +123,9 @@ func (f *Flock) TestHandler() {
 	log.Printf("Message successfully sent to channel %s at %s", f.Url, time.Now())
 }
 
-func notifyFlock(f *Flock, obj interface{}, action string) {
-	e := kbEvent.New(obj, action)
-
+func notifyFlock(f *Flock, obj interface{}) {
+	e,_ := obj.(kbEvent.Event)
+	
 	flockMessage := prepareFlockMessage(e, f)
 
 	err := postMessage(f.Url, flockMessage)
