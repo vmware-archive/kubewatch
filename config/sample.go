@@ -71,6 +71,7 @@ resource:
   secret: false
   configmap: false
   ing: false
+  np: false
 # For watching specific namespace, leave it empty for watching all.
 # this config is ignored when watching namespaces
 namespace: ""

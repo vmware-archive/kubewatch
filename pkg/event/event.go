@@ -20,6 +20,7 @@ import (
 	apps_v1 "k8s.io/api/apps/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
+	networking_v1 "k8s.io/api/networking/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
 	rbac_v1beta1 "k8s.io/api/rbac/v1beta1"
 )
@@ -86,6 +87,8 @@ func New(obj interface{}, action string) Event {
 		kind = "cluster role"
 	case *api_v1.ServiceAccount:
 		kind = "service account"
+	case *networking_v1.NetworkPolicy:
+		kind = "network policy"
 	case Event:
 		name = object.Name
 		kind = object.Kind

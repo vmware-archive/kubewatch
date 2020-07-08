@@ -63,6 +63,7 @@ type Resource struct {
 	Secret                bool `json:"secret"`
 	ConfigMap             bool `json:"configmap"`
 	Ingress               bool `json:"ing"`
+	NetworkPolicy         bool `json:"np"`
 }
 
 // Config struct contains kubewatch configuration
@@ -252,6 +253,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.ServiceAccount && os.Getenv("KW_SERVICE_ACCOUNT") == "true" {
 		c.Resource.ServiceAccount = true
 	}
+    if !c.Resource.NetworkPolicy && os.Getenv("KW_NETWORK_POLICY") == "true" {
+        c.Resource.NetworkPolicy = true
+    }
 	if !c.Resource.ClusterRole && os.Getenv("KW_CLUSTER_ROLE") == "true" {
 		c.Resource.ClusterRole = true
 	}
