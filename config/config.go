@@ -53,7 +53,7 @@ type Resource struct {
 	ReplicationController bool `json:"rc"`
 	ReplicaSet            bool `json:"rs"`
 	DaemonSet             bool `json:"ds"`
-	Service               bool `json:"svc"`
+	Services              bool `json:"svc"`
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
 	Node                  bool `json:"node"`
@@ -80,7 +80,7 @@ type Config struct {
 	Handler Handler `json:"handler"`
 
 	//Reason   []string `json:"reason"`
-	Resource Resource `json:"resource,omitempty"`
+	Resource Resource `json:"resource"`
 	// for watching specific namespace, leave it empty for watching all.
 	// this config is ignored when watching namespaces
 	Event     Event  `json:"event,omitempty"`
@@ -236,8 +236,8 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	if !c.Resource.ReplicationController && os.Getenv("KW_REPLICATION_CONTROLLER") == "true" {
 		c.Resource.ReplicationController = true
 	}
-	if !c.Resource.Service && os.Getenv("KW_SERVICE") == "true" {
-		c.Resource.Service = true
+	if !c.Resource.Services && os.Getenv("KW_SERVICE") == "true" {
+		c.Resource.Services = true
 	}
 	if !c.Resource.Job && os.Getenv("KW_JOB") == "true" {
 		c.Resource.Job = true
@@ -294,7 +294,7 @@ func (c *Config) UnmarshallConfig() {
 		if c.Resource.ReplicationController {
 			c.Event.Global = append(c.Event.Global, "replicationcontroller")
 		}
-		if c.Resource.Service {
+		if c.Resource.Services {
 			c.Event.Global = append(c.Event.Global, "service")
 		}
 		if c.Resource.Job {
@@ -341,9 +341,9 @@ func (c *Config) configureEvents(s []string) {
 			{
 				c.Resource.DaemonSet = true
 			}
-		case "service":
+		case "services":
 			{
-				c.Resource.Service = true
+				c.Resource.Services = true
 			}
 		case "pod":
 			{

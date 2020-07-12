@@ -17,8 +17,8 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -83,7 +83,7 @@ func configureResource(operation string, cmd *cobra.Command, conf *config.Config
 	}{
 		{
 			"svc",
-			&conf.Resource.Service,
+			&conf.Resource.Services,
 		},
 		{
 			"deploy",
@@ -173,7 +173,7 @@ func init() {
 		resourceConfigRemoveCmd,
 	)
 	// Add resource object flags as PersistentFlags to resourceConfigCmd
-	resourceConfigCmd.PersistentFlags().Bool("svc", false, "watch for Service")
+	resourceConfigCmd.PersistentFlags().Bool("svc", false, "watch for services")
 	resourceConfigCmd.PersistentFlags().Bool("deploy", false, "watch for deployments")
 	resourceConfigCmd.PersistentFlags().Bool("po", false, "watch for pods")
 	resourceConfigCmd.PersistentFlags().Bool("rc", false, "watch for replication controllers")

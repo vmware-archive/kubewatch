@@ -39,7 +39,7 @@ var configStr = `
     	"replicationcontroller": "false",
     	"replicaset": "false",
     	"daemonset": "false",
-    	"Service": "false",
+    	"services": "false",
     	"pod": "false",
     	"secret": "true",
     	"configmap": "true",
