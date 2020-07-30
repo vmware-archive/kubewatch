@@ -8,8 +8,8 @@ import (
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rbac_v1beta1 "k8s.io/api/rbac/v1beta1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -55,7 +55,7 @@ func GetClientOutOfCluster() kubernetes.Interface {
 
 // GetObjectMetaData returns metadata of a given k8s object
 func GetObjectMetaData(obj interface{}) (objectMeta meta_v1.ObjectMeta) {
-	
+
 	switch object := obj.(type) {
 	case *apps_v1.Deployment:
 		objectMeta = object.ObjectMeta
