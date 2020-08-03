@@ -132,7 +132,7 @@ func (ms *MSTeams) Handle(e event.Event) {
 	card := &TeamsMessageCard{
 		Type:    messageType,
 		Context: context,
-		Title:   fmt.Sprintf("kubewatch"),
+		Title:   "kubewatch",
 		// Set a default Summary, this is required for Microsoft Teams
 		Summary: "kubewatch notification received",
 	}

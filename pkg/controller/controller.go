@@ -209,7 +209,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "daemonset")
+		c := newResourceController(kubeClient, eventHandler, informer, "daemon set")
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -231,7 +231,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "replicaset")
+		c := newResourceController(kubeClient, eventHandler, informer, "replica set")
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
