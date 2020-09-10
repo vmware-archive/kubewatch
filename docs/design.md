@@ -37,6 +37,7 @@ With each event get from k8s and matched filtering from configuration, it is pas
  - `MS Teams`: which send notification to MS Team incoming webhook based on information from config
  - `Slack`: which send notification to Slack channel based on information from config
  - `Smtp`: which sends notifications to email recipients using a SMTP server obtained from config
+ - `BaseCamp`: which sends notifications to a campfire room using a basecamp url obtained from config
 
 More handlers will be added in future.
 

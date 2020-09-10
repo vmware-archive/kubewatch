@@ -54,6 +54,8 @@ handler:
     requireTLS: false
     # SMTP hello field (optional)
     hello: ""
+  basecamp:
+    url: ""
 # Resources to watch.
 resource:
   deployment: false

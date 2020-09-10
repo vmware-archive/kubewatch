@@ -19,6 +19,7 @@ package handlers
 import (
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/basecamp"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/flock"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/hipchat"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
@@ -45,6 +46,7 @@ var Map = map[string]interface{}{
 	"webhook":    &webhook.Webhook{},
 	"ms-teams":   &msteam.MSTeams{},
 	"smtp":       &smtp.SMTP{},
+	"basecamp":   &basecamp.BaseCamp{},
 }
 
 // Default handler implements Handler interface,
