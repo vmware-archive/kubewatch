@@ -120,5 +120,6 @@ func init() {
 		webhookConfigCmd,
 		msteamsConfigCmd,
 		smtpConfigCmd,
+		basecampConfigCmd,
 	)
 }
