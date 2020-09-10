@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
-	"bytes"
-	"encoding/json"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/bitnami-labs/kubewatch/config"
@@ -46,11 +46,6 @@ Command line flags will override environment variables
 // Notify event to BaseCamp campfire
 type BaseCamp struct {
 	Url string
-}
-
-// BaseCampMessage for messages
-type BaseCampMessage struct {
-	content string `json:"text"`
 }
 
 // EventMeta contains the metadata about the occurred event
@@ -76,9 +71,7 @@ func (m *BaseCamp) Init(c *config.Config) error {
 
 // Handle handles an event.
 func (m *BaseCamp) Handle(e event.Event) {
-	basecampMessage := prepareBaseCampMessage(e, m)
-
-	err := postMessage(m.Url, basecampMessage)
+	err := postMessage(m.Url, e.Message())
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
@@ -95,23 +88,15 @@ func checkMissingBaseCampVars(s *BaseCamp) error {
 	return nil
 }
 
-func prepareBaseCampMessage(e event.Event, m *BaseCamp) *BaseCampMessage {
-	return &BaseCampMessage{
-		content: e.Message(),
-	}
-}
+func postMessage(basecampURL string, basecampMessage string) error {
+	data := url.Values{}
+	data.Set("content", basecampMessage)
 
-func postMessage(url string, basecampMessage *BaseCampMessage) error {
-	message, err := json.Marshal(basecampMessage)
+	req, err := http.NewRequest("POST", basecampURL, strings.NewReader(data.Encode()))
 	if err != nil {
 		return err
 	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(message))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
 	_, err = client.Do(req)
