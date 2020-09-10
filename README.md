@@ -183,7 +183,7 @@ INFO[0000] Kubewatch controller synced and ready         pkg=kubewatch-pod
 ```
 #### Using Docker:
 
-To Run Kubewatch Container interactively, place the config file in `$HOME/.kubewatch.yaml` location and use the following command. 
+To Run Kubewatch Container interactively, place the config file in `$HOME/.kubewatch.yaml` location and use the following command.
 
 ```
 docker run --rm -it --network host -v $HOME/.kubewatch.yaml:/root/.kubewatch.yaml -v $HOME/.kube/config:/opt/bitnami/kubewatch/.kube/config --name <container-name> bitnami/kubewatch
@@ -422,13 +422,11 @@ $ kubewatch resource remove --rc --po --svc
 
 ### Using go
 
-Clone the repository into your $GOPATH and then build it.
-```
-$ mkdir -p $GOPATH/src/github.com/bitnami-labs/
-$ cd $GOPATH/src/github.com/bitnami-labs/
+Clone the repository anywhere:
+```console
 $ git clone https://github.com/bitnami-labs/kubewatch.git
 $ cd kubewatch
-$ go build -o kubewatch main.go
+$ go build
 ```
 or
 
