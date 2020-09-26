@@ -333,7 +333,7 @@ resource:
   secret: false
   configmap: false
   ingress: false
-namespace: ""
+namespace: []
 
 ```
 
@@ -417,6 +417,12 @@ $ kubewatch resource add --rc --po --svc
 # rc, po and svc will be stopped from being watched
 $ kubewatch resource remove --rc --po --svc
 ```
+
+## Namespaces
+
+If a specific set of namespaces need to be applied to the filter, that can be done with the namepace configuration as shown in the [example config ](examples/conf/kubewatch.conf.multiple.namespaces.yaml).
+
+This functionality can be useful for clusters where one is not admin and is merely a tennant.
 
 # Build
 
