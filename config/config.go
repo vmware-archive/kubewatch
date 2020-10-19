@@ -63,6 +63,7 @@ type Resource struct {
 	Secret                bool `json:"secret"`
 	ConfigMap             bool `json:"configmap"`
 	Ingress               bool `json:"ing"`
+	StatefulSet           bool `json:"sts"`
 }
 
 // Config struct contains kubewatch configuration
@@ -248,6 +249,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.Node && os.Getenv("KW_NODE") == "true" {
 		c.Resource.Node = true
+	}
+	if !c.Resource.StatefulSet && os.Getenv("KW_STATEFULSET") == "true" {
+		c.Resource.StatefulSet = true
 	}
 	if !c.Resource.ServiceAccount && os.Getenv("KW_SERVICE_ACCOUNT") == "true" {
 		c.Resource.ServiceAccount = true

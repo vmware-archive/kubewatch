@@ -141,6 +141,10 @@ func configureResource(operation string, cmd *cobra.Command, conf *config.Config
 			"sa",
 			&conf.Resource.ServiceAccount,
 		},
+		{
+			"sts",
+			&conf.Resource.StatefulSet,
+		},
 	}
 
 	for _, flag := range flags {
@@ -188,4 +192,5 @@ func init() {
 	resourceConfigCmd.PersistentFlags().Bool("node", false, "watch for Nodes")
 	resourceConfigCmd.PersistentFlags().Bool("clusterrole", false, "watch for cluster roles")
 	resourceConfigCmd.PersistentFlags().Bool("sa", false, "watch for service accounts")
+	resourceConfigCmd.PersistentFlags().Bool("sts", false, "watch for stateful sets")
 }
