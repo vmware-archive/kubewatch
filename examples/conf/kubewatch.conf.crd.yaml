@@ -1,0 +1,20 @@
+handler:
+  slack:
+    token: ""
+    channel: ""
+  hipchat:
+    token: ""
+    room: ""
+    url: ""
+  mattermost:
+    channel: ""
+    url: ""
+    username: ""
+  flock:
+    url: ""
+  webhook:
+    url: "http://localhost:8080"
+crd:
+  apiVersion: core.oam.dev/v1alpha2
+  kind: ApplicationConfiguration
+
