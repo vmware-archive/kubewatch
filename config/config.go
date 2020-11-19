@@ -117,6 +117,12 @@ type Flock struct {
 type Webhook struct {
 	// Webhook URL.
 	Url string `json:"url"`
+	// HMACKey is a base64 encoded string to sign the webhook payload with
+	HMACKey string `json:"hmac_secret"`
+	// HMACSignatureHeader is the name of the http header to put the HMAC signature in.
+	// Defaults to "X-KubeWatch-Signature". The header value will be a hex encoded string of an
+	// HMAC signature using sha256.
+	HMACSignatureHeader string `json:"hmac_signature_header"`
 }
 
 // MSTeams contains MSTeams configuration

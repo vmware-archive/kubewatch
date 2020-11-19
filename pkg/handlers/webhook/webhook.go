@@ -17,6 +17,10 @@ limitations under the License.
 package webhook
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
@@ -45,7 +49,9 @@ Command line flags will override environment variables
 // Webhook handler implements handler.Handler interface,
 // Notify event to Webhook channel
 type Webhook struct {
-	Url string
+	Url                 string
+	HMACKey             []byte
+	HMACSignatureHeader string
 }
 
 // WebhookMessage for messages
@@ -66,12 +72,34 @@ type EventMeta struct {
 // Init prepares Webhook configuration
 func (m *Webhook) Init(c *config.Config) error {
 	url := c.Handler.Webhook.Url
+	hmacKey := c.Handler.Webhook.HMACKey
+	hmacSignatureHeader := c.Handler.Webhook.HMACSignatureHeader
 
 	if url == "" {
 		url = os.Getenv("KW_WEBHOOK_URL")
 	}
 
+	if hmacKey == "" {
+		hmacKey = os.Getenv("KW_WEBHOOK_HMAC_KEY")
+	}
+
+	if hmacSignatureHeader == "" {
+		hmacSignatureHeader = os.Getenv("KW_WEBHOOK_HMAC_SIGNATURE_HEADER")
+		if hmacSignatureHeader == "" {
+			hmacSignatureHeader = "X-KubeWatch-Signature"
+		}
+	}
+
 	m.Url = url
+	m.HMACSignatureHeader = hmacSignatureHeader
+
+	if hmacKey != "" {
+		hmacKeyDecoded, err := base64.StdEncoding.DecodeString(hmacKey)
+		if err != nil {
+			return err
+		}
+		m.HMACKey = hmacKeyDecoded
+	}
 
 	return checkMissingWebhookVars(m)
 }
@@ -80,7 +108,7 @@ func (m *Webhook) Init(c *config.Config) error {
 func (m *Webhook) Handle(e event.Event) {
 	webhookMessage := prepareWebhookMessage(e, m)
 
-	err := postMessage(m.Url, webhookMessage)
+	err := postMessage(m.Url, m.HMACKey, m.HMACSignatureHeader, webhookMessage)
 	if err != nil {
 		log.Printf("%s\n", err)
 		return
@@ -110,7 +138,7 @@ func prepareWebhookMessage(e event.Event, m *Webhook) *WebhookMessage {
 	}
 }
 
-func postMessage(url string, webhookMessage *WebhookMessage) error {
+func postMessage(url string, hmacKey []byte, hmacSignatureHeader string, webhookMessage *WebhookMessage) error {
 	message, err := json.Marshal(webhookMessage)
 	if err != nil {
 		return err
@@ -122,6 +150,11 @@ func postMessage(url string, webhookMessage *WebhookMessage) error {
 	}
 	req.Header.Add("Content-Type", "application/json")
 
+	if hmacKey != nil {
+		signature := getWebhookMessageSignature(hmacKey, message)
+		req.Header.Add(hmacSignatureHeader, signature)
+	}
+
 	client := &http.Client{}
 	_, err = client.Do(req)
 	if err != nil {
@@ -129,4 +162,11 @@ func postMessage(url string, webhookMessage *WebhookMessage) error {
 	}
 
 	return nil
+}
+
+func getWebhookMessageSignature(hmacKey, data []byte) string {
+	mac := hmac.New(sha256.New, hmacKey)
+	mac.Write(data)
+
+	return hex.EncodeToString(mac.Sum(nil))
 }

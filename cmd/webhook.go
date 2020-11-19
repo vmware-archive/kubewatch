@@ -42,6 +42,25 @@ var webhookConfigCmd = &cobra.Command{
 			logrus.Fatal(err)
 		}
 
+		hmacKey, err := cmd.Flags().GetString("hmac-key")
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		if hmacKey != "" {
+			conf.Handler.Webhook.HMACKey = hmacKey
+		}
+
+		hmacSignatureHeader, err := cmd.Flags().GetString("hmac-signature-header")
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		if hmacSignatureHeader != "" {
+			if conf.Handler.Webhook.HMACKey == "" {
+				logrus.Warn("HMAC signature header is set but HMAC key is empty")
+			}
+			conf.Handler.Webhook.HMACSignatureHeader = hmacSignatureHeader
+		}
+
 		if err = conf.Write(); err != nil {
 			logrus.Fatal(err)
 		}
@@ -50,4 +69,6 @@ var webhookConfigCmd = &cobra.Command{
 
 func init() {
 	webhookConfigCmd.Flags().StringP("url", "u", "", "Specify Webhook url")
+	webhookConfigCmd.Flags().String("hmac-key", "", "A base64 encoded string to generate a webhook signature with")
+	webhookConfigCmd.Flags().String("hmac-signature-header", "", "The name of the header to set the hmac signature value to")
 }
