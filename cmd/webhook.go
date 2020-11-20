@@ -55,10 +55,11 @@ var webhookConfigCmd = &cobra.Command{
 			logrus.Fatal(err)
 		}
 		if hmacSignatureHeader != "" {
-			if conf.Handler.Webhook.HMACKey == "" {
-				logrus.Warn("HMAC signature header is set but HMAC key is empty")
-			}
 			conf.Handler.Webhook.HMACSignatureHeader = hmacSignatureHeader
+		}
+
+		if conf.Handler.Webhook.HMACSignatureHeader != "" && conf.Handler.Webhook.HMACKey == "" {
+			logrus.Warn("HMAC signature header is set but HMAC key is empty")
 		}
 
 		if err = conf.Write(); err != nil {
