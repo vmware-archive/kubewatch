@@ -18,6 +18,7 @@ package controller
 
 import (
 	"fmt"
+	v1 "k8s.io/api/autoscaling/v1"
 	"os"
 	"os/signal"
 	"strings"
@@ -496,6 +497,28 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		)
 
 		c := newResourceController(kubeClient, eventHandler, informer, "ingress")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
+	if conf.Resource.HorizontalPodAutoscaler {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.AutoscalingV1().HorizontalPodAutoscalers(conf.Namespace).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.AutoscalingV1().HorizontalPodAutoscalers(conf.Namespace).Watch(options)
+				},
+			},
+			&v1.HorizontalPodAutoscaler{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "HorizontalPodAutoscaler")
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
