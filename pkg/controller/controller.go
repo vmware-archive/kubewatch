@@ -56,6 +56,8 @@ type Event struct {
 	eventType    string
 	namespace    string
 	resourceType string
+	obj          runtime.Object 
+	oldObj       runtime.Object
 }
 
 // Controller object
@@ -67,6 +69,7 @@ type Controller struct {
 	eventHandler handlers.Handler
 }
 
+// TODO: we don't need the informer to be indexed
 // Start prepares watchers and run their controllers, then waits for process termination signals
 func Start(conf *config.Config, eventHandler handlers.Handler) {
 	var kubeClient kubernetes.Interface
@@ -77,6 +80,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		kubeClient = utils.GetClient()
 	}
 
+	// TODO: simplify this part and register to all event changes, period
 	// Adding Default Critical Alerts
 	// For Capturing Critical Event NodeNotReady in Nodes
 	nodeNotReadyInformer := cache.NewSharedIndexInformer(
@@ -514,28 +518,47 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 	var err error
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
+			var ok bool
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "create"
 			newEvent.resourceType = resourceType
+			newEvent.obj, ok = obj.(runtime.Object)
+			if !ok {
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for add on %v", obj)	
+			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
 			}
 		},
 		UpdateFunc: func(old, new interface{}) {
+			var ok bool
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(old)
 			newEvent.eventType = "update"
 			newEvent.resourceType = resourceType
+			newEvent.obj, ok = new.(runtime.Object)
+			if !ok {
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for update on %v", new)	
+			}
+			newEvent.oldObj, ok = new.(runtime.Object)
+			if !ok {
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert old to runtime.Object for update on %v", old)	
+			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
+			var ok bool
 			newEvent.key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "delete"
 			newEvent.resourceType = resourceType
 			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
+			newEvent.obj, ok = obj.(runtime.Object)
+			if !ok {
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for delete on %v", obj)	
+			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, newEvent.key)
 			if err == nil {
 				queue.Add(newEvent)
@@ -619,7 +642,9 @@ func (c *Controller) processNextItem() bool {
 */
 
 func (c *Controller) processItem(newEvent Event) error {
+	// NOTE that obj will be nil on deletes!
 	obj, _, err := c.informer.GetIndexer().GetByKey(newEvent.key)
+	
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", newEvent.key, err)
 	}
@@ -660,6 +685,7 @@ func (c *Controller) processItem(newEvent Event) error {
 				Kind:      newEvent.resourceType,
 				Status:    status,
 				Reason:    "Created",
+				Obj:       newEvent.obj,
 			}
 			c.eventHandler.Handle(kbEvent)
 			return nil
@@ -680,6 +706,8 @@ func (c *Controller) processItem(newEvent Event) error {
 			Kind:      newEvent.resourceType,
 			Status:    status,
 			Reason:    "Updated",
+			Obj:       newEvent.obj,
+			OldObj:    newEvent.oldObj,
 		}
 		c.eventHandler.Handle(kbEvent)
 		return nil
@@ -690,6 +718,7 @@ func (c *Controller) processItem(newEvent Event) error {
 			Kind:      newEvent.resourceType,
 			Status:    "Danger",
 			Reason:    "Deleted",
+			Obj:       newEvent.obj,
 		}
 		c.eventHandler.Handle(kbEvent)
 		return nil

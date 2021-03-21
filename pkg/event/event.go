@@ -15,6 +15,7 @@ package event
 
 import (
 	"fmt"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Event represent an event got from k8s api server
@@ -28,6 +29,8 @@ type Event struct {
 	Reason    string
 	Status    string
 	Name      string
+	Obj       runtime.Object
+	OldObj    runtime.Object
 }
 
 var m = map[string]string{
