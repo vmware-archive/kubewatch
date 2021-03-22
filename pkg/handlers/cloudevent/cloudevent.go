@@ -66,8 +66,8 @@ type CloudEventMessage struct {
 type CloudEventMessageData struct {
 	Operation   string         `json:"operation"`
 	Kind        string         `json:"kind"`
-	ClusterUid  string         `json:"clusteruid`
-	Description string         `json:description"`
+	ClusterUid  string         `json:"clusteruid"`
+	Description string         `json:"description"`
 	Obj         runtime.Object `json:"obj"`
 	OldObj      runtime.Object `json:"oldObj"`
 }
