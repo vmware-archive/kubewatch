@@ -118,6 +118,7 @@ func init() {
 		mattermostConfigCmd,
 		flockConfigCmd,
 		webhookConfigCmd,
+		cloudEventConfigCmd,
 		msteamsConfigCmd,
 		smtpConfigCmd,
 	)

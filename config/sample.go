@@ -26,6 +26,9 @@ handler:
   webhook:
     # Webhook URL.
     url: ""
+  cloudevent:
+    # CloudEvent webhook URL.
+    url: ""
   msteams:
     # MSTeams API Webhook URL.
     webhookurl: ""

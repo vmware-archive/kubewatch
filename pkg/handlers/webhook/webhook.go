@@ -28,7 +28,6 @@ import (
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 var webhookErrMsg = `
@@ -54,8 +53,6 @@ type WebhookMessage struct {
 	EventMeta EventMeta `json:"eventmeta"`
 	Text      string    `json:"text"`
 	Time      time.Time `json:"time"`
-	Obj       runtime.Object `json:"obj"`
-	OldObj    runtime.Object `json:"oldObj"`
 }
 
 // EventMeta containes the meta data about the event occurred
@@ -110,8 +107,6 @@ func prepareWebhookMessage(e event.Event, m *Webhook) *WebhookMessage {
 		},
 		Text: e.Message(),
 		Time: time.Now(),
-		Obj: e.Obj,
-		OldObj: e.OldObj,
 	}
 }
 

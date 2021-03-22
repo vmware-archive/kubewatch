@@ -42,6 +42,7 @@ type Handler struct {
 	Mattermost Mattermost `json:"mattermost"`
 	Flock      Flock      `json:"flock"`
 	Webhook    Webhook    `json:"webhook"`
+	CloudEvent CloudEvent `json:"cloudevent"`
 	MSTeams    MSTeams    `json:"msteams"`
 	SMTP       SMTP       `json:"smtp"`
 }
@@ -116,6 +117,11 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	// Webhook URL.
+	Url string `json:"url"`
+}
+
+// CloudEvent contains CloudEvent configuration
+type CloudEvent struct {
 	Url string `json:"url"`
 }
 
