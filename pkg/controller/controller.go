@@ -540,7 +540,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			if !ok {
 				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for update on %v", new)	
 			}
-			newEvent.oldObj, ok = new.(runtime.Object)
+			newEvent.oldObj, ok = old.(runtime.Object)
 			if !ok {
 				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert old to runtime.Object for update on %v", old)	
 			}
