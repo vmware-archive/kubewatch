@@ -56,7 +56,7 @@ type Event struct {
 	eventType    string
 	namespace    string
 	resourceType string
-	obj          runtime.Object 
+	obj          runtime.Object
 	oldObj       runtime.Object
 }
 
@@ -80,17 +80,14 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		kubeClient = utils.GetClient()
 	}
 
-	// TODO: simplify this part and register to all event changes, period
-	// Adding Default Critical Alerts
-	// For Capturing Critical Event NodeNotReady in Nodes
-	nodeNotReadyInformer := cache.NewSharedIndexInformer(
+	allEventsInformer := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeNotReady"
+				options.FieldSelector = ""
 				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
 			},
 			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeNotReady"
+				options.FieldSelector = ""
 				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
 			},
 		},
@@ -99,104 +96,11 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		cache.Indexers{},
 	)
 
-	nodeNotReadyController := newResourceController(kubeClient, eventHandler, nodeNotReadyInformer, "NodeNotReady")
-	stopNodeNotReadyCh := make(chan struct{})
-	defer close(stopNodeNotReadyCh)
+	allEventsController := newResourceController(kubeClient, eventHandler, allEventsInformer, "Event")
+	stopAllEventsCh := make(chan struct{})
+	defer close(stopAllEventsCh)
 
-	go nodeNotReadyController.Run(stopNodeNotReadyCh)
-
-	// For Capturing Critical Event NodeReady in Nodes
-	nodeReadyInformer := cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeReady"
-				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
-			},
-			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Normal,reason=NodeReady"
-				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
-			},
-		},
-		&api_v1.Event{},
-		0, //Skip resync
-		cache.Indexers{},
-	)
-
-	nodeReadyController := newResourceController(kubeClient, eventHandler, nodeReadyInformer, "NodeReady")
-	stopNodeReadyCh := make(chan struct{})
-	defer close(stopNodeReadyCh)
-
-	go nodeReadyController.Run(stopNodeReadyCh)
-
-	// For Capturing Critical Event NodeRebooted in Nodes
-	nodeRebootedInformer := cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Warning,reason=Rebooted"
-				return kubeClient.CoreV1().Events(conf.Namespace).List(options)
-			},
-			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-				options.FieldSelector = "involvedObject.kind=Node,type=Warning,reason=Rebooted"
-				return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
-			},
-		},
-		&api_v1.Event{},
-		0, //Skip resync
-		cache.Indexers{},
-	)
-
-	nodeRebootedController := newResourceController(kubeClient, eventHandler, nodeRebootedInformer, "NodeRebooted")
-	stopNodeRebootedCh := make(chan struct{})
-	defer close(stopNodeRebootedCh)
-
-	go nodeRebootedController.Run(stopNodeRebootedCh)
-
-	// User Configured Events
-	if conf.Resource.Pod {
-		informer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					return kubeClient.CoreV1().Pods(conf.Namespace).List(options)
-				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					return kubeClient.CoreV1().Pods(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.Pod{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
-
-		c := newResourceController(kubeClient, eventHandler, informer, "pod")
-		stopCh := make(chan struct{})
-		defer close(stopCh)
-
-		go c.Run(stopCh)
-
-		// For Capturing CrashLoopBackOff Events in pods
-		backoffInformer := cache.NewSharedIndexInformer(
-			&cache.ListWatch{
-				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					options.FieldSelector = "involvedObject.kind=Pod,type=Warning,reason=BackOff"
-					return kubeClient.CoreV1().Events(conf.Namespace).List(options)
-				},
-				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					options.FieldSelector = "involvedObject.kind=Pod,type=Warning,reason=BackOff"
-					return kubeClient.CoreV1().Events(conf.Namespace).Watch(options)
-				},
-			},
-			&api_v1.Event{},
-			0, //Skip resync
-			cache.Indexers{},
-		)
-
-		backoffcontroller := newResourceController(kubeClient, eventHandler, backoffInformer, "Backoff")
-		stopBackoffCh := make(chan struct{})
-		defer close(stopBackoffCh)
-
-		go backoffcontroller.Run(stopBackoffCh)
-
-	}
+	go allEventsController.Run(stopAllEventsCh)
 
 	if conf.Resource.DaemonSet {
 		informer := cache.NewSharedIndexInformer(
@@ -524,7 +428,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.resourceType = resourceType
 			newEvent.obj, ok = obj.(runtime.Object)
 			if !ok {
-				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for add on %v", obj)	
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for add on %v", obj)
 			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
 			if err == nil {
@@ -538,11 +442,11 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.resourceType = resourceType
 			newEvent.obj, ok = new.(runtime.Object)
 			if !ok {
-				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for update on %v", new)	
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for update on %v", new)
 			}
 			newEvent.oldObj, ok = old.(runtime.Object)
 			if !ok {
-				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert old to runtime.Object for update on %v", old)	
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert old to runtime.Object for update on %v", old)
 			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, newEvent.key)
 			if err == nil {
@@ -557,7 +461,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
 			newEvent.obj, ok = obj.(runtime.Object)
 			if !ok {
-				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for delete on %v", obj)	
+				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for delete on %v", obj)
 			}
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, newEvent.key)
 			if err == nil {
@@ -644,7 +548,7 @@ func (c *Controller) processNextItem() bool {
 func (c *Controller) processItem(newEvent Event) error {
 	// NOTE that obj will be nil on deletes!
 	obj, _, err := c.informer.GetIndexer().GetByKey(newEvent.key)
-	
+
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", newEvent.key, err)
 	}
