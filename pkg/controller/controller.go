@@ -102,6 +102,29 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 
 	go allEventsController.Run(stopAllEventsCh)
 
+	// User Configured Events
+	if conf.Resource.Pod {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.CoreV1().Pods(conf.Namespace).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.CoreV1().Pods(conf.Namespace).Watch(options)
+				},
+			},
+			&api_v1.Pod{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "pod")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
 	if conf.Resource.DaemonSet {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
