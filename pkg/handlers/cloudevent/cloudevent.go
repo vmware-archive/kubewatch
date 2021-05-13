@@ -68,6 +68,7 @@ type CloudEventMessageData struct {
 	Kind        string         `json:"kind"`
 	ClusterUid  string         `json:"clusterUid"`
 	Description string         `json:"description"`
+	ApiVersion  string         `json:"apiVersion"`
 	Obj         runtime.Object `json:"obj"`
 	OldObj      runtime.Object `json:"oldObj"`
 }
@@ -112,6 +113,7 @@ func (m *CloudEvent) prepareMessage(e event.Event) *CloudEventMessage {
 		Data: CloudEventMessageData{
 			Operation:   m.formatReason(e),
 			Kind:        e.Kind,
+			ApiVersion:  e.ApiVersion,
 			ClusterUid:  "TODO",
 			Description: e.Message(),
 			Obj:         e.Obj,

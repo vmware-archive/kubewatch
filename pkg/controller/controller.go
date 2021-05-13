@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"reflect"
 	"strings"
 	"syscall"
 	"time"
@@ -47,6 +48,11 @@ import (
 )
 
 const maxRetries = 5
+const V1 = "v1"
+const APPS_V1 = "apps/v1"
+const BATCH_V1 = "batch/v1"
+const RBAC_V1 = "rbac.authorization.k8s.io/v1"
+const EXT_V1BETA = "extensions/v1beta1"
 
 var serverStartTime time.Time
 
@@ -56,6 +62,7 @@ type Event struct {
 	eventType    string
 	namespace    string
 	resourceType string
+	apiVersion   string
 	obj          runtime.Object
 	oldObj       runtime.Object
 }
@@ -67,6 +74,10 @@ type Controller struct {
 	queue        workqueue.RateLimitingInterface
 	informer     cache.SharedIndexInformer
 	eventHandler handlers.Handler
+}
+
+func objName(obj interface{}) string {
+	return reflect.TypeOf(obj).Name()
 }
 
 // TODO: we don't need the informer to be indexed
@@ -96,7 +107,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		cache.Indexers{},
 	)
 
-	allEventsController := newResourceController(kubeClient, eventHandler, allEventsInformer, "Event")
+	allEventsController := newResourceController(kubeClient, eventHandler, allEventsInformer, objName(api_v1.Event{}), V1)
 	stopAllEventsCh := make(chan struct{})
 	defer close(stopAllEventsCh)
 
@@ -118,7 +129,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "pod")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.Pod{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -140,7 +151,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "daemon set")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(apps_v1.DaemonSet{}), APPS_V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -162,7 +173,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "replica set")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(apps_v1.ReplicaSet{}), APPS_V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -184,7 +195,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "service")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.Service{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -206,7 +217,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "deployment")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(apps_v1.Deployment{}), APPS_V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -228,7 +239,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "namespace")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.Namespace{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -250,7 +261,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "replication controller")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.ReplicationController{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -272,7 +283,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "job")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(batch_v1.Job{}), BATCH_V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -294,7 +305,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "node")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.Node{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -316,7 +327,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "service account")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.ServiceAccount{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -338,7 +349,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "cluster role")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(rbac_v1beta1.ClusterRole{}), RBAC_V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -360,7 +371,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "persistent volume")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.PersistentVolume{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -382,7 +393,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "secret")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.Secret{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -404,7 +415,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "configmap")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(api_v1.ConfigMap{}), V1)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -426,7 +437,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 			cache.Indexers{},
 		)
 
-		c := newResourceController(kubeClient, eventHandler, informer, "ingress")
+		c := newResourceController(kubeClient, eventHandler, informer, objName(ext_v1beta1.Ingress{}), EXT_V1BETA)
 		stopCh := make(chan struct{})
 		defer close(stopCh)
 
@@ -439,7 +450,7 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 	<-sigterm
 }
 
-func newResourceController(client kubernetes.Interface, eventHandler handlers.Handler, informer cache.SharedIndexInformer, resourceType string) *Controller {
+func newResourceController(client kubernetes.Interface, eventHandler handlers.Handler, informer cache.SharedIndexInformer, resourceType string, apiVersion string) *Controller {
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	var newEvent Event
 	var err error
@@ -449,6 +460,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "create"
 			newEvent.resourceType = resourceType
+			newEvent.apiVersion = apiVersion
 			newEvent.obj, ok = obj.(runtime.Object)
 			if !ok {
 				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for add on %v", obj)
@@ -463,6 +475,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(old)
 			newEvent.eventType = "update"
 			newEvent.resourceType = resourceType
+			newEvent.apiVersion = apiVersion
 			newEvent.obj, ok = new.(runtime.Object)
 			if !ok {
 				logrus.WithField("pkg", "kubewatch-"+resourceType).Errorf("cannot convert to runtime.Object for update on %v", new)
@@ -481,6 +494,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.key, err = cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "delete"
 			newEvent.resourceType = resourceType
+			newEvent.apiVersion = apiVersion
 			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
 			newEvent.obj, ok = obj.(runtime.Object)
 			if !ok {
@@ -607,12 +621,13 @@ func (c *Controller) processItem(newEvent Event) error {
 				status = "Normal"
 			}
 			kbEvent := event.Event{
-				Name:      objectMeta.Name,
-				Namespace: newEvent.namespace,
-				Kind:      newEvent.resourceType,
-				Status:    status,
-				Reason:    "Created",
-				Obj:       newEvent.obj,
+				Name:       objectMeta.Name,
+				Namespace:  newEvent.namespace,
+				Kind:       newEvent.resourceType,
+				ApiVersion: newEvent.apiVersion,
+				Status:     status,
+				Reason:     "Created",
+				Obj:        newEvent.obj,
 			}
 			c.eventHandler.Handle(kbEvent)
 			return nil
@@ -628,24 +643,26 @@ func (c *Controller) processItem(newEvent Event) error {
 			status = "Warning"
 		}
 		kbEvent := event.Event{
-			Name:      newEvent.key,
-			Namespace: newEvent.namespace,
-			Kind:      newEvent.resourceType,
-			Status:    status,
-			Reason:    "Updated",
-			Obj:       newEvent.obj,
-			OldObj:    newEvent.oldObj,
+			Name:       newEvent.key,
+			Namespace:  newEvent.namespace,
+			Kind:       newEvent.resourceType,
+			ApiVersion: newEvent.apiVersion,
+			Status:     status,
+			Reason:     "Updated",
+			Obj:        newEvent.obj,
+			OldObj:     newEvent.oldObj,
 		}
 		c.eventHandler.Handle(kbEvent)
 		return nil
 	case "delete":
 		kbEvent := event.Event{
-			Name:      newEvent.key,
-			Namespace: newEvent.namespace,
-			Kind:      newEvent.resourceType,
-			Status:    "Danger",
-			Reason:    "Deleted",
-			Obj:       newEvent.obj,
+			Name:       newEvent.key,
+			Namespace:  newEvent.namespace,
+			Kind:       newEvent.resourceType,
+			ApiVersion: newEvent.apiVersion,
+			Status:     "Danger",
+			Reason:     "Deleted",
+			Obj:        newEvent.obj,
 		}
 		c.eventHandler.Handle(kbEvent)
 		return nil

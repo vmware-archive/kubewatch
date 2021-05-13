@@ -22,15 +22,16 @@ import (
 // Events from different endpoints need to be casted to KubewatchEvent
 // before being able to be handled by handler
 type Event struct {
-	Namespace string
-	Kind      string
-	Component string
-	Host      string
-	Reason    string
-	Status    string
-	Name      string
-	Obj       runtime.Object
-	OldObj    runtime.Object
+	Namespace  string
+	Kind       string
+	ApiVersion string
+	Component  string
+	Host       string
+	Reason     string
+	Status     string
+	Name       string
+	Obj        runtime.Object
+	OldObj     runtime.Object
 }
 
 var m = map[string]string{
@@ -38,7 +39,6 @@ var m = map[string]string{
 	"deleted": "Danger",
 	"updated": "Warning",
 }
-
 
 // Message returns event message in standard format.
 // included as a part of event packege to enhance code resuablity across handlers.
