@@ -24,6 +24,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/msteam"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slackwebhook"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/smtp"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
@@ -37,14 +38,15 @@ type Handler interface {
 
 // Map maps each event handler function to a name for easily lookup
 var Map = map[string]interface{}{
-	"default":    &Default{},
-	"slack":      &slack.Slack{},
-	"hipchat":    &hipchat.Hipchat{},
-	"mattermost": &mattermost.Mattermost{},
-	"flock":      &flock.Flock{},
-	"webhook":    &webhook.Webhook{},
-	"ms-teams":   &msteam.MSTeams{},
-	"smtp":       &smtp.SMTP{},
+	"default":      &Default{},
+	"slack":        &slack.Slack{},
+	"slackwebhook": &slackwebhook.SlackWebhook{},
+	"hipchat":      &hipchat.Hipchat{},
+	"mattermost":   &mattermost.Mattermost{},
+	"flock":        &flock.Flock{},
+	"webhook":      &webhook.Webhook{},
+	"ms-teams":     &msteam.MSTeams{},
+	"smtp":         &smtp.SMTP{},
 }
 
 // Default handler implements Handler interface,

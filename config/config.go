@@ -37,13 +37,14 @@ var (
 
 // Handler contains handler configuration
 type Handler struct {
-	Slack      Slack      `json:"slack"`
-	Hipchat    Hipchat    `json:"hipchat"`
-	Mattermost Mattermost `json:"mattermost"`
-	Flock      Flock      `json:"flock"`
-	Webhook    Webhook    `json:"webhook"`
-	MSTeams    MSTeams    `json:"msteams"`
-	SMTP       SMTP       `json:"smtp"`
+	Slack        Slack        `json:"slack"`
+	SlackWebhook SlackWebhook `json:"slackwebhook"`
+	Hipchat      Hipchat      `json:"hipchat"`
+	Mattermost   Mattermost   `json:"mattermost"`
+	Flock        Flock        `json:"flock"`
+	Webhook      Webhook      `json:"webhook"`
+	MSTeams      MSTeams      `json:"msteams"`
+	SMTP         SMTP         `json:"smtp"`
 }
 
 // Resource contains resource configuration
@@ -88,6 +89,18 @@ type Slack struct {
 	Channel string `json:"channel"`
 	// Title of the message.
 	Title string `json:"title"`
+}
+
+// SlackWebhook contains slack configuration
+type SlackWebhook struct {
+	// Slack channel.
+	Channel string `json:"channel"`
+	// Slack Username.
+	Username string `json:"username"`
+	// Slack Emoji.
+	Emoji string `json:"emoji"`
+	// Slack Webhook Url.
+	Slackwebhookurl string `json:"slackwebhookurl"`
 }
 
 // Hipchat contains hipchat configuration

@@ -114,6 +114,7 @@ func init() {
 
 	configAddCmd.AddCommand(
 		slackConfigCmd,
+		slackwebhookConfigCmd,
 		hipchatConfigCmd,
 		mattermostConfigCmd,
 		flockConfigCmd,
