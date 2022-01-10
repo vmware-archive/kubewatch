@@ -42,11 +42,9 @@ import (
 	"log"
 	"os"
 
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
 	"time"
+
+	"github.com/slack-go/slack"
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
@@ -74,30 +72,6 @@ type SlackWebhook struct {
 	Username        string
 	Emoji           string
 	Slackwebhookurl string
-}
-
-// SlackWebhookMessage for messages
-type WebhookMessage struct {
-	Username        string       `json:"username,omitempty"`
-	IconEmoji       string       `json:"icon_emoji,omitempty"`
-	IconURL         string       `json:"icon_url,omitempty"`
-	Channel         string       `json:"channel,omitempty"`
-	ThreadTimestamp string       `json:"thread_ts,omitempty"`
-	Text            string       `json:"text,omitempty"`
-	Attachments     []Attachment `json:"attachments,omitempty"`
-	Parse           string       `json:"parse,omitempty"`
-	Blocks          *Blocks      `json:"blocks,omitempty"`
-	ResponseType    string       `json:"response_type,omitempty"`
-	ReplaceOriginal bool         `json:"replace_original,omitempty"`
-	DeleteOriginal  bool         `json:"delete_original,omitempty"`
-}
-
-// EventMeta containes the meta data about the event occurred
-type EventMeta struct {
-	Kind      string `json:"kind"`
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
-	Reason    string `json:"reason"`
 }
 
 // Init prepares Webhook configuration
@@ -130,20 +104,24 @@ func (m *SlackWebhook) Init(c *config.Config) error {
 
 // Handle handles an event.
 func (m *SlackWebhook) Handle(e event.Event) {
-	webhookMessage := prepareWebhookMessage(e, m)
 
-	var whmessage, _ = json.Marshal(webhookMessage)
+	webhookMessage := slack.WebhookMessage{
+		Channel:   m.Channel,
+		Username:  m.Username,
+		Text:      e.Message(),
+		IconEmoji: m.Emoji,
+	}
 
 	log.Printf("slackwebhook-handle():Slackwebhook WebHookMessage: %s", webhookMessage)
-	fmt.Println("slackwebhook-handle():Slackwebhook WebHookMessage JSON: ", string(whmessage))
 
-	err := postMessage(m.Slackwebhookurl, webhookMessage)
+	err := slack.PostWebhook(m.Slackwebhookurl, &webhookMessage)
+
 	if err != nil {
 		log.Printf("slackwebhook-handle() Error: %s\n", err)
 		return
 	}
 
-	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), whmessage)
+	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), string(webhookMessage))
 }
 
 func checkMissingWebhookVars(s *SlackWebhook) error {
@@ -155,69 +133,6 @@ func checkMissingWebhookVars(s *SlackWebhook) error {
 	}
 	if s.Slackwebhookurl == "" {
 		return fmt.Errorf(webhookErrMsg, "Missing Slack Webhook url")
-	}
-
-	return nil
-}
-
-func prepareWebhookMessage(e event.Event, m *SlackWebhook) *WebhookMessage {
-
-	var eventmetamsg = EventMeta{
-		Kind:      e.Kind,
-		Name:      e.Name,
-		Namespace: e.Namespace,
-		Reason:    e.Reason,
-	}
-	eventmetamsgjson := json.Marshaler(eventmetamsg)
-
-	whmsg := &WebhookMessage{
-		Channel:   m.Channel,
-		Username:  m.Username,
-		Text:      eventmetamsgjson,
-		IconEmoji: m.Emoji,
-	}
-
-	return whmsg
-}
-
-func postMessage(slackwebhookurl string, webhookMessage *WebhookMessage) error {
-	message, err := json.Marshal(webhookMessage)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("slackwebhook-postMessage(): Slackwebhook Message: %s", message)
-	fmt.Println("slackwebhook-postMessage(): Slackwebhook Message JSON:", string(message))
-
-	req, err := http.NewRequest("POST", slackwebhookurl, bytes.NewBuffer(message))
-
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	log.Printf("slackwebhook-postMessage(): Slackwebhook Request: %s", req)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	if resp != nil {
-
-		defer resp.Body.Close()
-
-		log.Printf("slackwebhook-postMessage(): Slackwebhook Response: %s", resp)
-		fmt.Println("Slackwebhook Response Status:", resp.Status)
-		fmt.Println("Slackwebhook Response Headers:", resp.Header)
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal("Error reading body. ", err)
-		}
-
-		fmt.Printf("Slackwebhook Response Body: %s\n", body)
 	}
 
 	return nil
