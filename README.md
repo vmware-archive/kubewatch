@@ -19,6 +19,7 @@ for resource changes and notifies them through webhooks.
 
 supported webhooks:
  - slack
+ - slackwebhook
  - hipchat
  - mattermost
  - flock
@@ -256,6 +257,72 @@ Use "kubewatch config [command] --help" for more information about a command.
   $ export KW_SLACK_TOKEN='XXXXXXXXXXXXXXXX'
   $ export KW_SLACK_CHANNEL='#channel_name'
   ```
+
+### slackwebhookurl:
+
+- Create a [slack app](https://api.slack.com/apps/new)
+
+- Enable Incoming Webhooks. (On "Settings" page.)
+
+- Create an incoming webhook URL (Add New Webhook to Workspace on "Settings" page.)
+
+- Pick a channel that the app will post to, and then click to Authorize your app. You will get back your webhook URL.  
+  The Slack Webhook URL will look like: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+
+- Add slack webhook url to kubewatch config using the following steps
+
+  ```console
+  $ kubewatch config add slackwebhookurl --username <slack_username> --token <slack_token> -emoji <slack_emoji> --slackwebhookurl <slack_webhook_url>
+  ```
+  Or, you have an altenative choice to set your SLACK channel, username, emoji and webhook URL via environment variables:
+
+  ```console
+  $ export KW_SLACK_CHANNEL=slack_channel
+  $ export KW_SLACK_USERNAME=slack_username
+  $ export KW_SLACK_EMOJI=slack_emoji
+  $ export KW_SLACK_WEBHOOK_URL=slack_webhook_url
+  ```
+  
+ - Example apply done in a bash script:  
+  
+ ```console
+ $ cat kubewatch-configmap-slackwebhook.yaml | sed "s|<slackchannel>|"\"$SlackChannel"\"|g;s|<slackusername>|"\"$SlackUsesrName"\"|g;s|<slackemoji>|"\"$SlackEmoji"\"|g;s|<SlackWebhookUrl>|"\"$WebhookUrl"\"|g" | kubectl create -f -
+ ```
+ 
+ - An example kubewatch-configmap-slackwebhook.yaml YAML File:  
+  
+ ```yaml
+ apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubewatch
+data:
+  .kubewatch.yaml: |
+    namespace: ""
+    handler:
+      slackwebhook:
+        enabled: true
+        channel: <slackchannel>
+        username: <slackusername>
+        emoji: <slackemoji>
+        slackwebhookurl: <SlackWebhookUrl>
+    resource:
+      clusterrole: false
+      configmap: false
+      daemonset: false
+      deployment: true
+      ingress: false
+      job: false
+      namespace: false
+      node: false
+      persistentvolume: false
+      pod: true
+      replicaset: false
+      replicationcontroller: false
+      secret: false
+      serviceaccount: false
+      services: true
+    ```
 
 ### flock:
 
