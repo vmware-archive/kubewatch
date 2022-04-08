@@ -1,6 +1,6 @@
 ## WARNING: Kubewatch is no longer actively maintained by VMware.
 
-VMware has made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. If you would like to take over maintaining this project independently from VMware, please let us know so we can add a link to your forked project here.
+VMware has made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. The project will be externally maintained in the following fork: https://github.com/robusta-dev/kubewatch
 
 Thank You.
 
