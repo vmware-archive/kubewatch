@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	nyaml "github.com/ghodss/yaml"
 	"gopkg.in/yaml.v3"
 )
 
@@ -75,9 +76,20 @@ type Config struct {
 	// Resources to watch.
 	Resource Resource `json:"resource"`
 
+	// For watching specific CRD and CRD.
+	CRD *TypedReference `json:"crd,omitempty"`
+
 	// For watching specific namespace, leave it empty for watching all.
 	// this config is ignored when watching namespaces
 	Namespace string `json:"namespace,omitempty"`
+}
+
+type TypedReference struct {
+	// APIVersion of the referenced object.
+	APIVersion string `json:"apiVersion",yaml:"apiVersion"`
+
+	// Kind of the referenced object.
+	Kind string `json:"kind"`
 }
 
 // Slack contains slack configuration
@@ -202,7 +214,7 @@ func (c *Config) Load() error {
 	}
 
 	if len(b) != 0 {
-		return yaml.Unmarshal(b, c)
+		return nyaml.Unmarshal(b, c)
 	}
 
 	return nil
