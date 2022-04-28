@@ -1,0 +1,13 @@
+handler:
+  basecamp:
+    url: "https://3.basecamp.com/ID_A/integrations/ID_B/buckets/ID_C/chats/ID_D/lines"
+resource:
+  deployment: true
+  replicationcontroller: false
+  replicaset: false
+  daemonset: false
+  services: false
+  pod: false
+  job: false
+  persistentvolume: false
+  ingress: false
