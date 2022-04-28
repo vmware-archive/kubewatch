@@ -630,9 +630,11 @@ func (c *Controller) processItem(newEvent Event) error {
 	var status string
 
 	// namespace retrived from event key incase namespace value is empty
-	if newEvent.namespace == "" && strings.Contains(newEvent.key, "/") {
+	if strings.Contains(newEvent.key, "/") {
 		substring := strings.Split(newEvent.key, "/")
-		newEvent.namespace = substring[0]
+		if newEvent.namespace == "" {
+			newEvent.namespace = substring[0]
+		}
 		newEvent.key = substring[1]
 	}
 
@@ -655,7 +657,7 @@ func (c *Controller) processItem(newEvent Event) error {
 				status = "Normal"
 			}
 			kbEvent := event.Event{
-				Name:      objectMeta.Name,
+				Name:      newEvent.key,
 				Namespace: newEvent.namespace,
 				Kind:      newEvent.resourceType,
 				Status:    status,
