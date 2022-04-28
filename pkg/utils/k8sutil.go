@@ -7,6 +7,7 @@ import (
 	apps_v1 "k8s.io/api/apps/v1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
+	networking_v1 "k8s.io/api/networking/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
 	rbac_v1beta1 "k8s.io/api/rbac/v1beta1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -85,6 +86,8 @@ func GetObjectMetaData(obj interface{}) (objectMeta meta_v1.ObjectMeta) {
 		objectMeta = object.ObjectMeta
 	case *api_v1.ServiceAccount:
 		objectMeta = object.ObjectMeta
+	case *networking_v1.NetworkPolicy:
+        objectMeta = object.ObjectMeta
 	case *api_v1.Event:
 		objectMeta = object.ObjectMeta
 	}

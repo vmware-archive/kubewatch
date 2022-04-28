@@ -44,6 +44,7 @@ var configStr = `
     	"secret": "true",
     	"configmap": "true",
         "ingress": "false",
+        "networkpolicy": "true",
     },
 }
 `
