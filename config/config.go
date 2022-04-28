@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -65,18 +66,24 @@ type Resource struct {
 	Ingress               bool `json:"ing"`
 }
 
+// Event struct for granular config
+type Event struct {
+	Global []string `json:"string,omitempty"`
+	Create []string `json:"create,omitempty"`
+	Update []string `json:"update,omitempty"`
+	Delete []string `json:"delete,omitempty"`
+}
+
 // Config struct contains kubewatch configuration
 type Config struct {
 	// Handlers know how to send notifications to specific services.
 	Handler Handler `json:"handler"`
 
 	//Reason   []string `json:"reason"`
-
-	// Resources to watch.
 	Resource Resource `json:"resource"`
-
-	// For watching specific namespace, leave it empty for watching all.
+	// for watching specific namespace, leave it empty for watching all.
 	// this config is ignored when watching namespaces
+	Event     Event  `json:"event,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
 }
 
@@ -210,6 +217,7 @@ func (c *Config) Load() error {
 
 // CheckMissingResourceEnvvars will read the environment for equivalent config variables to set
 func (c *Config) CheckMissingResourceEnvvars() {
+
 	if !c.Resource.DaemonSet && os.Getenv("KW_DAEMONSET") == "true" {
 		c.Resource.DaemonSet = true
 	}
@@ -260,6 +268,112 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if (c.Handler.Slack.Token == "") && (os.Getenv("SLACK_TOKEN") != "") {
 		c.Handler.Slack.Token = os.Getenv("SLACK_TOKEN")
+	}
+}
+
+func (c *Config) UnmarshallConfig() {
+
+	// Resource Object Config add events under global scope
+	if c.Resource != (Resource{}) {
+		logrus.Info("Configuring Resources For Global Events")
+		if c.Resource.DaemonSet {
+			c.Event.Global = append(c.Event.Global, "demonset")
+		}
+		if c.Resource.ReplicaSet {
+			c.Event.Global = append(c.Event.Global, "replicaset")
+		}
+		if c.Resource.Namespace {
+			c.Event.Global = append(c.Event.Global, "namespace")
+		}
+		if c.Resource.Deployment {
+			c.Event.Global = append(c.Event.Global, "deployment")
+		}
+		if c.Resource.Pod {
+			c.Event.Global = append(c.Event.Global, "pod")
+		}
+		if c.Resource.ReplicationController {
+			c.Event.Global = append(c.Event.Global, "replicationcontroller")
+		}
+		if c.Resource.Services {
+			c.Event.Global = append(c.Event.Global, "service")
+		}
+		if c.Resource.Job {
+			c.Event.Global = append(c.Event.Global, "job")
+		}
+		if c.Resource.PersistentVolume {
+			c.Event.Global = append(c.Event.Global, "persistentvolume")
+		}
+		if c.Resource.Secret {
+			c.Event.Global = append(c.Event.Global, "secret")
+		}
+		if c.Resource.ConfigMap {
+			c.Event.Global = append(c.Event.Global, "configmap")
+		}
+		if c.Resource.Ingress {
+			c.Event.Global = append(c.Event.Global, "ingress")
+		}
+	} else {
+		// Configured using Events Config
+		logrus.Info("Configuring Resources Based on Events Config")
+		c.configureEvents(c.Event.Global)
+		c.configureEvents(c.Event.Create)
+		c.configureEvents(c.Event.Update)
+		c.configureEvents(c.Event.Delete)
+	}
+}
+
+func (c *Config) configureEvents(s []string) {
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case "deployment":
+			{
+				c.Resource.Deployment = true
+			}
+		case "replicationcontroller":
+			{
+				c.Resource.ReplicationController = true
+			}
+		case "replicaset":
+			{
+				c.Resource.ReplicaSet = true
+			}
+		case "daemonset":
+			{
+				c.Resource.DaemonSet = true
+			}
+		case "services":
+			{
+				c.Resource.Services = true
+			}
+		case "pod":
+			{
+				c.Resource.Pod = true
+			}
+		case "job":
+			{
+				c.Resource.Job = true
+			}
+		case "persistentvolume":
+			{
+				c.Resource.PersistentVolume = true
+			}
+		case "namespace":
+			{
+				c.Resource.Namespace = true
+			}
+		case "secret":
+			{
+				c.Resource.Secret = true
+			}
+		case "configmap":
+			{
+				c.Resource.ConfigMap = true
+			}
+		case "ingress":
+			{
+				c.Resource.Ingress = true
+			}
+		}
 	}
 }
 

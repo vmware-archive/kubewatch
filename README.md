@@ -116,7 +116,7 @@ Once the Pod is running, you will start seeing Kubernetes events in your configu
 
 To modify what notifications you get, update the `kubewatch` ConfigMap and turn on and off (true/false) resources:
 
-```
+```yaml
 resource:
   deployment: false
   replicationcontroller: false
@@ -303,7 +303,7 @@ Testing Handler configs from .kubewatch.yaml
 
 ## Viewing config
 To view the entire config file `$HOME/.kubewatch.yaml` use the following command.
-```
+```yaml
 $ kubewatch config view
 Contents of .kubewatch.yaml
 
@@ -323,6 +323,8 @@ handler:
     url: ""
   webhook:
     url: ""
+
+# Resource Config Section for generic alerting
 resource:
   deployment: false
   replicationcontroller: false
@@ -339,6 +341,19 @@ resource:
   secret: false
   configmap: false
   ingress: false
+
+# Events Config Section for granular alerting
+event:
+    global:
+     - pod
+     - deployment
+    create:
+     - service
+    update:
+
+    delete:
+     - job
+     - service
 namespace: ""
 
 ```
@@ -422,6 +437,31 @@ $ kubewatch resource add --rc --po --svc
 
 # rc, po and svc will be stopped from being watched
 $ kubewatch resource remove --rc --po --svc
+```
+
+## Events
+
+Event config section in `.kubewatch.yaml` file can be used for granular alerting.
+
+```yaml
+handler:
+  slack:
+    token: xoxb-xxxxx-yyyyyyy
+    channel: kube-watch-test
+
+event:
+    global:                       # global alerts for all events
+     - pod
+     - deployment
+    create:                       # create alerts for resource object creation
+     - service
+    update:                       # update alerts for resource object updation
+     - 
+    delete:                       # delete alerts for resource object deletion
+     - job
+     - service
+
+namespace: ""
 ```
 
 # Build

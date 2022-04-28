@@ -50,6 +50,12 @@ const maxRetries = 5
 
 var serverStartTime time.Time
 
+// Maps for holding events config 
+var global map[string]uint8
+var create map[string]uint8
+var delete map[string]uint8
+var update map[string]uint8
+
 // Event indicate the informerEvent
 type Event struct {
 	key          string
@@ -69,6 +75,10 @@ type Controller struct {
 
 // Start prepares watchers and run their controllers, then waits for process termination signals
 func Start(conf *config.Config, eventHandler handlers.Handler) {
+
+	// loads events config into memory for granular alerting
+	loadEventConfig(conf)
+
 	var kubeClient kubernetes.Interface
 
 	if _, err := rest.InClusterConfig(); err != nil {
@@ -695,4 +705,40 @@ func (c *Controller) processItem(newEvent Event) error {
 		return nil
 	}
 	return nil
+}
+
+// loadEventConfig loads event list from Event config for granular alerting
+func loadEventConfig(c *config.Config) {
+
+	// Load Global events
+	if len(c.Event.Global) > 0 {
+		global = make(map[string]uint8)
+		for _, r := range c.Event.Global {
+			global[r] = 0
+		}
+	}
+
+	// Load Create events
+	if len(c.Event.Create) > 0 {
+		create = make(map[string]uint8)
+		for _, r := range c.Event.Create {
+			create[r] = 0
+		}
+	}
+
+	// Load Update events
+	if len(c.Event.Update) > 0 {
+		update = make(map[string]uint8)
+		for _, r := range c.Event.Update {
+			update[r] = 0
+		}
+	}
+
+	// Load Delete events
+	if len(c.Event.Delete) > 0 {
+		delete = make(map[string]uint8)
+		for _, r := range c.Event.Delete {
+			delete[r] = 0
+		}
+	}
 }

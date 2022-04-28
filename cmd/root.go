@@ -54,6 +54,7 @@ supported webhooks:
 			logrus.Fatal(err)
 		}
 		config.CheckMissingResourceEnvvars()
+		config.UnmarshallConfig()
 		c.Run(config)
 	},
 }
