@@ -4,7 +4,7 @@ metadata:
   name: kubewatch
 data:
   .kubewatch.yaml: |
-    namespace: ""
+    namespace: []
     handler:
       slack:
         token: <token>

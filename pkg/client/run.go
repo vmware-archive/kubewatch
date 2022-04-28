@@ -18,6 +18,9 @@ package client
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/controller"
@@ -35,7 +38,21 @@ import (
 func Run(conf *config.Config) {
 
 	var eventHandler = ParseEventHandler(conf)
-	controller.Start(conf, eventHandler)
+	// Setting an empty namespace value in case config is empty
+	// If no specific namespace is defined cluster scope is taken
+	if len(conf.Namespace) == 0 {
+		conf.Namespace = append(conf.Namespace, "")
+	}
+	// Create a controler
+	go controller.StartClusterScope(conf, eventHandler)
+	// For each namespace in array create a controller
+	for _, ns := range conf.Namespace {
+		go controller.StartNamespaceScope(conf, eventHandler, ns)
+	}
+	sigterm := make(chan os.Signal, 1)
+	signal.Notify(sigterm, syscall.SIGTERM)
+	signal.Notify(sigterm, syscall.SIGINT)
+	<-sigterm
 }
 
 // ParseEventHandler returns the respective handler object specified in the config file.

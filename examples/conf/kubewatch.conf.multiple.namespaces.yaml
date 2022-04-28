@@ -4,10 +4,13 @@ metadata:
   name: kubewatch
 data:
   .kubewatch.yaml: |
-    namespace: []
+    namespace:
+      - namespaceOne
+      - namespaceTwo
     handler:
-      msteams:
-        webhookurl: https://outlook.office.com/webhook/...
+      slack:
+        token: xxx
+        channel: xxx
     resource:
       namespace: false
       deployment: false
