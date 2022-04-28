@@ -282,6 +282,28 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		go c.Run(stopCh)
 	}
 
+	if conf.Resource.StatefulSet {
+		informer := cache.NewSharedIndexInformer(
+			&cache.ListWatch{
+				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					return kubeClient.AppsV1().StatefulSets(conf.Namespace).List(options)
+				},
+				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					return kubeClient.AppsV1().StatefulSets(conf.Namespace).Watch(options)
+				},
+			},
+			&apps_v1.StatefulSet{},
+			0, //Skip resync
+			cache.Indexers{},
+		)
+
+		c := newResourceController(kubeClient, eventHandler, informer, "statefulset")
+		stopCh := make(chan struct{})
+		defer close(stopCh)
+
+		go c.Run(stopCh)
+	}
+
 	if conf.Resource.Namespace {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{

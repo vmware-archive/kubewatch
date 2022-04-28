@@ -58,6 +58,8 @@ func New(obj interface{}, action string) Event {
 		kind = "daemon set"
 	case *apps_v1.Deployment:
 		kind = "deployment"
+	case *apps_v1.StatefulSet:
+		kind = "stateful set"
 	case *batch_v1.Job:
 		kind = "job"
 	case *api_v1.Namespace:
