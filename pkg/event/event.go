@@ -105,7 +105,7 @@ func New(obj interface{}, action string) Event {
 }
 
 // Message returns event message in standard format.
-// included as a part of event packege to enhance code resuablity across handlers.
+// included as a part of event package to enhance code reusability across handlers.
 func (e *Event) Message() (msg string) {
 	// using switch over if..else, since the format could vary based on the kind of the object in future.
 	switch e.Kind {
