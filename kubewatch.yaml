@@ -8,6 +8,9 @@ spec:
   - image: bitnami/kubewatch #using this image, its more stable and active
     imagePullPolicy: Always
     name: kubewatch
+    env:
+    - name: KW_CONFIG
+      value: /root
     volumeMounts:
     - name: config-volume
       mountPath: /root
