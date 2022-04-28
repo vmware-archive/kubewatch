@@ -48,21 +48,22 @@ type Handler struct {
 
 // Resource contains resource configuration
 type Resource struct {
-	Deployment            bool `json:"deployment"`
-	ReplicationController bool `json:"rc"`
-	ReplicaSet            bool `json:"rs"`
-	DaemonSet             bool `json:"ds"`
-	Services              bool `json:"svc"`
-	Pod                   bool `json:"po"`
-	Job                   bool `json:"job"`
-	Node                  bool `json:"node"`
-	ClusterRole           bool `json:"clusterrole"`
-	ServiceAccount        bool `json:"sa"`
-	PersistentVolume      bool `json:"pv"`
-	Namespace             bool `json:"ns"`
-	Secret                bool `json:"secret"`
-	ConfigMap             bool `json:"configmap"`
-	Ingress               bool `json:"ing"`
+	Deployment              bool `json:"deployment"`
+	ReplicationController   bool `json:"rc"`
+	ReplicaSet              bool `json:"rs"`
+	DaemonSet               bool `json:"ds"`
+	Services                bool `json:"svc"`
+	Pod                     bool `json:"po"`
+	Job                     bool `json:"job"`
+	Node                    bool `json:"node"`
+	ClusterRole             bool `json:"clusterrole"`
+	ServiceAccount          bool `json:"sa"`
+	PersistentVolume        bool `json:"pv"`
+	Namespace               bool `json:"ns"`
+	Secret                  bool `json:"secret"`
+	ConfigMap               bool `json:"configmap"`
+	Ingress                 bool `json:"ing"`
+	HorizontalPodAutoscaler bool `json:"hpa"`
 }
 
 // Config struct contains kubewatch configuration
@@ -254,6 +255,9 @@ func (c *Config) CheckMissingResourceEnvvars() {
 	}
 	if !c.Resource.ClusterRole && os.Getenv("KW_CLUSTER_ROLE") == "true" {
 		c.Resource.ClusterRole = true
+	}
+	if !c.Resource.HorizontalPodAutoscaler && os.Getenv("KW_HPA") == "true" {
+		c.Resource.HorizontalPodAutoscaler = true
 	}
 	if (c.Handler.Slack.Channel == "") && (os.Getenv("SLACK_CHANNEL") != "") {
 		c.Handler.Slack.Channel = os.Getenv("SLACK_CHANNEL")

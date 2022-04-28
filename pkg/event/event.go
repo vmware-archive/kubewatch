@@ -15,6 +15,7 @@ package event
 
 import (
 	"fmt"
+	v1 "k8s.io/api/autoscaling/v1"
 
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
 	apps_v1 "k8s.io/api/apps/v1"
@@ -86,6 +87,8 @@ func New(obj interface{}, action string) Event {
 		kind = "cluster role"
 	case *api_v1.ServiceAccount:
 		kind = "service account"
+	case *v1.HorizontalPodAutoscaler:
+		kind = "horizontal pod autoscaler"
 	case Event:
 		name = object.Name
 		kind = object.Kind
