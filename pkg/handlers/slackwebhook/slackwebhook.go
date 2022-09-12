@@ -121,7 +121,7 @@ func (m *SlackWebhook) Handle(e event.Event) {
 		return
 	}
 
-	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), string(webhookMessage))
+	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), webhookMessage)
 }
 
 func checkMissingWebhookVars(s *SlackWebhook) error {

@@ -271,7 +271,7 @@ Use "kubewatch config [command] --help" for more information about a command.
 
 - Create a [slack app](https://api.slack.com/apps/new)
 
-- Enable Incoming Webhooks. (On "Settings" page.)
+- Enable [Incoming Webhooks](https://api.slack.com/messaging/webhooks#enable_webhooks). (On "Settings" page.)
 
 - Create an incoming webhook URL (Add New Webhook to Workspace on "Settings" page.)
 
@@ -281,7 +281,7 @@ Use "kubewatch config [command] --help" for more information about a command.
 - Add slack webhook url to kubewatch config using the following steps
 
   ```console
-  $ kubewatch config add slackwebhookurl --username <slack_username> --token <slack_token> -emoji <slack_emoji> --slackwebhookurl <slack_webhook_url>
+  $ kubewatch config add slackwebhookurl --username <slack_username> --emoji <slack_emoji> --channel <slack_channel> --slackwebhookurl <slack_webhook_url>
   ```
   Or, you have an altenative choice to set your SLACK channel, username, emoji and webhook URL via environment variables:
 

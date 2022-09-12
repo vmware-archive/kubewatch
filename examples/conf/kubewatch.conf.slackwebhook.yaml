@@ -1,0 +1,22 @@
+handler:
+  slackwebhook:
+    channel: ""
+    username: ""
+    emoji: ""
+    slackwebhookurl: ""
+resource:
+  clusterrole: false
+  configmap: false
+  daemonset: false
+  deployment: true
+  ingress: false
+  job: false
+  namespace: false
+  node: false
+  persistentvolume: false
+  pod: true
+  replicaset: false
+  replicationcontroller: false
+  secret: false
+  serviceaccount: false
+  services: true

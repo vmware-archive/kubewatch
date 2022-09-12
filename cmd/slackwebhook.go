@@ -56,8 +56,6 @@ var slackwebhookConfigCmd = &cobra.Command{
 			if len(emoji) > 0 {
 				conf.Handler.SlackWebhook.Emoji = emoji
 			}
-		} else {
-			//logrus.Fatal(err)
 		}
 
 		slackwebhookurl, err := cmd.Flags().GetString("slackwebhookurl")
