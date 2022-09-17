@@ -1,11 +1,6 @@
-## WARNING: Kubewatch is no longer actively maintained by VMware.
+**This is a Robusta fork of Bitnami's [Kubewatch](https://github.com/bitnami-labs/kubewatch/) project**. The original repository is no longer maintained. Ideally we'd like to get our changes upstream, but for now we'll be maintaining this repository as a blessed Robusta fork of Kubewatch. Please feel free to open PRs for this repo and we'll review them. If anyone from Bitnami is reading this, please reach out! We'd love to get this all merged upstream.
 
-This is a **Blast Motion** fork of Bitnami's Kubewatch project. The original repository is no longer actively maintained. If anyone from Bitnami or Robusta is reading this, please reach out! I'd love to get our stuff all merged upstream.  
-
-From Original README:  
-VMware has made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. The project will be externally maintained in the following fork: https://github.com/robusta-dev/kubewatch
-
-Thank You.
+**Kubewatch is used by Robusta to power higher-level usecases like [multi-cluster change tracking and auditing](https://home.robusta.dev/audit-and-change-tracking/) as well as [event-driven automations](https://home.robusta.dev).**
 
 <p align="center">
   <img src="./docs/kubewatch-logo.jpeg">
