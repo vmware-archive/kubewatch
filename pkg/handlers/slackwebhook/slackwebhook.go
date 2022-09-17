@@ -41,7 +41,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"time"
 
 	"github.com/slack-go/slack"
@@ -112,7 +111,7 @@ func (m *SlackWebhook) Handle(e event.Event) {
 		IconEmoji: m.Emoji,
 	}
 
-	log.Printf("slackwebhook-handle():Slackwebhook WebHookMessage: %s", webhookMessage)
+	log.Printf("slackwebhook-handle():Slackwebhook WebHookMessage: %s", webhookMessage.Text)
 
 	err := slack.PostWebhook(m.Slackwebhookurl, &webhookMessage)
 
@@ -121,7 +120,7 @@ func (m *SlackWebhook) Handle(e event.Event) {
 		return
 	}
 
-	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), webhookMessage)
+	log.Printf("Message successfully sent to %s at %s. Message: %s", m.Slackwebhookurl, time.Now(), webhookMessage.Text)
 }
 
 func checkMissingWebhookVars(s *SlackWebhook) error {
