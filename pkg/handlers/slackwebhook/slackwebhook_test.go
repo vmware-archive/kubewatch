@@ -32,23 +32,22 @@ import (
 
 func TestWebhookInit(t *testing.T) {
 	s := &SlackWebhook{}
-	expectedError := fmt.Errorf(webhookErrMsg, "Missing Slack Webhook channel, username or url")
 
 	var Tests = []struct {
 		slackwebhook config.SlackWebhook
 		err          error
 	}{
-		{config.Slack{Channel: "foo", Username: "bar", Slackwebhookurl: "you"}, expectedError},
-		{config.Slack{Channel: "foo"}, expectedError},
-		{config.Slack{Username: "bar"}, expectedError},
-		{config.Slack{Emoji: ":kubernetes:"}, expectedError},
-		{config.SlackWebhook{Slackwebhookurl: "you"}, nil},
-		{config.SlackWebhook{}, expectedError},
+		{config.SlackWebhook{Channel: "foo", Username: "bar", Slackwebhookurl: "you"}, nil},
+		{config.SlackWebhook{Channel: "foo"}, fmt.Errorf(webhookErrMsg, "Missing Slack Webhook Username")},
+		{config.SlackWebhook{Username: "bar"}, fmt.Errorf(webhookErrMsg, "Missing Slack Webhook Channel")},
+		{config.SlackWebhook{Emoji: ":kubernetes:"}, fmt.Errorf(webhookErrMsg, "Missing Slack Webhook Channel")},
+		{config.SlackWebhook{Slackwebhookurl: "you"}, fmt.Errorf(webhookErrMsg, "Missing Slack Webhook Channel")},
+		{config.SlackWebhook{}, fmt.Errorf(webhookErrMsg, "Missing Slack Webhook Channel")},
 	}
 
 	for _, tt := range Tests {
 		c := &config.Config{}
-		c.Handler.SlackWebhook = tt.webhook
+		c.Handler.SlackWebhook = tt.slackwebhook
 		if err := s.Init(c); !reflect.DeepEqual(err, tt.err) {
 			t.Fatalf("Init(): %v", err)
 		}
