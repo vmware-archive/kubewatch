@@ -28,6 +28,7 @@ supported webhooks:
  - mattermost
  - flock
  - webhook
+ - cloudevent
  - smtp
 
 Usage:
@@ -387,6 +388,8 @@ handler:
   flock:
     url: ""
   webhook:
+    url: ""
+  cloudevent:
     url: ""
 resource:
   deployment: false
