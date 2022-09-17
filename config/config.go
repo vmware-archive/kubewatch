@@ -43,6 +43,7 @@ type Handler struct {
 	Mattermost   Mattermost   `json:"mattermost"`
 	Flock        Flock        `json:"flock"`
 	Webhook      Webhook      `json:"webhook"`
+	CloudEvent   CloudEvent   `json:"cloudevent"`
 	MSTeams      MSTeams      `json:"msteams"`
 	SMTP         SMTP         `json:"smtp"`
 }
@@ -53,6 +54,7 @@ type Resource struct {
 	ReplicationController bool `json:"rc"`
 	ReplicaSet            bool `json:"rs"`
 	DaemonSet             bool `json:"ds"`
+	StatefulSet           bool `json:"statefulset"`
 	Services              bool `json:"svc"`
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
@@ -64,6 +66,7 @@ type Resource struct {
 	Secret                bool `json:"secret"`
 	ConfigMap             bool `json:"configmap"`
 	Ingress               bool `json:"ing"`
+	HPA                   bool `json:"hpa"`
 }
 
 // Config struct contains kubewatch configuration
@@ -129,6 +132,13 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	// Webhook URL.
+	Url     string `json:"url"`
+	Cert    string `json:"cert"`
+	TlsSkip bool   `json:"tlsskip"`
+}
+
+// CloudEvent contains CloudEvent configuration
+type CloudEvent struct {
 	Url string `json:"url"`
 }
 
