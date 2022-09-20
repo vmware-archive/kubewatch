@@ -1,8 +1,6 @@
-## WARNING: Kubewatch is no longer actively maintained by VMware.
+**This is a Robusta fork of Bitnami's [Kubewatch](https://github.com/bitnami-labs/kubewatch/) project**. The original repository is no longer maintained. Ideally we'd like to get our changes upstream, but for now we'll be maintaining this repository as a blessed Robusta fork of Kubewatch. Please feel free to open PRs for this repo and we'll review them. If anyone from Bitnami is reading this, please reach out! We'd love to get this all merged upstream.
 
-VMware has made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. The project will be externally maintained in the following fork: https://github.com/robusta-dev/kubewatch
-
-Thank You.
+**Kubewatch is used by Robusta to power higher-level usecases like [multi-cluster change tracking and auditing](https://home.robusta.dev/audit-and-change-tracking/) as well as [event-driven automations](https://home.robusta.dev).**
 
 <p align="center">
   <img src="./docs/kubewatch-logo.jpeg">
@@ -25,10 +23,12 @@ for resource changes and notifies them through webhooks.
 
 supported webhooks:
  - slack
+ - slackwebhook
  - hipchat
  - mattermost
  - flock
  - webhook
+ - cloudevent
  - smtp
 
 Usage:
@@ -263,6 +263,72 @@ Use "kubewatch config [command] --help" for more information about a command.
   $ export KW_SLACK_CHANNEL='#channel_name'
   ```
 
+### slackwebhookurl:
+
+- Create a [slack app](https://api.slack.com/apps/new)
+
+- Enable [Incoming Webhooks](https://api.slack.com/messaging/webhooks#enable_webhooks). (On "Settings" page.)
+
+- Create an incoming webhook URL (Add New Webhook to Workspace on "Settings" page.)
+
+- Pick a channel that the app will post to, and then click to Authorize your app. You will get back your webhook URL.  
+  The Slack Webhook URL will look like: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+
+- Add slack webhook url to kubewatch config using the following steps
+
+  ```console
+  $ kubewatch config add slackwebhookurl --username <slack_username> --emoji <slack_emoji> --channel <slack_channel> --slackwebhookurl <slack_webhook_url>
+  ```
+  Or, you have an altenative choice to set your SLACK channel, username, emoji and webhook URL via environment variables:
+
+  ```console
+  $ export KW_SLACK_CHANNEL=slack_channel
+  $ export KW_SLACK_USERNAME=slack_username
+  $ export KW_SLACK_EMOJI=slack_emoji
+  $ export KW_SLACK_WEBHOOK_URL=slack_webhook_url
+  ```
+  
+ - Example apply done in a bash script:  
+  
+ ```console
+ $ cat kubewatch-configmap-slackwebhook.yaml | sed "s|<slackchannel>|"\"$SlackChannel"\"|g;s|<slackusername>|"\"$SlackUsesrName"\"|g;s|<slackemoji>|"\"$SlackEmoji"\"|g;s|<SlackWebhookUrl>|"\"$WebhookUrl"\"|g" | kubectl create -f -
+ ```
+ 
+ - An example kubewatch-configmap-slackwebhook.yaml YAML File:  
+  
+ ```yaml
+ apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubewatch
+data:
+  .kubewatch.yaml: |
+    namespace: ""
+    handler:
+      slackwebhook:
+        enabled: true
+        channel: <slackchannel>
+        username: <slackusername>
+        emoji: <slackemoji>
+        slackwebhookurl: <SlackWebhookUrl>
+    resource:
+      clusterrole: false
+      configmap: false
+      daemonset: false
+      deployment: true
+      ingress: false
+      job: false
+      namespace: false
+      node: false
+      persistentvolume: false
+      pod: true
+      replicaset: false
+      replicationcontroller: false
+      secret: false
+      serviceaccount: false
+      services: true
+    ```
+
 ### flock:
 
 - Create a [flock bot](https://docs.flock.com/display/flockos/Bots).
@@ -322,6 +388,8 @@ handler:
   flock:
     url: ""
   webhook:
+    url: ""
+  cloudevent:
     url: ""
 resource:
   deployment: false

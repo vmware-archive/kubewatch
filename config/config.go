@@ -37,13 +37,15 @@ var (
 
 // Handler contains handler configuration
 type Handler struct {
-	Slack      Slack      `json:"slack"`
-	Hipchat    Hipchat    `json:"hipchat"`
-	Mattermost Mattermost `json:"mattermost"`
-	Flock      Flock      `json:"flock"`
-	Webhook    Webhook    `json:"webhook"`
-	MSTeams    MSTeams    `json:"msteams"`
-	SMTP       SMTP       `json:"smtp"`
+	Slack        Slack        `json:"slack"`
+	SlackWebhook SlackWebhook `json:"slackwebhook"`
+	Hipchat      Hipchat      `json:"hipchat"`
+	Mattermost   Mattermost   `json:"mattermost"`
+	Flock        Flock        `json:"flock"`
+	Webhook      Webhook      `json:"webhook"`
+	CloudEvent   CloudEvent   `json:"cloudevent"`
+	MSTeams      MSTeams      `json:"msteams"`
+	SMTP         SMTP         `json:"smtp"`
 }
 
 // Resource contains resource configuration
@@ -52,6 +54,7 @@ type Resource struct {
 	ReplicationController bool `json:"rc"`
 	ReplicaSet            bool `json:"rs"`
 	DaemonSet             bool `json:"ds"`
+	StatefulSet           bool `json:"statefulset"`
 	Services              bool `json:"svc"`
 	Pod                   bool `json:"po"`
 	Job                   bool `json:"job"`
@@ -63,6 +66,7 @@ type Resource struct {
 	Secret                bool `json:"secret"`
 	ConfigMap             bool `json:"configmap"`
 	Ingress               bool `json:"ing"`
+	HPA                   bool `json:"hpa"`
 }
 
 // Config struct contains kubewatch configuration
@@ -88,6 +92,18 @@ type Slack struct {
 	Channel string `json:"channel"`
 	// Title of the message.
 	Title string `json:"title"`
+}
+
+// SlackWebhook contains slack configuration
+type SlackWebhook struct {
+	// Slack channel.
+	Channel string `json:"channel"`
+	// Slack Username.
+	Username string `json:"username"`
+	// Slack Emoji.
+	Emoji string `json:"emoji"`
+	// Slack Webhook Url.
+	Slackwebhookurl string `json:"slackwebhookurl"`
 }
 
 // Hipchat contains hipchat configuration
@@ -116,6 +132,13 @@ type Flock struct {
 // Webhook contains webhook configuration
 type Webhook struct {
 	// Webhook URL.
+	Url     string `json:"url"`
+	Cert    string `json:"cert"`
+	TlsSkip bool   `json:"tlsskip"`
+}
+
+// CloudEvent contains CloudEvent configuration
+type CloudEvent struct {
 	Url string `json:"url"`
 }
 

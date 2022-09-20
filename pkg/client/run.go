@@ -27,6 +27,7 @@ import (
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/mattermost"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/msteam"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/slack"
+	"github.com/bitnami-labs/kubewatch/pkg/handlers/slackwebhook"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/smtp"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers/webhook"
 )
@@ -45,6 +46,8 @@ func ParseEventHandler(conf *config.Config) handlers.Handler {
 	switch {
 	case len(conf.Handler.Slack.Channel) > 0 || len(conf.Handler.Slack.Token) > 0:
 		eventHandler = new(slack.Slack)
+	case len(conf.Handler.SlackWebhook.Channel) > 0 || len(conf.Handler.SlackWebhook.Username) > 0 || len(conf.Handler.SlackWebhook.Slackwebhookurl) > 0:
+		eventHandler = new(slackwebhook.SlackWebhook)
 	case len(conf.Handler.Hipchat.Room) > 0 || len(conf.Handler.Hipchat.Token) > 0:
 		eventHandler = new(hipchat.Hipchat)
 	case len(conf.Handler.Mattermost.Channel) > 0 || len(conf.Handler.Mattermost.Url) > 0:
